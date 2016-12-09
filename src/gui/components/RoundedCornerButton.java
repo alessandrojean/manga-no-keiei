@@ -1,7 +1,9 @@
 package gui.components;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -27,7 +29,7 @@ public class RoundedCornerButton extends JButton implements MouseListener
 	private int borderRadius = 8;
 
 	private Color previous;
-
+	
 	public RoundedCornerButton()
 	{
 		setBackground(DEFAULT_COLOR);
@@ -38,6 +40,18 @@ public class RoundedCornerButton extends JButton implements MouseListener
 		setCursor(new Cursor(Cursor.HAND_CURSOR));
 		setBorderPainted(false);
 		addMouseListener(this);
+	}
+	
+	@Override
+	public Dimension getMinimumSize()
+	{
+		return new Dimension(40, 40);
+	}
+	
+	@Override
+	public Dimension getPreferredSize()
+	{
+		return new Dimension(40, 40);
 	}
 
 	public boolean isPressed()

@@ -1,5 +1,8 @@
 /.classpath
 /bin/
 /.project
+/.settings/
 /config.properties
 /databases/
+*.jar
+*.zip
