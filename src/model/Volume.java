@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.util.Date;
 
 public class Volume
@@ -26,6 +27,8 @@ public class Volume
 	private String observations;
 
 	private Manga manga;
+	
+	private File poster;
 
 	public Volume()
 	{
@@ -240,6 +243,16 @@ public class Volume
 	public void setManga(Manga manga)
 	{
 		this.manga = manga;
+	}
+
+	public File getPoster()
+	{
+		return poster;
+	}
+
+	public void setPoster(File poster)
+	{
+		this.poster = poster;
 	}
 
 	@Override

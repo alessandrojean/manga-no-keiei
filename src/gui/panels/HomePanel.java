@@ -33,8 +33,7 @@ public class HomePanel extends JPanel
 
 		RoundedCornerButton buttonNewManga = new RoundedCornerButton();
 		buttonNewManga.setIcon(new ImageIcon(getClass().getResource("/images/new_book.png")));
-		buttonNewManga.setBackground(ColorUtils.HexToRGB("#FF5722"));
-		buttonNewManga.setHover(ColorUtils.HexToRGB("#E64A19"));
+		buttonNewManga.setColors(ColorUtils.HexToRGB("#FF5722"), ColorUtils.HexToRGB("#E64A19"));
 		buttonNewManga.setBounds(30, 103, 64, 64);
 		buttonNewManga.addActionListener(new ActionListener() {
 
@@ -64,8 +63,7 @@ public class HomePanel extends JPanel
 
 		RoundedCornerButton buttonNewVolume = new RoundedCornerButton();
 		buttonNewVolume.setIcon(new ImageIcon(getClass().getResource("/images/add.png")));
-		buttonNewVolume.setBackground(ColorUtils.HexToRGB("#009688"));
-		buttonNewVolume.setHover(ColorUtils.HexToRGB("#00796B"));
+		buttonNewVolume.setColors(ColorUtils.HexToRGB("#009688"),ColorUtils.HexToRGB("#00796B"));
 		buttonNewVolume.setBounds(100, 103, 64, 64);
 		buttonNewVolume.addActionListener(new ActionListener() {
 
@@ -76,7 +74,7 @@ public class HomePanel extends JPanel
 				Manga m = null;
 				try (MangaDAO lMangaDAO = Main.DATABASE.getMangaDAO())
 				{
-					m = lMangaDAO.select(2);
+					m = lMangaDAO.select(3);
 				}
 				catch (SQLException e)
 				{
@@ -91,7 +89,7 @@ public class HomePanel extends JPanel
 
 					try (VolumeDAO lVolumeDAO = Main.DATABASE.getVolumeDAO())
 					{
-						boolean inserted = lVolumeDAO.remove(lVolumeDialog.getResult());
+						boolean inserted = lVolumeDAO.insert(lVolumeDialog.getResult());
 						JOptionPane.showMessageDialog(null, String.valueOf(inserted));
 					}
 					catch (SQLException e)
@@ -107,8 +105,7 @@ public class HomePanel extends JPanel
 
 		RoundedCornerButton buttonNewPublisher = new RoundedCornerButton();
 		buttonNewPublisher.setIcon(new ImageIcon(getClass().getResource("/images/domain.png")));
-		buttonNewPublisher.setHover(ColorUtils.HexToRGB("#AFB42B"));
-		buttonNewPublisher.setBackground(ColorUtils.HexToRGB("#CDDC39"));
+		buttonNewPublisher.setColors(ColorUtils.HexToRGB("#CDDC39"), ColorUtils.HexToRGB("#AFB42B"));
 		buttonNewPublisher.setBounds(170, 103, 64, 64);
 		buttonNewPublisher.addActionListener(new ActionListener() {
 

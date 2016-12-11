@@ -1,5 +1,7 @@
 package model;
 
+import java.io.File;
+
 public class Publisher
 {
 	private int id;
@@ -7,6 +9,8 @@ public class Publisher
 	private String site;
 	private String history;
 	private boolean favorite;
+	
+	private File logo;
 
 	public Publisher()
 	{
@@ -67,6 +71,16 @@ public class Publisher
 	public void setFavorite(boolean favorite)
 	{
 		this.favorite = favorite;
+	}
+
+	public File getLogo()
+	{
+		return logo;
+	}
+
+	public void setLogo(File logo)
+	{
+		this.logo = logo;
 	}
 
 	@Override

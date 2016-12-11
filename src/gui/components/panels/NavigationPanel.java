@@ -1,11 +1,15 @@
 package gui.components.panels;
 
+import gui.Main;
 import gui.components.RoundedCornerButton;
+import gui.panels.Panels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -19,6 +23,10 @@ public class NavigationPanel extends JPanel
 	
 	private static final Dimension BUTTON_SIZE = new Dimension(40,40);
 	private static final Dimension GAP_SIZE = new Dimension(0,5);
+	private RoundedCornerButton buttonHome;
+	private RoundedCornerButton buttonList;
+	private RoundedCornerButton buttonSettings;
+	private RoundedCornerButton buttonHelp;
 	
 	public NavigationPanel(Color backgroundColor)
 	{
@@ -30,23 +38,55 @@ public class NavigationPanel extends JPanel
 		JLabel lbLogo = new JLabel(new ImageIcon(getClass().getResource("/images/navigation_logo.png")));
 		add(lbLogo, BorderLayout.NORTH);
 		
-		RoundedCornerButton buttonHome = new RoundedCornerButton();
+		buttonHome = new RoundedCornerButton();
 		buttonHome.setIcon(new ImageIcon(getClass().getResource("/images/home.png")));
-		buttonHome.setBackground(ColorUtils.HexToRGB("#2196F3"));
-		buttonHome.setHover(ColorUtils.HexToRGB("#1976D2"));
+		buttonHome.setColors(ColorUtils.HexToRGB("#2196F3"), ColorUtils.HexToRGB("#1976D2"));
 		buttonHome.setPressed(true);
 		buttonHome.setToolTipText("Início");
 		buttonHome.setAlignmentX(CENTER_ALIGNMENT);
 		buttonHome.setMaximumSize(BUTTON_SIZE);
+		buttonHome.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				buttonHome.setPressed(true);
+				buttonList.setPressed(false);
+				buttonSettings.setPressed(false);
+				buttonHelp.setPressed(false);
+				Main.showPanel(Panels.HOME);
+			}
+		});
 		box.add(buttonHome);
+		
+		box.add(Box.createRigidArea(GAP_SIZE));
+		
+		buttonList = new RoundedCornerButton();
+		buttonList.setIcon(new ImageIcon(getClass().getResource("/images/list.png")));
+		buttonList.setColors(ColorUtils.HexToRGB("#2196F3"), ColorUtils.HexToRGB("#1976D2"));
+		buttonList.setToolTipText("Lista");
+		buttonList.setAlignmentX(CENTER_ALIGNMENT);
+		buttonList.setMaximumSize(BUTTON_SIZE);
+		buttonList.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				buttonHome.setPressed(false);
+				buttonList.setPressed(true);
+				buttonSettings.setPressed(false);
+				buttonHelp.setPressed(false);
+				Main.showPanel(Panels.MANGAS_LIST);
+			}
+		});
+		box.add(buttonList);
 		
 		Component verticalGlue = Box.createVerticalGlue();
 		box.add(verticalGlue);
 		
-		RoundedCornerButton buttonSettings = new RoundedCornerButton();
+		buttonSettings = new RoundedCornerButton();
 		buttonSettings.setIcon(new ImageIcon(getClass().getResource("/images/settings.png")));
-		buttonSettings.setBackground(ColorUtils.HexToRGB("#2196F3"));
-		buttonSettings.setHover(ColorUtils.HexToRGB("#1976D2"));
+		buttonSettings.setColors(ColorUtils.HexToRGB("#2196F3"), ColorUtils.HexToRGB("#1976D2"));
 		buttonSettings.setToolTipText("Configurações");
 		buttonSettings.setAlignmentX(CENTER_ALIGNMENT);
 		buttonSettings.setMaximumSize(BUTTON_SIZE);
@@ -54,10 +94,9 @@ public class NavigationPanel extends JPanel
 		
 		box.add(Box.createRigidArea(GAP_SIZE));
 		
-		RoundedCornerButton buttonHelp = new RoundedCornerButton();
+		buttonHelp = new RoundedCornerButton();
 		buttonHelp.setIcon(new ImageIcon(getClass().getResource("/images/help.png")));
-		buttonHelp.setBackground(ColorUtils.HexToRGB("#2196F3"));
-		buttonHelp.setHover(ColorUtils.HexToRGB("#1976D2"));
+		buttonHelp.setColors(ColorUtils.HexToRGB("#2196F3"), ColorUtils.HexToRGB("#1976D2"));
 		buttonHelp.setToolTipText("Ajuda");
 		buttonHelp.setAlignmentX(CENTER_ALIGNMENT);
 		buttonHelp.setMaximumSize(BUTTON_SIZE);

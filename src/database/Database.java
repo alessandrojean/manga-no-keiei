@@ -14,7 +14,7 @@ public class Database
 {
 	public static final String CLASS_SQLITE = "org.sqlite.JDBC";
 	public static final String CONNECTION_URL_SQLITE = "jdbc:sqlite:%s";
-	public static final String DEFAULT_DATABASE_FOLDER = "databases";
+	public static final String DEFAULT_DATABASE_FOLDER = "databases" + File.separator + System.getProperty("user.name");
 	public static final String DEFAULT_FILE = DEFAULT_DATABASE_FOLDER + File.separator + System.getProperty("user.name") + ".mnk";
 
 	private static final String CREATE_TABLE_PUBLISHERS = "create table if not exists publishers(id_publisher integer primary key AUTOINCREMENT not null, name_publisher varchar(100) not null, site_publisher varchar(200) not null, history_publisher longtext, favorite_publisher tinyint(1) not null);";
@@ -73,7 +73,7 @@ public class Database
 	{
 		File folder = new File(DEFAULT_DATABASE_FOLDER);
 		if (!folder.exists())
-			folder.mkdir();
+			folder.mkdirs();
 
 		Connection connection = null;
 		try

@@ -51,6 +51,7 @@ public class VolumeDialog extends Dialog<Volume>
 	private JTextField tfSubtitle;
 	private JTextField tfTotalPrice;
 	private JTextField tfPaidPrice;
+	private ImageSelector imgPoster;
 
 	private Manga manga;
 	private JComboBox<Publisher> cbPublisher;
@@ -138,9 +139,9 @@ public class VolumeDialog extends Dialog<Volume>
 		JLabel lbISBN = new JLabel("ISBN:");
 		informationPanel.add(lbISBN, "cell 3 0");
 
-		ImageSelector imageSelector = new ImageSelector();
+		imgPoster = new ImageSelector();
 		// imageSelector.setPreferredSize(new Dimension(220,450));
-		informationPanel.add(imageSelector, "cell 4 0 1 11,grow");
+		informationPanel.add(imgPoster, "cell 4 0 1 11,grow");
 
 		tfVolume = new JTextField();
 		informationPanel.add(tfVolume, "cell 0 1,growx,aligny top");
@@ -356,6 +357,7 @@ public class VolumeDialog extends Dialog<Volume>
 		chbProtectionPlastic.setSelected(false);
 		chbPlan.setSelected(false);
 		taObservations.setText("");
+		imgPoster.setImage(null);
 		tfVolume.requestFocus();
 	}
 
@@ -389,6 +391,7 @@ public class VolumeDialog extends Dialog<Volume>
 		result.setProtectionPlastic(chbProtectionPlastic.isSelected());
 		result.setPlan(chbPlan.isSelected());
 		result.setObservations(taObservations.getText());
+		result.setPoster(imgPoster.getImage());
 
 		return result;
 	}

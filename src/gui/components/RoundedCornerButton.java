@@ -24,11 +24,10 @@ public class RoundedCornerButton extends JButton implements MouseListener
 	private static final Color DEFAULT_COLOR = ColorUtils.HexToRGB("#9E9E9E");
 	private static final Color DEFAULT_HOVER_COLOR = ColorUtils.HexToRGB("#616161");
 
+	private Color back;
 	private Color hover;
 	private boolean pressed = false;
 	private int borderRadius = 8;
-
-	private Color previous;
 	
 	public RoundedCornerButton()
 	{
@@ -62,7 +61,7 @@ public class RoundedCornerButton extends JButton implements MouseListener
 	public void setPressed(boolean pressed)
 	{
 		this.pressed = pressed;
-		setBackground(pressed ? hover : getBackground());
+		setBackground(pressed ? hover : back);
 	}
 
 	public Color getHover()
@@ -73,6 +72,14 @@ public class RoundedCornerButton extends JButton implements MouseListener
 	public void setHover(Color hover)
 	{
 		this.hover = hover;
+	}
+	
+	public void setColors(Color back, Color hover)
+	{
+		this.back = back;
+		this.hover = hover;
+		
+		setBackground(pressed ? hover : back);
 	}
 
 	public int getBorderRadius()
@@ -110,14 +117,13 @@ public class RoundedCornerButton extends JButton implements MouseListener
 	@Override
 	public void mouseEntered(MouseEvent e)
 	{
-		previous = getBackground();
 		setBackground(hover);
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		setBackground(pressed ? hover : previous);
+		setBackground(pressed ? hover : back);
 	}
 
 	@Override

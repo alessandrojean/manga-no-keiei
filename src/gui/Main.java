@@ -2,6 +2,7 @@ package gui;
 
 import gui.components.panels.NavigationPanel;
 import gui.panels.HomePanel;
+import gui.panels.MangasPanel;
 import gui.panels.Panels;
 
 import java.awt.BorderLayout;
@@ -18,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import utils.ColorUtils;
 
@@ -30,7 +32,7 @@ public class Main extends JFrame
 
 	private JPanel contentPane;
 	private JPanel navigationPanel;
-	private JPanel cardPanel;
+	private static JPanel cardPanel;
 
 	public static final Database DATABASE = new Database();
 
@@ -70,6 +72,8 @@ public class Main extends JFrame
 		setBounds(0, 0, 1024, 768);
 		setMinimumSize(new Dimension(1024, 768));
 		setPreferredSize(new Dimension(1024, 768));
+		
+		
 
 		List<Image> icons = Arrays.asList(new ImageIcon(getClass().getResource("/images/logo_16.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_32.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_64.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_128.png")).getImage());
 
@@ -79,17 +83,23 @@ public class Main extends JFrame
 		contentPane.setLayout(new BorderLayout());
 
 		navigationPanel = new NavigationPanel(ColorUtils.HexToRGB("#2196F3"));
-		// navigationPanel.setBounds(0, 0, 50, 768);
 		contentPane.add(navigationPanel, BorderLayout.WEST);
 
 		cardPanel = new JPanel();
 		cardPanel.setBounds(50, 0, 1024 - 50, 768);
-		contentPane.add(cardPanel);
 		cardPanel.setLayout(new CardLayout(0, 0));
 		cardPanel.setBackground(Color.GREEN);
+		contentPane.add(cardPanel);
 
 		cardPanel.add(new HomePanel(), Panels.HOME);
+		cardPanel.add(new MangasPanel(), Panels.MANGAS_LIST);
 
 		setLocationRelativeTo(null);
+	}
+	
+	public static void showPanel(String panel)
+	{
+		CardLayout lCardLayout = (CardLayout) cardPanel.getLayout();
+		lCardLayout.show(cardPanel, panel);
 	}
 }

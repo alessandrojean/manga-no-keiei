@@ -16,8 +16,8 @@ import com.bulenkov.darcula.ui.DarculaTextFieldUI;
 
 public class BorderUtils
 {
-	private static final Color DEFAULT_LINE_COLOR = new Color(117,117,117);
-	private static final Color DEFAULT_BACKGROUND_COLOR = new Color(70,96,132);
+	public static final Color DEFAULT_LINE_COLOR = new Color(117,117,117);
+	public static final Color DEFAULT_BACKGROUND_COLOR = new Color(70,96,132);
 	
 	public static Border createRoundedBorder()
 	{		

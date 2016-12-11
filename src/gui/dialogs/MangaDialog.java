@@ -52,6 +52,7 @@ public class MangaDialog extends Dialog<Manga>
 	private JFormattedTextField tfFinishDate;
 	private JTextField tfAuthors;
 	private JTextField tfStamp;
+	private ImageSelector imgPoster;
 
 	private JComboBox<String> cbType;
 	private JComboBox<String> cbEdition;
@@ -142,8 +143,8 @@ public class MangaDialog extends Dialog<Manga>
 		JLabel lbOriginalName = new JLabel("<html>Nome <i>(original)</i>:</html>");
 		informationPanel.add(lbOriginalName, "cell 2 0");
 		
-		ImageSelector imageSelector = new ImageSelector();
-		informationPanel.add(imageSelector, "cell 4 0 1 10,grow");
+		imgPoster = new ImageSelector();
+		informationPanel.add(imgPoster, "cell 4 0 1 10,grow");
 
 		tfNationalName = new JTextField();
 		// tfNationalName.putClientProperty("JTextField.variant", "search");
@@ -285,6 +286,7 @@ public class MangaDialog extends Dialog<Manga>
 		cbGenders.setSelectedItems(result.getGenders().split(";"));
 		lbsRating.setLevel(result.getRating());
 		taObservations.setText(result.getObservations());
+		imgPoster.setImage(result.getPoster());
 	}
 	
 	@Override
@@ -302,6 +304,7 @@ public class MangaDialog extends Dialog<Manga>
 		cbGenders.clearSelection();
 		lbsRating.setLevel(-1);
 		taObservations.setText("");
+		imgPoster.setImage(null);
 		tfNationalName.requestFocus();
 	}
 	
@@ -310,7 +313,10 @@ public class MangaDialog extends Dialog<Manga>
 	{
 		Manga result = new Manga();
 		if(this.result!=null)
+		{
 			result.setId(this.result.getId());
+			result.setVolumes(this.result.getVolumes());
+		}
 		result.setNationalName(tfNationalName.getText());
 		result.setOriginalName(tfOriginalName.getText());
 		result.setType(String.valueOf(cbType.getSelectedItem()));
@@ -323,6 +329,7 @@ public class MangaDialog extends Dialog<Manga>
 		result.setGenders(ComboBoxUtils.toString(cbGenders.getSelectedItems()));
 		result.setRating(lbsRating.getLevel());
 		result.setObservations(taObservations.getText());
+		result.setPoster(imgPoster.getImage());
 		
 		return result;
 	}

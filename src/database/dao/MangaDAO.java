@@ -12,6 +12,7 @@ import utils.DateUtils;
 import model.Manga;
 import model.Publisher;
 import database.DatabaseMethods;
+import database.ImageDatabase;
 
 public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 {
@@ -54,6 +55,7 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 				if (generatedKeys.next())
 				{
 					object.setId(generatedKeys.getInt(1));
+					ImageDatabase.insertImage(object);
 					return true;
 				}
 				else
@@ -89,6 +91,9 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 			lPreparedStatement.setInt(13, object.getId());
 			int i = lPreparedStatement.executeUpdate();
 
+			if(i>0)
+				ImageDatabase.insertImage(object);
+			
 			return i>0;
 		}
 		catch (SQLException e)
@@ -106,6 +111,9 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 			PreparedStatement lPreparedStatement = connection.prepareStatement(SQL_REMOVE);
 			lPreparedStatement.setInt(1, object.getId());
 			int i = lPreparedStatement.executeUpdate();
+			
+			if(i>0)
+				ImageDatabase.removeImage(object);
 
 			return i>0;
 		}
@@ -125,6 +133,8 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 			Statement lStatement = connection.createStatement();
 			ResultSet lResultSet = lStatement.executeQuery(SQL_SELECT_ALL);
 			
+			VolumeDAO lVolumeDAO = new VolumeDAO(connection);
+			
 			while (lResultSet.next())
 			{
 				Manga lManga = new Manga();
@@ -141,6 +151,8 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 				lManga.setGenders(lResultSet.getString("genders_manga"));
 				lManga.setRating(lResultSet.getInt("rating_manga"));
 				lManga.setObservations(lResultSet.getString("observations_manga"));
+				lManga.setPoster(ImageDatabase.selectImage(lManga));
+				lManga.setVolumes(lVolumeDAO.select(lManga));
 				
 				result.add(lManga);
 			}
@@ -182,6 +194,7 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 				result.setGenders(lResultSet.getString("genders_manga"));
 				result.setRating(lResultSet.getInt("rating_manga"));
 				result.setObservations(lResultSet.getString("observations_manga"));
+				result.setPoster(ImageDatabase.selectImage(result));
 			}
 
 			lResultSet.close();

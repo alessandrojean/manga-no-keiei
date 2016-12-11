@@ -124,7 +124,6 @@ public class ImageSelector extends JPanel implements MouseListener
 	{
 		if (image == null)
 		{			
-			LookAndFeelUtils.setSystemLookAndFeel();
 			JFileChooser lJFileChooser = new JFileChooser();
 			lJFileChooser.setFileFilter(new FileNameExtensionFilter("Imagens", ImageIO.getReaderFileSuffixes()));
 			if (lJFileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
@@ -135,7 +134,6 @@ public class ImageSelector extends JPanel implements MouseListener
 				setToolTipText("");
 				repaint();
 			}
-			LookAndFeelUtils.setDarculaLookAndFeel();
 		}
 	}
 
@@ -167,5 +165,12 @@ public class ImageSelector extends JPanel implements MouseListener
 	public void setImage(File image)
 	{
 		this.image = image;
+		repaint();
+		if(image!=null)
+		{
+			btRemove.setVisible(true);
+			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			setToolTipText("");
+		}
 	}
 }

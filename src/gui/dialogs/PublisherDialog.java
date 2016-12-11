@@ -49,6 +49,7 @@ public class PublisherDialog extends Dialog<Publisher>
 	private JTextField tfName;
 	private JTextField tfSite;
 	private JTextArea taHistory;
+	private ImageSelector imgLogo;
 
 	/**
 	 * Launch the application.
@@ -133,8 +134,8 @@ public class PublisherDialog extends Dialog<Publisher>
 		taHistory.setWrapStyleWord(true);
 		scrollPane.setViewportView(taHistory);
 		
-		ImageSelector imageSelector = new ImageSelector();
-		informationPanel.add(imageSelector, "cell 3 3,grow");
+		imgLogo = new ImageSelector();
+		informationPanel.add(imgLogo, "cell 3 3,grow");
 
 		JPanel buttonPanel = new JPanel();
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
@@ -192,6 +193,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		tfName.setText("");
 		tfSite.setText("");
 		taHistory.setText("");
+		imgLogo.setImage(null);
 		tfName.requestFocus();
 	}
 	
@@ -205,6 +207,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		result.setSite(tfSite.getText());
 		result.setHistory(taHistory.getText());
 		result.setFavorite(false);
+		result.setLogo(imgLogo.getImage());
 		
 		return result;
 	}

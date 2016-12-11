@@ -1,7 +1,10 @@
 package model;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+
+import javax.swing.ImageIcon;
 
 public class Manga
 {
@@ -18,6 +21,8 @@ public class Manga
 	private String genders;
 	private int rating;
 	private String observations;
+	
+	private File poster;
 
 	private List<Volume> volumes;
 
@@ -177,6 +182,16 @@ public class Manga
 	public void setVolumes(List<Volume> volumes)
 	{
 		this.volumes = volumes;
+	}
+
+	public File getPoster()
+	{
+		return poster;
+	}
+
+	public void setPoster(File poster)
+	{
+		this.poster = poster;
 	}
 
 	@Override
