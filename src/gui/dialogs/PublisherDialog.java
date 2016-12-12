@@ -185,6 +185,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		tfName.setText(result.getName());
 		tfSite.setText(result.getSite());
 		taHistory.setText(result.getHistory());
+		imgLogo.setImage(result.getLogo());
 	}
 	
 	@Override

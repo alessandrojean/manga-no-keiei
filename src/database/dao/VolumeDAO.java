@@ -25,6 +25,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 	private static final String SQL_SELECT_ALL = "select * from volumes, mangas where volumes.manga_volume=mangas.id_manga order by number_volume asc;";
 	private static final String SQL_SELECT_BY_ID = "select * from volumes, mangas where volumes.manga_volume=mangas.id_manga and volumes.id_volume=?;";
 	private static final String SQL_SELECT_BY_MANGA = "select * from volumes where manga_volume=? order by number_volume asc;";
+	private static final String SQL_SELECT_BY_PUBLISHER = "select * from volumes, mangas where volumes.manga_volume=mangas.id_manga and volumes.publisher_volume=?;";
 
 	public VolumeDAO(Connection connection)
 	{
@@ -308,6 +309,73 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 				lVolume.setObservations(lResultSet.getString("observations_volume"));
 				lVolume.setManga(manga);
 				lVolume.setPoster(ImageDatabase.selectImage(lVolume));
+				
+				result.add(lVolume);
+			}
+
+			lResultSet.close();
+			lPreparedStatement.close();		
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	public List<Volume> select(Publisher publisher)
+	{
+		List<Volume> result = new ArrayList<>();
+		try
+		{
+			PreparedStatement lPreparedStatement = connection.prepareStatement(SQL_SELECT_BY_PUBLISHER);
+			lPreparedStatement.setInt(1, publisher.getId());
+			ResultSet lResultSet = lPreparedStatement.executeQuery();
+			
+			while (lResultSet.next())
+			{
+				Volume lVolume = new Volume();
+				lVolume.setId(lResultSet.getInt("id_volume"));
+				lVolume.setNumber(lResultSet.getString("number_volume"));
+				lVolume.setChecklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")));
+				lVolume.setBarcode(lResultSet.getString("barcode_volume"));
+				lVolume.setIsbn(lResultSet.getString("isbn_volume"));
+				lVolume.setTitle(lResultSet.getString("title_volume"));
+				lVolume.setSubtitle(lResultSet.getString("subtitle_volume"));
+				lVolume.setPublisher(new Publisher(lResultSet.getInt("publisher_volume")));
+				lVolume.setTotalPrice(lResultSet.getDouble("total_price_volume"));
+				lVolume.setPaidPrice(lResultSet.getDouble("paid_price_volume"));
+				lVolume.setBelongsTo(lResultSet.getString("belongs_to_volume"));
+				lVolume.setPaper(lResultSet.getString("paper_volume"));
+				lVolume.setSize(lResultSet.getString("size_volume"));
+				lVolume.setGift(lResultSet.getString("gift_volume"));
+				lVolume.setAge(lResultSet.getString("age_volume"));
+				lVolume.setColorPages(lResultSet.getBoolean("color_pages_volume"));
+				lVolume.setOriginalPlastic(lResultSet.getBoolean("original_plastic_volume"));
+				lVolume.setProtectionPlastic(lResultSet.getBoolean("protection_plastic_volume"));
+				lVolume.setPlan(lResultSet.getBoolean("plan_volume"));
+				lVolume.setObservations(lResultSet.getString("observations_volume"));
+				lVolume.setPublisher(publisher);
+				lVolume.setPoster(ImageDatabase.selectImage(lVolume));
+				
+				Manga lManga = new Manga();
+				lManga.setId(lResultSet.getInt("id_manga"));
+				lManga.setNationalName(lResultSet.getString("national_name_manga"));
+				lManga.setOriginalName(lResultSet.getString("original_name_manga"));
+				lManga.setType(lResultSet.getString("type_manga"));
+				lManga.setSerialization(lResultSet.getString("serialization_manga"));
+				lManga.setStartDate(DateUtils.toDate(lResultSet.getString("start_date_manga")));
+				lManga.setFinishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")));
+				lManga.setAuthors(lResultSet.getString("authors_manga"));
+				lManga.setEdition(lResultSet.getString("edition_manga"));
+				lManga.setStamp(lResultSet.getString("stamp_manga"));
+				lManga.setGenders(lResultSet.getString("genders_manga"));
+				lManga.setRating(lResultSet.getInt("rating_manga"));
+				lManga.setObservations(lResultSet.getString("observations_manga"));
+				lManga.setPoster(ImageDatabase.selectImage(lManga));
+				
+				lVolume.setManga(lManga);
 				
 				result.add(lVolume);
 			}

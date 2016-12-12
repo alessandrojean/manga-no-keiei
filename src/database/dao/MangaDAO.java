@@ -177,6 +177,8 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 			lPreparedStatement.setInt(1, id);
 			ResultSet lResultSet = lPreparedStatement.executeQuery();
 			
+			VolumeDAO lVolumeDAO = new VolumeDAO(connection);
+			
 			Manga result = null;
 			if (lResultSet.next())
 			{
@@ -195,6 +197,7 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 				result.setRating(lResultSet.getInt("rating_manga"));
 				result.setObservations(lResultSet.getString("observations_manga"));
 				result.setPoster(ImageDatabase.selectImage(result));
+				result.setVolumes(lVolumeDAO.select(result));
 			}
 
 			lResultSet.close();

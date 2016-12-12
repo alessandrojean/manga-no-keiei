@@ -4,6 +4,7 @@ import gui.components.panels.NavigationPanel;
 import gui.panels.HomePanel;
 import gui.panels.MangasPanel;
 import gui.panels.Panels;
+import gui.panels.PublishersPanel;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -93,6 +94,7 @@ public class Main extends JFrame
 
 		cardPanel.add(new HomePanel(), Panels.HOME);
 		cardPanel.add(new MangasPanel(), Panels.MANGAS_LIST);
+		cardPanel.add(new PublishersPanel(), Panels.PUBLISHERS_LIST);
 
 		setLocationRelativeTo(null);
 	}

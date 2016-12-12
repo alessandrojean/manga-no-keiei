@@ -25,6 +25,7 @@ public class NavigationPanel extends JPanel
 	private static final Dimension GAP_SIZE = new Dimension(0,5);
 	private RoundedCornerButton buttonHome;
 	private RoundedCornerButton buttonList;
+	private RoundedCornerButton buttonPublisherList;
 	private RoundedCornerButton buttonSettings;
 	private RoundedCornerButton buttonHelp;
 	
@@ -52,6 +53,7 @@ public class NavigationPanel extends JPanel
 			{
 				buttonHome.setPressed(true);
 				buttonList.setPressed(false);
+				buttonPublisherList.setPressed(false);
 				buttonSettings.setPressed(false);
 				buttonHelp.setPressed(false);
 				Main.showPanel(Panels.HOME);
@@ -74,12 +76,36 @@ public class NavigationPanel extends JPanel
 			{
 				buttonHome.setPressed(false);
 				buttonList.setPressed(true);
+				buttonPublisherList.setPressed(false);
 				buttonSettings.setPressed(false);
 				buttonHelp.setPressed(false);
 				Main.showPanel(Panels.MANGAS_LIST);
 			}
 		});
 		box.add(buttonList);
+		
+		box.add(Box.createRigidArea(GAP_SIZE));
+		
+		buttonPublisherList = new RoundedCornerButton();
+		buttonPublisherList.setIcon(new ImageIcon(getClass().getResource("/images/domain_36.png")));
+		buttonPublisherList.setColors(ColorUtils.HexToRGB("#2196F3"), ColorUtils.HexToRGB("#1976D2"));
+		buttonPublisherList.setToolTipText("Editoras");
+		buttonPublisherList.setAlignmentX(CENTER_ALIGNMENT);
+		buttonPublisherList.setMaximumSize(BUTTON_SIZE);
+		buttonPublisherList.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				buttonHome.setPressed(false);
+				buttonList.setPressed(false);
+				buttonPublisherList.setPressed(true);
+				buttonSettings.setPressed(false);
+				buttonHelp.setPressed(false);
+				Main.showPanel(Panels.PUBLISHERS_LIST);
+			}
+		});
+		box.add(buttonPublisherList);
 		
 		Component verticalGlue = Box.createVerticalGlue();
 		box.add(verticalGlue);

@@ -10,6 +10,7 @@ import java.util.List;
 
 import model.Publisher;
 import database.DatabaseMethods;
+import database.ImageDatabase;
 
 public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 {
@@ -44,6 +45,7 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 				if (generatedKeys.next())
 				{
 					object.setId(generatedKeys.getInt(1));
+					ImageDatabase.insertImage(object);
 					return true;
 				}
 				else
@@ -71,6 +73,9 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 			lPreparedStatement.setInt(5, object.getId());
 			int i = lPreparedStatement.executeUpdate();
 
+			if(i>0)
+				ImageDatabase.insertImage(object);
+			
 			return i>0;
 		}
 		catch (SQLException e)
@@ -88,6 +93,9 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 			PreparedStatement lPreparedStatement = connection.prepareStatement(SQL_REMOVE);
 			lPreparedStatement.setInt(1, object.getId());
 			int i = lPreparedStatement.executeUpdate();
+			
+			if(i>0)
+				ImageDatabase.removeImage(object);
 
 			return i>0;
 		}
@@ -107,6 +115,8 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 			Statement lStatement = connection.createStatement();
 			ResultSet lResultSet = lStatement.executeQuery(SQL_SELECT_ALL);
 			
+			VolumeDAO lVolumeDAO = new VolumeDAO(connection);
+			
 			while (lResultSet.next())
 			{
 				Publisher lPublisher = new Publisher();
@@ -115,6 +125,8 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 				lPublisher.setSite(lResultSet.getString("site_publisher"));
 				lPublisher.setHistory(lResultSet.getString("history_publisher"));
 				lPublisher.setFavorite(lResultSet.getBoolean("favorite_publisher"));
+				lPublisher.setLogo(ImageDatabase.selectImage(lPublisher));
+				lPublisher.setVolumes(lVolumeDAO.select(lPublisher));
 				
 				result.add(lPublisher);
 			}
@@ -139,6 +151,8 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 			lPreparedStatement.setInt(1, id);
 			ResultSet lResultSet = lPreparedStatement.executeQuery();
 			
+			VolumeDAO lVolumeDAO = new VolumeDAO(connection);
+			
 			Publisher result = null;
 			if (lResultSet.next())
 			{
@@ -148,6 +162,8 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 				result.setSite(lResultSet.getString("site_publisher"));
 				result.setHistory(lResultSet.getString("history_publisher"));
 				result.setFavorite(lResultSet.getBoolean("favorite_publisher"));
+				result.setLogo(ImageDatabase.selectImage(result));
+				result.setVolumes(lVolumeDAO.select(result));
 			}
 
 			lResultSet.close();

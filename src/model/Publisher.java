@@ -1,6 +1,7 @@
 package model;
 
 import java.io.File;
+import java.util.List;
 
 public class Publisher
 {
@@ -9,6 +10,8 @@ public class Publisher
 	private String site;
 	private String history;
 	private boolean favorite;
+	
+	private List<Volume> volumes;
 	
 	private File logo;
 
@@ -81,6 +84,16 @@ public class Publisher
 	public void setLogo(File logo)
 	{
 		this.logo = logo;
+	}
+
+	public List<Volume> getVolumes()
+	{
+		return volumes;
+	}
+
+	public void setVolumes(List<Volume> volumes)
+	{
+		this.volumes = volumes;
 	}
 
 	@Override
