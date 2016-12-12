@@ -72,7 +72,7 @@ public class Main extends JFrame
 
 	public Main()
 	{
-		setTitle("Manga no Keiei");
+		setTitle(String.format("%s %s", Splash.PROJECT_NAME, Splash.PROJECT_VERSION));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1024, 768);
 		setMinimumSize(new Dimension(1024, 768));
