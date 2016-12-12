@@ -31,7 +31,7 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 	}
 
 	@Override
-	public boolean insert(Manga object)
+	public boolean insert(Manga object) throws SQLException
 	{
 		try
 		{
@@ -65,13 +65,12 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean update(Manga object)
+	public boolean update(Manga object) throws SQLException
 	{
 		try
 		{
@@ -98,13 +97,12 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean remove(Manga object)
+	public boolean remove(Manga object) throws SQLException
 	{
 		try
 		{
@@ -119,13 +117,12 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public List<Manga> select()
+	public List<Manga> select() throws SQLException
 	{
 		List<Manga> result = new ArrayList<>();
 		try
@@ -162,14 +159,14 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			throw e;
 		}
 		
 		return result;
 	}
 
 	@Override
-	public Manga select(int id)
+	public Manga select(int id) throws SQLException
 	{
 		try
 		{
@@ -207,8 +204,7 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return null;
+			throw e;
 		}
 	}
 

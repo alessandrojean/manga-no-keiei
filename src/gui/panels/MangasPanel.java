@@ -18,24 +18,24 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import utils.ExceptionUtils;
 import model.Manga;
 import database.dao.MangaDAO;
-
-import javax.swing.JToggleButton;
-import javax.swing.ImageIcon;
 
 public class MangasPanel extends JPanel
 {
@@ -52,11 +52,11 @@ public class MangasPanel extends JPanel
 	{
 		setLayout(new BorderLayout(0, 0));
 
-		JPanel panel = new JPanel();
-		add(panel, BorderLayout.NORTH);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		JToolBar jtOptions = new JToolBar();
+		jtOptions.setFloatable(false);
+		add(jtOptions, BorderLayout.NORTH);
 
-		JButton btCards = new JButton("");
+		JToggleButton btCards = new JToggleButton("");
 		btCards.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0)
 			{
@@ -65,11 +65,12 @@ public class MangasPanel extends JPanel
 			}
 		});
 		btCards.setToolTipText("Mostrar cards");
+		btCards.setSelected(true);
 		btCards.setPreferredSize(new Dimension(32, 32));
 		btCards.setIcon(new ImageIcon(MangasPanel.class.getResource("/images/cards_16.png")));
-		panel.add(btCards);
+		jtOptions.add(btCards);
 
-		JButton btTable = new JButton("");
+		JToggleButton btTable = new JToggleButton("");
 		btTable.setToolTipText("Mostrar tabela");
 		btTable.setPreferredSize(new Dimension(32, 32));
 		btTable.setIcon(new ImageIcon(MangasPanel.class.getResource("/images/table_16.png")));
@@ -82,10 +83,14 @@ public class MangasPanel extends JPanel
 				lCardLayout.show(centerPanel, PANEL_TABLE);
 			}
 		});
-		panel.add(btTable);
+		jtOptions.add(btTable);
+
+		ButtonGroup lButtonGroup = new ButtonGroup();
+		lButtonGroup.add(btCards);
+		lButtonGroup.add(btTable);
 
 		Component horizontalGlue = Box.createHorizontalGlue();
-		panel.add(horizontalGlue);
+		jtOptions.add(horizontalGlue);
 
 		JButton btNewManga = new JButton("Novo");
 		btNewManga.addActionListener(new ActionListener() {
@@ -96,7 +101,7 @@ public class MangasPanel extends JPanel
 				newManga();
 			}
 		});
-		panel.add(btNewManga);
+		jtOptions.add(btNewManga);
 
 		centerPanel = new JPanel();
 		centerPanel.setLayout(new CardLayout());
@@ -115,7 +120,7 @@ public class MangasPanel extends JPanel
 			{
 				super.componentResized(e);
 				int horizontalCards = ((int) getSize().getWidth() - 15) / 300;
-				int divide = (int) Math.ceil((double)mangas.size()/horizontalCards);
+				int divide = (int) Math.ceil((double) mangas.size() / horizontalCards);
 				panelMangas.setPreferredSize(new Dimension((int) getSize().getWidth() - 15, 150 * divide + 5 * divide));
 			}
 		});
@@ -156,8 +161,7 @@ public class MangasPanel extends JPanel
 			}
 			catch (SQLException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ExceptionUtils.showExceptionDialog(null, e);
 			}
 			fillMangas();
 		}
@@ -174,8 +178,7 @@ public class MangasPanel extends JPanel
 		}
 		catch (SQLException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ExceptionUtils.showExceptionDialog(null, e);
 		}
 
 	}
@@ -202,8 +205,7 @@ public class MangasPanel extends JPanel
 						}
 						catch (SQLException e)
 						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							ExceptionUtils.showExceptionDialog(null, e);
 						}
 					}
 				}
@@ -225,8 +227,7 @@ public class MangasPanel extends JPanel
 						}
 						catch (SQLException e)
 						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							ExceptionUtils.showExceptionDialog(null, e);
 						}
 					}
 				}
@@ -235,9 +236,9 @@ public class MangasPanel extends JPanel
 		}
 		panelMangas.revalidate();
 		panelMangas.repaint();
-		
-		int horizontalCards = ((getSize().getWidth()==0 ? 958 : (int) getSize().getWidth()) - 15) / 300;
-		int divide = (int) Math.ceil((double)mangas.size()/horizontalCards);
+
+		int horizontalCards = ((getSize().getWidth() == 0 ? 958 : (int) getSize().getWidth()) - 15) / 300;
+		int divide = (int) Math.ceil((double) mangas.size() / horizontalCards);
 		panelMangas.setPreferredSize(new Dimension((int) getSize().getWidth() - 15, 150 * divide + 5 * divide));
 	}
 

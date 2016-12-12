@@ -34,7 +34,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 	}
 
 	@Override
-	public boolean insert(Volume object)
+	public boolean insert(Volume object) throws SQLException
 	{
 		try
 		{
@@ -76,13 +76,12 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean update(Volume object)
+	public boolean update(Volume object) throws SQLException
 	{
 		try
 		{
@@ -117,13 +116,12 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean remove(Volume object)
+	public boolean remove(Volume object) throws SQLException
 	{
 		try
 		{
@@ -138,13 +136,12 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public List<Volume> select()
+	public List<Volume> select() throws SQLException
 	{
 		List<Volume> result = new ArrayList<>();
 		try
@@ -203,14 +200,14 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			throw e;
 		}
 		
 		return result;
 	}
 
 	@Override
-	public Volume select(int id)
+	public Volume select(int id) throws SQLException
 	{
 		try
 		{
@@ -270,12 +267,11 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return null;
+			throw e;
 		}
 	}
 
-	public List<Volume> select(Manga manga)
+	public List<Volume> select(Manga manga) throws SQLException
 	{
 		List<Volume> result = new ArrayList<>();
 		try
@@ -327,13 +323,13 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			throw e;
 		}
 		
 		return result;
 	}
 	
-	public List<Volume> select(Publisher publisher)
+	public List<Volume> select(Publisher publisher) throws SQLException
 	{
 		List<Volume> result = new ArrayList<>();
 		try
@@ -394,7 +390,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			throw e;
 		}
 		
 		return result;

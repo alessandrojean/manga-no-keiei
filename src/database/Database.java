@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import utils.ExceptionUtils;
 import database.dao.MangaDAO;
 import database.dao.PublisherDAO;
 import database.dao.VolumeDAO;
@@ -37,7 +38,7 @@ public class Database
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			ExceptionUtils.showExceptionDialog(null, e);
 		}
 		finally
 		{
@@ -48,7 +49,7 @@ public class Database
 			}
 			catch (SQLException e)
 			{
-				e.printStackTrace();
+				ExceptionUtils.showExceptionDialog(null, e);
 			}
 		}
 	}
@@ -84,7 +85,7 @@ public class Database
 		}
 		catch (ClassNotFoundException | SQLException e)
 		{
-			e.printStackTrace();
+			ExceptionUtils.showExceptionDialog(null, e);
 		}
 
 		return connection;

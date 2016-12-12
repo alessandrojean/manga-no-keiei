@@ -1,10 +1,8 @@
 package gui.panels;
 
 import gui.Main;
-import gui.components.panels.MangaCard;
 import gui.components.panels.PublisherCard;
 import gui.dialogs.Dialog;
-import gui.dialogs.MangaDialog;
 import gui.dialogs.PublisherDialog;
 
 import java.awt.BorderLayout;
@@ -20,22 +18,23 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import model.Manga;
+import utils.ExceptionUtils;
 import model.Publisher;
-import database.dao.MangaDAO;
 import database.dao.PublisherDAO;
 
 public class PublishersPanel extends JPanel
@@ -53,11 +52,11 @@ public class PublishersPanel extends JPanel
 	{
 		setLayout(new BorderLayout(0, 0));
 
-		JPanel panel = new JPanel();
-		add(panel, BorderLayout.NORTH);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		JToolBar jtOptions = new JToolBar();
+		jtOptions.setFloatable(false);
+		add(jtOptions, BorderLayout.NORTH);
 
-		JButton btCards = new JButton("");
+		JToggleButton btCards = new JToggleButton("");
 		btCards.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0)
 			{
@@ -66,11 +65,12 @@ public class PublishersPanel extends JPanel
 			}
 		});
 		btCards.setToolTipText("Mostrar cards");
+		btCards.setSelected(true);
 		btCards.setPreferredSize(new Dimension(32, 32));
 		btCards.setIcon(new ImageIcon(PublishersPanel.class.getResource("/images/cards_16.png")));
-		panel.add(btCards);
+		jtOptions.add(btCards);
 
-		JButton btTable = new JButton("");
+		JToggleButton btTable = new JToggleButton("");
 		btTable.setToolTipText("Mostrar tabela");
 		btTable.setPreferredSize(new Dimension(32, 32));
 		btTable.setIcon(new ImageIcon(PublishersPanel.class.getResource("/images/table_16.png")));
@@ -83,21 +83,25 @@ public class PublishersPanel extends JPanel
 				lCardLayout.show(centerPanel, PANEL_TABLE);
 			}
 		});
-		panel.add(btTable);
+		jtOptions.add(btTable);
+
+		ButtonGroup lButtonGroup = new ButtonGroup();
+		lButtonGroup.add(btCards);
+		lButtonGroup.add(btTable);
 
 		Component horizontalGlue = Box.createHorizontalGlue();
-		panel.add(horizontalGlue);
+		jtOptions.add(horizontalGlue);
 
-		JButton btNewManga = new JButton("Novo");
-		btNewManga.addActionListener(new ActionListener() {
+		JButton btNewPublisher = new JButton("Novo");
+		btNewPublisher.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				newManga();
+				newPublisher();
 			}
 		});
-		panel.add(btNewManga);
+		jtOptions.add(btNewPublisher);
 
 		centerPanel = new JPanel();
 		centerPanel.setLayout(new CardLayout());
@@ -116,7 +120,7 @@ public class PublishersPanel extends JPanel
 			{
 				super.componentResized(e);
 				int horizontalCards = ((int) getSize().getWidth() - 15) / 300;
-				int divide = (int) Math.ceil((double)publishers.size()/horizontalCards);
+				int divide = (int) Math.ceil((double) publishers.size() / horizontalCards);
 				panelPublishers.setPreferredSize(new Dimension((int) getSize().getWidth() - 15, 100 * divide + 5 * divide));
 			}
 		});
@@ -143,7 +147,7 @@ public class PublishersPanel extends JPanel
 		fillPublishers();
 	}
 
-	private void newManga()
+	private void newPublisher()
 	{
 		PublisherDialog lPublisherDialog = new PublisherDialog();
 		if (lPublisherDialog.showDialog() == Dialog.APPROVE_OPTION)
@@ -157,8 +161,7 @@ public class PublishersPanel extends JPanel
 			}
 			catch (SQLException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ExceptionUtils.showExceptionDialog(null, e);
 			}
 			fillPublishers();
 		}
@@ -175,8 +178,7 @@ public class PublishersPanel extends JPanel
 		}
 		catch (SQLException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ExceptionUtils.showExceptionDialog(null, e);
 		}
 
 	}
@@ -203,8 +205,7 @@ public class PublishersPanel extends JPanel
 						}
 						catch (SQLException e)
 						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							ExceptionUtils.showExceptionDialog(null, e);
 						}
 					}
 				}
@@ -226,8 +227,7 @@ public class PublishersPanel extends JPanel
 						}
 						catch (SQLException e)
 						{
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							ExceptionUtils.showExceptionDialog(null, e);
 						}
 					}
 				}
@@ -236,9 +236,9 @@ public class PublishersPanel extends JPanel
 		}
 		panelPublishers.revalidate();
 		panelPublishers.repaint();
-		
-		int horizontalCards = ((getSize().getWidth()==0 ? 958 : (int) getSize().getWidth()) - 15) / 300;
-		int divide = (int) Math.ceil((double)publishers.size()/horizontalCards);
+
+		int horizontalCards = ((getSize().getWidth() == 0 ? 958 : (int) getSize().getWidth()) - 15) / 300;
+		int divide = (int) Math.ceil((double) publishers.size() / horizontalCards);
 		panelPublishers.setPreferredSize(new Dimension((int) getSize().getWidth() - 15, 100 * divide + 5 * divide));
 	}
 
@@ -256,7 +256,7 @@ public class PublishersPanel extends JPanel
 		lDefaultTableModel.addColumn("Site");
 
 		for (Publisher p : publishers)
-			lDefaultTableModel.addRow(new Object[] { p.getId(), p.getName(), p.getSite()});
+			lDefaultTableModel.addRow(new Object[] { p.getId(), p.getName(), p.getSite() });
 
 		tablePublishers.setModel(lDefaultTableModel);
 	}

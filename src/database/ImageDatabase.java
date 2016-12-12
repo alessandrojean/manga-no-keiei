@@ -9,6 +9,8 @@ import model.Volume;
 
 import org.apache.commons.io.FileUtils;
 
+import utils.ExceptionUtils;
+
 public class ImageDatabase
 {
 
@@ -52,7 +54,7 @@ public class ImageDatabase
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				ExceptionUtils.showExceptionDialog(null, e);
 			}
 
 	}

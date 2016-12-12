@@ -30,6 +30,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import utils.ExceptionUtils;
 import utils.ImageUtils;
 import utils.LookAndFeelUtils;
 
@@ -108,6 +109,7 @@ public class ImageSelector extends JPanel implements MouseListener
 			}
 			catch (IOException e)
 			{
+				ExceptionUtils.showExceptionDialog(null, e);
 			}
 		}
 		g2d.dispose();

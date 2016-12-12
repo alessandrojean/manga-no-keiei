@@ -5,6 +5,7 @@ import gui.panels.HomePanel;
 import gui.panels.MangasPanel;
 import gui.panels.Panels;
 import gui.panels.PublishersPanel;
+import gui.panels.SettingsPanel;
 import gui.panels.VolumesPanel;
 
 import java.awt.BorderLayout;
@@ -23,6 +24,7 @@ import javax.swing.UIManager;
 
 import model.Manga;
 import utils.ColorUtils;
+import utils.ExceptionUtils;
 
 import com.bulenkov.darcula.DarculaLaf;
 
@@ -34,9 +36,9 @@ public class Main extends JFrame
 	private JPanel contentPane;
 	private JPanel navigationPanel;
 	private static JPanel cardPanel;
-	
+
 	public static final Database DATABASE = new Database();
-	
+
 	public static MangasPanel MANGAS_PANEL;
 
 	/**
@@ -50,7 +52,7 @@ public class Main extends JFrame
 		}
 		catch (Throwable e)
 		{
-			e.printStackTrace();
+			ExceptionUtils.showExceptionDialog(null, e);
 		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run()
@@ -62,7 +64,7 @@ public class Main extends JFrame
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
+					ExceptionUtils.showExceptionDialog(null, e);
 				}
 			}
 		});
@@ -75,8 +77,6 @@ public class Main extends JFrame
 		setBounds(0, 0, 1024, 768);
 		setMinimumSize(new Dimension(1024, 768));
 		setPreferredSize(new Dimension(1024, 768));
-		
-		
 
 		List<Image> icons = Arrays.asList(new ImageIcon(getClass().getResource("/images/logo_16.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_32.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_64.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_128.png")).getImage());
 
@@ -89,7 +89,6 @@ public class Main extends JFrame
 		contentPane.add(navigationPanel, BorderLayout.WEST);
 
 		cardPanel = new JPanel();
-		cardPanel.setBounds(50, 0, 1024 - 50, 768);
 		cardPanel.setLayout(new CardLayout(0, 0));
 		cardPanel.setBackground(Color.GREEN);
 		contentPane.add(cardPanel);
@@ -98,20 +97,21 @@ public class Main extends JFrame
 		MANGAS_PANEL = new MangasPanel();
 		cardPanel.add(MANGAS_PANEL, Panels.MANGAS_LIST);
 		cardPanel.add(new PublishersPanel(), Panels.PUBLISHERS_LIST);
+		cardPanel.add(new SettingsPanel(), Panels.SETTINGS);
 
 		setLocationRelativeTo(null);
 	}
-	
+
 	public static void showPanel(String panel)
 	{
 		CardLayout lCardLayout = (CardLayout) cardPanel.getLayout();
 		lCardLayout.show(cardPanel, panel);
 	}
-	
+
 	public static void showVolumePanel(Manga m)
 	{
-		cardPanel.add(new VolumesPanel(m), Panels.VOLUMES_LIST+m.getId());
+		cardPanel.add(new VolumesPanel(m), Panels.VOLUMES_LIST + m.getId());
 		CardLayout lCardLayout = (CardLayout) cardPanel.getLayout();
-		lCardLayout.show(cardPanel, Panels.VOLUMES_LIST+m.getId());
+		lCardLayout.show(cardPanel, Panels.VOLUMES_LIST + m.getId());
 	}
 }

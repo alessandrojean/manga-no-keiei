@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 
 import model.Manga;
 import utils.ColorUtils;
+import utils.ExceptionUtils;
 import database.dao.MangaDAO;
 import database.dao.PublisherDAO;
 import database.dao.VolumeDAO;
@@ -52,8 +53,7 @@ public class HomePanel extends JPanel
 					}
 					catch (SQLException e)
 					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						ExceptionUtils.showExceptionDialog(null, e);
 					}
 				}
 
@@ -63,7 +63,7 @@ public class HomePanel extends JPanel
 
 		RoundedCornerButton buttonNewVolume = new RoundedCornerButton();
 		buttonNewVolume.setIcon(new ImageIcon(getClass().getResource("/images/add.png")));
-		buttonNewVolume.setColors(ColorUtils.HexToRGB("#009688"),ColorUtils.HexToRGB("#00796B"));
+		buttonNewVolume.setColors(ColorUtils.HexToRGB("#009688"), ColorUtils.HexToRGB("#00796B"));
 		buttonNewVolume.setBounds(100, 103, 64, 64);
 		buttonNewVolume.addActionListener(new ActionListener() {
 
@@ -78,8 +78,7 @@ public class HomePanel extends JPanel
 				}
 				catch (SQLException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					ExceptionUtils.showExceptionDialog(null, e);
 				}
 
 				VolumeDialog lVolumeDialog = new VolumeDialog(m);
@@ -94,8 +93,7 @@ public class HomePanel extends JPanel
 					}
 					catch (SQLException e)
 					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						ExceptionUtils.showExceptionDialog(null, e);
 					}
 				}
 
@@ -123,8 +121,7 @@ public class HomePanel extends JPanel
 					}
 					catch (SQLException e)
 					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						ExceptionUtils.showExceptionDialog(null, e);
 					}
 				}
 			}

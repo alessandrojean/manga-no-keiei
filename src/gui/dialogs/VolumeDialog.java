@@ -333,9 +333,9 @@ public class VolumeDialog extends Dialog<Volume>
 		chbPlan.setSelected(result.isPlan());
 		taObservations.setText(result.getObservations());
 		imgPoster.setImage(result.getPoster());
-		
-		for(int i=0;i<cbPublisher.getModel().getSize();i++)
-			if(cbPublisher.getModel().getElementAt(i).getId()==result.getPublisher().getId())
+
+		for (int i = 0; i < cbPublisher.getModel().getSize(); i++)
+			if (cbPublisher.getModel().getElementAt(i).getId() == result.getPublisher().getId())
 				cbPublisher.setSelectedIndex(i);
 	}
 

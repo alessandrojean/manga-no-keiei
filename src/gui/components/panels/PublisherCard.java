@@ -59,6 +59,10 @@ public class PublisherCard extends JPanel implements MouseListener
 
 		Box horizontalBox = Box.createHorizontalBox();
 		add(horizontalBox);
+		
+		add(Box.createRigidArea(new Dimension(1, 3)));
+
+		horizontalBox.add(Box.createRigidArea(new Dimension(2, 1)));
 
 		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
 		horizontalBox.add(btEdit);
@@ -68,12 +72,11 @@ public class PublisherCard extends JPanel implements MouseListener
 		btEdit.setFocusPainted(false);
 		btEdit.setOpaque(false);
 		btEdit.setBorderPainted(false);
-		btEdit.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
 		btEdit.setPreferredSize(new Dimension(16, 16));
 		btEdit.setMaximumSize(new Dimension(16, 16));
 		btEdit.addMouseListener(this);
 
-		rigidArea = Box.createRigidArea(new Dimension(71, 16));
+		rigidArea = Box.createRigidArea(new Dimension(65, 16));
 		horizontalBox.add(rigidArea);
 
 		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png")));
@@ -85,7 +88,6 @@ public class PublisherCard extends JPanel implements MouseListener
 		btRemove.setFocusPainted(false);
 		btRemove.setContentAreaFilled(false);
 		btRemove.setBorderPainted(false);
-		btRemove.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
 		btRemove.addMouseListener(this);
 		horizontalBox.add(btRemove);
 
@@ -138,24 +140,24 @@ public class PublisherCard extends JPanel implements MouseListener
 
 		// Draw Poster
 		Image poster = publisher.getLogo() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(publisher.getLogo().toString()).getImage();
-		g2d.drawImage(poster, 0, 0, 105, height, null);
+		g2d.drawImage(poster, 0, 0, height, height, null);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
-		g2d.drawLine(105, 0, 105, height);
+		g2d.drawLine(100, 0, 100, height);
 
 		// Draw Title Background
 		g2d.setColor(BorderUtils.DEFAULT_BACKGROUND_COLOR);
-		g2d.fillRect(106, 0, width - 105, titleHeight);
+		g2d.fillRect(101, 0, width - 100, titleHeight);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
-		g2d.drawLine(106, titleHeight, width, titleHeight);
+		g2d.drawLine(101, titleHeight, width, titleHeight);
 
 		// Draw Title
 		g2d.setColor(getForeground());
 		g2d.setFont(getFont().deriveFont(Font.BOLD));
 		FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
 		if (metrics.stringWidth(publisher.getName()) <= 190)
-			g2d.drawString(publisher.getName(), 110 + (195 - metrics.stringWidth(publisher.getName())) / 2, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+			g2d.drawString(publisher.getName(), 100 + (200 - metrics.stringWidth(publisher.getName())) / 2, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		else
-			g2d.drawString(publisher.getName().substring(0, 25) + "...", 114, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+			g2d.drawString(publisher.getName().substring(0, 25) + "...", 105, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 
 		// Draw Volumes
 		String volumes = String.valueOf(publisher.getVolumes().size());
@@ -165,14 +167,14 @@ public class PublisherCard extends JPanel implements MouseListener
 		metrics = getFontMetrics(getFont().deriveFont(30.0f));
 		g2d.setColor(getForeground());
 		int numberY = yVolumes + (metrics.getHeight()) / 2, numberHeight = metrics.getHeight();
-		g2d.drawString(volumes, 110 + (195 - metrics.stringWidth(volumes)) / 2, numberY);
+		g2d.drawString(volumes, 100 + (200 - metrics.stringWidth(volumes)) / 2, numberY);
 		g2d.setFont(getFont().deriveFont(Font.BOLD));
 		metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-		g2d.drawString(quantity, 110 + (195 - metrics.stringWidth(quantity)) / 2, yVolumes + numberHeight);
+		g2d.drawString(quantity, 100 + (200 - metrics.stringWidth(quantity)) / 2, yVolumes + numberHeight);
 
 		// Draw Button Background
 		g2d.setPaint(new Color(0, 0, 0, 150));
-		g2d.fillRect(0, height - 21, 105, 26);
+		g2d.fillRect(0, height - 21, 100, 26);
 
 		// Draw Border
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));

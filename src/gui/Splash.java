@@ -4,8 +4,12 @@ import gui.components.ProgressCircleUI;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -13,9 +17,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.MouseInputAdapter;
+
+import utils.ExceptionUtils;
+
+import com.bulenkov.darcula.DarculaLaf;
 
 public class Splash extends JFrame
 {
@@ -30,11 +40,11 @@ public class Splash extends JFrame
 	{
 		try
 		{
-			UIManager.setLookAndFeel("com.bulenkov.darcula.DarculaLaf");
+			UIManager.setLookAndFeel(new DarculaLaf());
 		}
 		catch (Throwable e)
 		{
-			e.printStackTrace();
+			ExceptionUtils.showExceptionDialog(null, e);
 		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run()
@@ -46,7 +56,7 @@ public class Splash extends JFrame
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
+					ExceptionUtils.showExceptionDialog(null, e);
 				}
 			}
 		});
@@ -68,6 +78,10 @@ public class Splash extends JFrame
 		contentPane.setBackground(new Color(1.0f, 1.0f, 1.0f, 0.0f));
 		setBackground(new Color(1.0f, 1.0f, 1.0f, 0.0f));
 
+		List<Image> icons = Arrays.asList(new ImageIcon(getClass().getResource("/images/logo_16.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_32.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_64.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_128.png")).getImage());
+
+		setIconImages(icons);
+
 		progressBar = new JProgressBar();
 		progressBar.setBounds(10, 10, 380, 380);
 		progressBar.setUI(new ProgressCircleUI());
@@ -83,29 +97,29 @@ public class Splash extends JFrame
 
 		startTimer();
 	}
-	
+
 	private void startTimer()
 	{
-		Timer lTimer = new Timer(50, null);
+		Timer lTimer = new Timer(30, null);
 		lTimer.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				int iv = Math.min(100, progressBar.getValue() + 1);
-				progressBar.setValue(iv);
-				if(iv==100)
+				if (progressBar.getValue() == 100)
 				{
 					lTimer.stop();
 					showMain();
 				}
+				else
+					progressBar.setValue(progressBar.getValue() + 1);
 			}
 		});
 		lTimer.setInitialDelay(0);
 		lTimer.setRepeats(true);
 		lTimer.start();
 	}
-	
+
 	private void showMain()
 	{
 		Main lMain = new Main();

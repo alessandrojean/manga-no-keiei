@@ -1,12 +1,11 @@
 package gui.dialogs;
 
-import gui.components.borders.DialogBorder;
+import gui.components.ImageSelector;
 import gui.components.checkedcombobox.CheckableItem;
 import gui.components.checkedcombobox.CheckedComboBox;
 import gui.components.levelbar.LevelBar;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -39,7 +38,6 @@ import utils.DateUtils;
 import utils.FormUtils;
 import utils.ImageUtils;
 import utils.MangaUtils;
-import gui.components.ImageSelector;
 
 public class MangaDialog extends Dialog<Manga>
 {

@@ -116,6 +116,19 @@ public class NavigationPanel extends JPanel
 		buttonSettings.setToolTipText("Configurações");
 		buttonSettings.setAlignmentX(CENTER_ALIGNMENT);
 		buttonSettings.setMaximumSize(BUTTON_SIZE);
+		buttonSettings.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				buttonHome.setPressed(false);
+				buttonList.setPressed(false);
+				buttonPublisherList.setPressed(false);
+				buttonSettings.setPressed(true);
+				buttonHelp.setPressed(false);
+				Main.showPanel(Panels.SETTINGS);
+			}
+		});
 		box.add(buttonSettings);
 		
 		box.add(Box.createRigidArea(GAP_SIZE));

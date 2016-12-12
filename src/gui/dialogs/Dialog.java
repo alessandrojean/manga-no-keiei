@@ -1,9 +1,5 @@
 package gui.dialogs;
 
-import java.awt.Component;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-
 import javax.swing.JDialog;
 
 public class Dialog<T> extends JDialog

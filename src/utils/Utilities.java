@@ -31,124 +31,125 @@
 
 package utils;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.net.URL;
+
+import javax.swing.SwingConstants;
 
 /**
  *
  * @author aim
  */
-public class Utilities {
-    
-    private Utilities() {
-        // never instantiate
-    }
-    
-    public static boolean runningFromWebStart() {
-        return false;
-    }
+public class Utilities
+{
 
-    public static String getURLFileName(URL url) {
-        String path = url.getPath();
-        return path.substring(path.lastIndexOf("/") + 1);
-    }
-    
-    private static BufferedImage createCompatibleImage(int width, int height) {
-        
-        return GraphicsEnvironment.getLocalGraphicsEnvironment().
-                    getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height);
+	private Utilities()
+	{
+		// never instantiate
+	}
 
-    }
-    
-    public static BufferedImage createTranslucentImage(int width, int height) {
-        
-        return GraphicsEnvironment.getLocalGraphicsEnvironment().
-                    getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
-               
-    }
-    
-    public static BufferedImage createGradientImage(int width, int height, Color gradient1, Color gradient2) {
-                   
-            BufferedImage gradientImage = createCompatibleImage(width, height);
-            GradientPaint gradient = new GradientPaint(0, 0, gradient1, 0, height, gradient2, false);
-            Graphics2D g2 = (Graphics2D)gradientImage.getGraphics();
-            g2.setPaint(gradient);
-            g2.fillRect(0, 0, width, height);
-            g2.dispose();
-            
-            return gradientImage;
-    }
+	public static boolean runningFromWebStart()
+	{
+		return false;
+	}
 
+	public static String getURLFileName(URL url)
+	{
+		String path = url.getPath();
+		return path.substring(path.lastIndexOf("/") + 1);
+	}
 
-    public static BufferedImage createGradientMask(int width, int height, int orientation) {
-        // algorithm derived from Romain Guy's blog
-        BufferedImage gradient = new BufferedImage(width, height,
-                BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = gradient.createGraphics();
-        GradientPaint paint = new GradientPaint(0.0f, 0.0f,
-                new Color(1.0f, 1.0f, 1.0f, 1.0f),
-                orientation == SwingConstants.HORIZONTAL? width : 0.0f, 
-                orientation == SwingConstants.VERTICAL? height : 0.0f,
-                new Color(1.0f, 1.0f, 1.0f, 0.0f));
-        g.setPaint(paint);
-        g.fill(new Rectangle2D.Double(0, 0, width, height));
+	private static BufferedImage createCompatibleImage(int width, int height)
+	{
 
-        g.dispose();
-        gradient.flush();
+		return GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height);
 
-        return gradient;
-    }
+	}
 
-    public static Color deriveColorAlpha(Color base, int alpha) {
-        return new Color(base.getRed(), base.getGreen(), base.getBlue(), alpha);
-    }
-    
-    /**
-     * Derives a color by adding the specified offsets to the base color's 
-     * hue, saturation, and brightness values.   The resulting hue, saturation,
-     * and brightness values will be contrained to be between 0 and 1.
-     * @param base the color to which the HSV offsets will be added
-     * @param dH the offset for hue
-     * @param dS the offset for saturation
-     * @param dB the offset for brightness
-     * @return Color with modified HSV values
-     */
-    public static Color deriveColorHSB(Color base, float dH, float dS, float dB) {
-        float hsb[] = Color.RGBtoHSB(
-                base.getRed(), base.getGreen(), base.getBlue(), null);
+	public static BufferedImage createTranslucentImage(int width, int height)
+	{
 
-        hsb[0] += dH;
-        hsb[1] += dS;
-        hsb[2] += dB;
-        return Color.getHSBColor(
-                hsb[0] < 0? 0 : (hsb[0] > 1? 1 : hsb[0]),
-                hsb[1] < 0? 0 : (hsb[1] > 1? 1 : hsb[1]),
-                hsb[2] < 0? 0 : (hsb[2] > 1? 1 : hsb[2]));
-                                               
-    }
-    
-    public static String getHTMLColorString(Color color) {
-        String red = Integer.toHexString(color.getRed());
-        String green = Integer.toHexString(color.getGreen());
-        String blue = Integer.toHexString(color.getBlue());
+		return GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(width, height, Transparency.TRANSLUCENT);
 
-        return "#" + 
-                (red.length() == 1? "0" + red : red) +
-                (green.length() == 1? "0" + green : green) +
-                (blue.length() == 1? "0" + blue : blue);        
-    }
+	}
 
-   public static void printColor(String key, Color color) {
-       float hsb[] = Color.RGBtoHSB(
-                color.getRed(), color.getGreen(),
-                color.getBlue(), null);
-       System.out.println(key+": RGB=" + 
-               color.getRed() + ","+ color.getGreen() + ","+ color.getBlue() + "  " +
-                "HSB=" + String.format("%.0f%n",hsb[0]*360) + "," + 
-                            String.format("%.3f%n",hsb[1]) + "," + 
-                            String.format("%.3f%n", hsb[2]));
-   }
+	public static BufferedImage createGradientImage(int width, int height, Color gradient1, Color gradient2)
+	{
+
+		BufferedImage gradientImage = createCompatibleImage(width, height);
+		GradientPaint gradient = new GradientPaint(0, 0, gradient1, 0, height, gradient2, false);
+		Graphics2D g2 = (Graphics2D) gradientImage.getGraphics();
+		g2.setPaint(gradient);
+		g2.fillRect(0, 0, width, height);
+		g2.dispose();
+
+		return gradientImage;
+	}
+
+	public static BufferedImage createGradientMask(int width, int height, int orientation)
+	{
+		// algorithm derived from Romain Guy's blog
+		BufferedImage gradient = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = gradient.createGraphics();
+		GradientPaint paint = new GradientPaint(0.0f, 0.0f, new Color(1.0f, 1.0f, 1.0f, 1.0f), orientation == SwingConstants.HORIZONTAL ? width : 0.0f, orientation == SwingConstants.VERTICAL ? height : 0.0f, new Color(1.0f, 1.0f, 1.0f, 0.0f));
+		g.setPaint(paint);
+		g.fill(new Rectangle2D.Double(0, 0, width, height));
+
+		g.dispose();
+		gradient.flush();
+
+		return gradient;
+	}
+
+	public static Color deriveColorAlpha(Color base, int alpha)
+	{
+		return new Color(base.getRed(), base.getGreen(), base.getBlue(), alpha);
+	}
+
+	/**
+	 * Derives a color by adding the specified offsets to the base color's hue,
+	 * saturation, and brightness values. The resulting hue, saturation, and
+	 * brightness values will be contrained to be between 0 and 1.
+	 * 
+	 * @param base
+	 *            the color to which the HSV offsets will be added
+	 * @param dH
+	 *            the offset for hue
+	 * @param dS
+	 *            the offset for saturation
+	 * @param dB
+	 *            the offset for brightness
+	 * @return Color with modified HSV values
+	 */
+	public static Color deriveColorHSB(Color base, float dH, float dS, float dB)
+	{
+		float hsb[] = Color.RGBtoHSB(base.getRed(), base.getGreen(), base.getBlue(), null);
+
+		hsb[0] += dH;
+		hsb[1] += dS;
+		hsb[2] += dB;
+		return Color.getHSBColor(hsb[0] < 0 ? 0 : (hsb[0] > 1 ? 1 : hsb[0]), hsb[1] < 0 ? 0 : (hsb[1] > 1 ? 1 : hsb[1]), hsb[2] < 0 ? 0 : (hsb[2] > 1 ? 1 : hsb[2]));
+
+	}
+
+	public static String getHTMLColorString(Color color)
+	{
+		String red = Integer.toHexString(color.getRed());
+		String green = Integer.toHexString(color.getGreen());
+		String blue = Integer.toHexString(color.getBlue());
+
+		return "#" + (red.length() == 1 ? "0" + red : red) + (green.length() == 1 ? "0" + green : green) + (blue.length() == 1 ? "0" + blue : blue);
+	}
+
+	public static void printColor(String key, Color color)
+	{
+		float hsb[] = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+		System.out.println(key + ": RGB=" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + "  " + "HSB=" + String.format("%.0f%n", hsb[0] * 360) + "," + String.format("%.3f%n", hsb[1]) + "," + String.format("%.3f%n", hsb[2]));
+	}
 }

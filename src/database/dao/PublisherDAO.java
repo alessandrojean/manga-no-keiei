@@ -29,7 +29,7 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 	}
 
 	@Override
-	public boolean insert(Publisher object)
+	public boolean insert(Publisher object) throws SQLException
 	{
 		try
 		{
@@ -55,13 +55,12 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean update(Publisher object)
+	public boolean update(Publisher object) throws SQLException
 	{
 		try
 		{
@@ -80,13 +79,12 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public boolean remove(Publisher object)
+	public boolean remove(Publisher object) throws SQLException
 	{
 		try
 		{
@@ -101,13 +99,12 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return false;
+			throw e;
 		}
 	}
 
 	@Override
-	public List<Publisher> select()
+	public List<Publisher> select() throws SQLException
 	{
 		List<Publisher> result = new ArrayList<>();
 		try
@@ -136,14 +133,14 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			throw e;
 		}
 		
 		return result;
 	}
 
 	@Override
-	public Publisher select(int id)
+	public Publisher select(int id) throws SQLException
 	{
 		try
 		{
@@ -173,8 +170,7 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
-			return null;
+			throw e;
 		}
 	}
 

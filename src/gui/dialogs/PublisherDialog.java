@@ -1,27 +1,18 @@
 package gui.dialogs;
 
-import gui.components.borders.DialogBorder;
-import gui.components.checkedcombobox.CheckableItem;
-import gui.components.checkedcombobox.CheckedComboBox;
-import gui.components.levelbar.LevelBar;
+import gui.components.ImageSelector;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.ImageProducer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,16 +22,9 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import model.Manga;
 import model.Publisher;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
-import utils.ComboBoxUtils;
-import utils.DateUtils;
-import utils.FormUtils;
-import utils.ImageUtils;
-import utils.MangaUtils;
-import gui.components.ImageSelector;
 
 public class PublisherDialog extends Dialog<Publisher>
 {
@@ -84,14 +68,14 @@ public class PublisherDialog extends Dialog<Publisher>
 	{
 		initComponents();
 	}
-	
+
 	public PublisherDialog(Publisher publisher)
 	{
 		result = publisher;
 		initComponents();
 		updateFields();
 	}
-	
+
 	private void initComponents()
 	{
 		setTitle("Nova Editora");
@@ -133,7 +117,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		taHistory.setLineWrap(true);
 		taHistory.setWrapStyleWord(true);
 		scrollPane.setViewportView(taHistory);
-		
+
 		imgLogo = new ImageSelector();
 		informationPanel.add(imgLogo, "cell 3 3,grow");
 
@@ -178,7 +162,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		btClear.setMnemonic('L');
 		buttonPanel.add(btClear);
 	}
-	
+
 	@Override
 	protected void updateFields()
 	{
@@ -187,7 +171,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		taHistory.setText(result.getHistory());
 		imgLogo.setImage(result.getLogo());
 	}
-	
+
 	@Override
 	protected void clearFields()
 	{
@@ -197,19 +181,19 @@ public class PublisherDialog extends Dialog<Publisher>
 		imgLogo.setImage(null);
 		tfName.requestFocus();
 	}
-	
+
 	@Override
 	protected Publisher generateResult()
 	{
 		Publisher result = new Publisher();
-		if(this.result!=null)
+		if (this.result != null)
 			result.setId(this.result.getId());
 		result.setName(tfName.getText());
 		result.setSite(tfSite.getText());
 		result.setHistory(taHistory.getText());
 		result.setFavorite(false);
 		result.setLogo(imgLogo.getImage());
-		
+
 		return result;
 	}
 
@@ -218,7 +202,7 @@ public class PublisherDialog extends Dialog<Publisher>
 	{
 		if (tfName.getText().equals(""))
 			return false;
-		if(tfSite.getText().equals(""))
+		if (tfSite.getText().equals(""))
 			return false;
 
 		return true;

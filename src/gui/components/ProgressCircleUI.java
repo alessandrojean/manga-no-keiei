@@ -52,12 +52,13 @@ public class ProgressCircleUI extends BasicProgressBarUI
 		double cy = barRectHeight * .5;
 		double or = sz * .5;
 		double ir = or - 2; // or - 20;
-		Shape inner = new Ellipse2D.Double(cx - ir, cy - ir, ir * 2, ir * 2);
 		Shape outer = new Arc2D.Double(cx - or, cy - or, sz, sz, 90 - degree, degree, Arc2D.PIE);
-		Area area = new Area(outer);
-		area.subtract(new Area(inner));
 		g2.setComposite(AlphaComposite.SrcAtop);
-		g2.fill(area);
+		g2.fill(outer);
+		
+		Image logo = new ImageIcon(getClass().getResource("/images/logo_splash_inner.png")).getImage();
+		g2.drawImage(logo, -10, -10, logo.getWidth(null), logo.getHeight(null), null);
+		
 		g2.dispose();
 
 		// Deal with possible text painting

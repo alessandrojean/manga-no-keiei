@@ -33,7 +33,7 @@ import utils.Utilities;
 
 import com.bulenkov.iconloader.util.Gray;
 
-public class VolumeCard extends JPanel implements MouseListener, MouseMotionListener
+public class VolumeCard extends JPanel implements MouseListener
 {
 
 	private Volume volume;
@@ -41,25 +41,29 @@ public class VolumeCard extends JPanel implements MouseListener, MouseMotionList
 	private JButton btRemove;
 	private Component rigidArea;
 	private Component horizontalGlue;
-	
+
 	private JPopupMenu jpmOptions;
 	private JMenuItem jmiEdit;
 	private JMenuItem jmiRemove;
-	
-	private Color hoverColor = new Color(69,73,74);
+
+	private Color hoverColor = new Color(69, 73, 74);
 
 	public VolumeCard(Volume volume)
 	{
 		super();
 		this.volume = volume;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
+
 		Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
-		
+
 		Box horizontalBox = Box.createHorizontalBox();
 		add(horizontalBox);
-		
+
+		add(Box.createRigidArea(new Dimension(1, 3)));
+
+		horizontalBox.add(Box.createRigidArea(new Dimension(2, 1)));
+
 		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
 		horizontalBox.add(btEdit);
 		btEdit.setToolTipText("Editar");
@@ -68,14 +72,13 @@ public class VolumeCard extends JPanel implements MouseListener, MouseMotionList
 		btEdit.setFocusPainted(false);
 		btEdit.setOpaque(false);
 		btEdit.setBorderPainted(false);
-		btEdit.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
 		btEdit.setPreferredSize(new Dimension(16, 16));
 		btEdit.setMaximumSize(new Dimension(16, 16));
 		btEdit.addMouseListener(this);
-		
-		rigidArea = Box.createRigidArea(new Dimension(71, 16));
+
+		rigidArea = Box.createRigidArea(new Dimension(70, 16));
 		horizontalBox.add(rigidArea);
-		
+
 		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png")));
 		btRemove.setToolTipText("Deletar");
 		btRemove.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -85,39 +88,28 @@ public class VolumeCard extends JPanel implements MouseListener, MouseMotionList
 		btRemove.setFocusPainted(false);
 		btRemove.setContentAreaFilled(false);
 		btRemove.setBorderPainted(false);
-		btRemove.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
 		btRemove.addMouseListener(this);
 		horizontalBox.add(btRemove);
-		
+
 		horizontalGlue = Box.createHorizontalGlue();
 		horizontalBox.add(horizontalGlue);
-		
+
 		jpmOptions = new JPopupMenu();
-		JMenu jmNew = new JMenu("Novo");
-		jmNew.setIcon(new ImageIcon(getClass().getResource("/images/plus_15.png")));
-		JMenuItem jmiNewVolume = new JMenuItem("Volume");
-		jmNew.add(jmiNewVolume);
-		JMenuItem jmiNewGift = new JMenuItem("Brinde");
-		jmNew.add(jmiNewGift);
-		jpmOptions.add(jmNew);
-		JSeparator jsSeparator = new JSeparator();
-		jpmOptions.add(jsSeparator);
 		jmiEdit = new JMenuItem("Editar", new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
 		jpmOptions.add(jmiEdit);
 		jmiRemove = new JMenuItem("Deletar", new ImageIcon(getClass().getResource("/images/delete_16.png")));
 		jpmOptions.add(jmiRemove);
-		
+
 		setBackground(hoverColor);
 		addMouseListener(this);
-		addMouseMotionListener(this);
 	}
-	
+
 	public void addEditButtonActionListener(ActionListener actionListener)
 	{
 		btEdit.addActionListener(actionListener);
 		jmiEdit.addActionListener(actionListener);
 	}
-	
+
 	public void addRemoveButtonActionListener(ActionListener actionListener)
 	{
 		btRemove.addActionListener(actionListener);
@@ -147,7 +139,7 @@ public class VolumeCard extends JPanel implements MouseListener, MouseMotionList
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		// Draw Poster
-		Image poster = volume.getPoster()==null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(volume.getPoster().toString()).getImage();
+		Image poster = volume.getPoster() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(volume.getPoster().toString()).getImage();
 		g2d.drawImage(poster, 0, 0, 105, height, null);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(105, 0, 105, height);
@@ -162,10 +154,10 @@ public class VolumeCard extends JPanel implements MouseListener, MouseMotionList
 		g2d.setColor(getForeground());
 		g2d.setFont(getFont().deriveFont(Font.BOLD));
 		FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-		if(metrics.stringWidth(volume.getTitle())<=190)
-			g2d.drawString(volume.getTitle(), 110 + (195 - metrics.stringWidth(volume.getTitle())) / 2, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+		if (metrics.stringWidth(volume.getTitle()) <= 190)
+			g2d.drawString(volume.getTitle(), 105 + (195 - metrics.stringWidth(volume.getTitle())) / 2, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		else
-			g2d.drawString(volume.getTitle().substring(0, 25) + "...", 114, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+			g2d.drawString(volume.getTitle().substring(0, 25) + "...", 110, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 
 		// Draw Details
 		String details = String.format("%1$s \u00B7 R$%2$.2f", volume.getPublisher().getName(), volume.getTotalPrice());
@@ -176,21 +168,21 @@ public class VolumeCard extends JPanel implements MouseListener, MouseMotionList
 		g2d.drawLine(110, titleHeight + 8 + metrics.getHeight(), width - 5, titleHeight + 8 + metrics.getHeight());
 		details = String.format("%s \u00B7 %s", volume.getPaper(), volume.getSize());
 		g2d.setColor(getForeground());
-		g2d.drawString(details, 105 + (195 - metrics.stringWidth(details)) / 2, titleHeight + 18 + (metrics.getHeight()*2 + metrics.getAscent()) / 2);
+		g2d.drawString(details, 105 + (195 - metrics.stringWidth(details)) / 2, titleHeight + 18 + (metrics.getHeight() * 2 + metrics.getAscent()) / 2);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
-		g2d.drawLine(110, titleHeight + 16 + metrics.getHeight() * 2, width - 5, titleHeight + 16 + metrics.getHeight()*2);
-		
+		g2d.drawLine(110, titleHeight + 16 + metrics.getHeight() * 2, width - 5, titleHeight + 16 + metrics.getHeight() * 2);
+
 		// Draw Number
 		String number = "#" + String.valueOf(volume.getNumber());
 		int yVolumes = titleHeight + 16 + metrics.getHeight() * 2;
 		g2d.setFont(getFont().deriveFont(30.0f));
 		metrics = getFontMetrics(getFont().deriveFont(30.0f));
 		g2d.setColor(getForeground());
-		g2d.drawString(number, 110 + (195 - metrics.stringWidth(number)) / 2, yVolumes + (height - yVolumes - metrics.getHeight())/2 + metrics.getAscent());
-		
-		//Draw Button Background
+		g2d.drawString(number, 105 + (195 - metrics.stringWidth(number)) / 2, yVolumes + (height - yVolumes - metrics.getHeight()) / 2 + metrics.getAscent());
+
+		// Draw Button Background
 		g2d.setPaint(new Color(0, 0, 0, 150));
-		g2d.fillRect(0, height-21, 105, 26);
+		g2d.fillRect(0, height - 21, 105, 26);
 
 		// Draw Border
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
@@ -214,7 +206,7 @@ public class VolumeCard extends JPanel implements MouseListener, MouseMotionList
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-		if(e.getX()>105 && e.isPopupTrigger())
+		if (e.getX() > 105 && e.isPopupTrigger())
 			jpmOptions.show(e.getComponent(), e.getX(), e.getY());
 	}
 
@@ -227,37 +219,21 @@ public class VolumeCard extends JPanel implements MouseListener, MouseMotionList
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		setBackground(hoverColor);		
+		setBackground(hoverColor);
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
-		if(e.getX()>105 && e.isPopupTrigger())
+		if (e.getX() > 105 && e.isPopupTrigger())
 			jpmOptions.show(e.getComponent(), e.getX(), e.getY());
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
-		if(e.getX()>105 && e.isPopupTrigger())
+		if (e.getX() > 105 && e.isPopupTrigger())
 			jpmOptions.show(e.getComponent(), e.getX(), e.getY());
-	}
-
-	@Override
-	public void mouseDragged(MouseEvent e)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e)
-	{
-		if(e.getX()>105)
-			setCursor(new Cursor(Cursor.HAND_CURSOR));
-		else
-			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
 
 }
