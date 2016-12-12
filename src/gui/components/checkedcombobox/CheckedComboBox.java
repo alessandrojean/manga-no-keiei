@@ -84,6 +84,12 @@ public class CheckedComboBox<E extends CheckableItem> extends JComboBox<E>
 	{
 		return new Dimension(200, 26);
 	}
+	
+	@Override
+	public Dimension getMaximumSize()
+	{
+		return getSize();
+	}
 
 	@Override
 	public void updateUI()
@@ -121,7 +127,7 @@ public class CheckedComboBox<E extends CheckableItem> extends JComboBox<E>
 		if (isPopupVisible())
 		{
 			E item = getItemAt(index);
-			item.setSelected(true);
+			item.setSelected(item.isSelected() ? false : true);
 			removeItemAt(index);
 			insertItemAt(item, index);
 			setSelectedItem(item);

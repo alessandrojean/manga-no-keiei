@@ -1,6 +1,7 @@
 package gui.components.checkedcombobox;
 
 import java.awt.Component;
+import java.awt.FontMetrics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +47,8 @@ public class CheckBoxCellRenderer<E extends CheckableItem> implements ListCellRe
 	private static String getCheckedItemString(ListModel model)
 	{
 		List<String> sl = new ArrayList<>();
-		for (int i = 0; i < model.getSize(); i++)
+		int max = Math.min(model.getSize(), 4);
+		for (int i = 0; i < max; i++)
 		{
 			Object o = model.getElementAt(i);
 			if (o instanceof CheckableItem && ((CheckableItem) o).isSelected())
@@ -54,6 +56,6 @@ public class CheckBoxCellRenderer<E extends CheckableItem> implements ListCellRe
 				sl.add(o.toString());
 			}
 		}
-		return sl.stream().sorted().collect(Collectors.joining(", "));
+		return sl.stream().sorted().collect(Collectors.joining(", "))+(max==model.getSize() || sl.size()==0 || sl.size()<4 ? "" : " etc.");
 	}
 }

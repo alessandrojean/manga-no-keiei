@@ -12,6 +12,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -24,12 +26,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import model.Manga;
 import database.dao.MangaDAO;
+
 import javax.swing.JToggleButton;
 import javax.swing.ImageIcon;
 
@@ -51,10 +55,11 @@ public class MangasPanel extends JPanel
 		JPanel panel = new JPanel();
 		add(panel, BorderLayout.NORTH);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		
+
 		JButton btCards = new JButton("");
 		btCards.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0)
+			{
 				CardLayout lCardLayout = (CardLayout) centerPanel.getLayout();
 				lCardLayout.show(centerPanel, PANEL_CARDS);
 			}
@@ -63,13 +68,13 @@ public class MangasPanel extends JPanel
 		btCards.setPreferredSize(new Dimension(32, 32));
 		btCards.setIcon(new ImageIcon(MangasPanel.class.getResource("/images/cards_16.png")));
 		panel.add(btCards);
-		
+
 		JButton btTable = new JButton("");
 		btTable.setToolTipText("Mostrar tabela");
 		btTable.setPreferredSize(new Dimension(32, 32));
 		btTable.setIcon(new ImageIcon(MangasPanel.class.getResource("/images/table_16.png")));
 		btTable.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
@@ -96,14 +101,24 @@ public class MangasPanel extends JPanel
 		centerPanel = new JPanel();
 		centerPanel.setLayout(new CardLayout());
 		add(centerPanel, BorderLayout.CENTER);
-		
+
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		centerPanel.add(scrollPane_1, PANEL_CARDS);
-		
+
 		panelMangas = new JPanel();
 		scrollPane_1.setViewportView(panelMangas);
 		panelMangas.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		panelMangas.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e)
+			{
+				super.componentResized(e);
+				int horizontalCards = ((int) getSize().getWidth() - 15) / 300;
+				int divide = (int) Math.ceil((double)mangas.size()/horizontalCards);
+				panelMangas.setPreferredSize(new Dimension((int) getSize().getWidth() - 15, 150 * divide + 5 * divide));
+			}
+		});
 
 		JScrollPane scrollPane = new JScrollPane();
 		centerPanel.add(scrollPane, PANEL_TABLE);
@@ -137,7 +152,7 @@ public class MangasPanel extends JPanel
 				Manga result = lMangaDialog.getResult();
 				if (!lMangaDAO.insert(result))
 					JOptionPane.showMessageDialog(null, "Houve um erro ao inserir o mangá.\nPor favor, tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
-				
+
 			}
 			catch (SQLException e)
 			{
@@ -172,7 +187,7 @@ public class MangasPanel extends JPanel
 		{
 			MangaCard lMangaCard = new MangaCard(m);
 			lMangaCard.addEditButtonActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent arg0)
 				{
@@ -194,13 +209,13 @@ public class MangasPanel extends JPanel
 				}
 			});
 			lMangaCard.addRemoveButtonActionListener(new ActionListener() {
-				
+
 				@Override
 				public void actionPerformed(ActionEvent arg0)
 				{
-					if(JOptionPane.showConfirmDialog(null, "Você tem certeza que deseja remover este mangá?\nTodos os itens relacionados a este mangá serão removidos também.", "Confirmação de exclusão", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION)
+					if (JOptionPane.showConfirmDialog(null, "Você tem certeza que deseja remover este mangá?\nTodos os itens relacionados a este mangá serão removidos também.", "Confirmação de exclusão", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 					{
-						try(MangaDAO lMangaDAO = Main.DATABASE.getMangaDAO())
+						try (MangaDAO lMangaDAO = Main.DATABASE.getMangaDAO())
 						{
 							if (!lMangaDAO.remove(lMangaCard.getManga()))
 								JOptionPane.showMessageDialog(null, "Houve um erro ao deletar o mangá.\nPor favor, tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -217,12 +232,13 @@ public class MangasPanel extends JPanel
 				}
 			});
 			panelMangas.add(lMangaCard);
-			
 		}
 		panelMangas.revalidate();
 		panelMangas.repaint();
 		
-		panelMangas.setPreferredSize(new Dimension(943, 150 * (mangas.size() % 3)));
+		int horizontalCards = ((getSize().getWidth()==0 ? 958 : (int) getSize().getWidth()) - 15) / 300;
+		int divide = (int) Math.ceil((double)mangas.size()/horizontalCards);
+		panelMangas.setPreferredSize(new Dimension((int) getSize().getWidth() - 15, 150 * divide + 5 * divide));
 	}
 
 	private void fillTable()
