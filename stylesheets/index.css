@@ -15,7 +15,7 @@ code {
 .masthead.segment {
     min-height: 700px;
     padding: 1em 0em;
-    background: transparent url("../../photos/site/home_background.png") !important;
+    background: transparent url("images/home_background.png") !important;
 }
 .masthead .logo.item img {
     margin-right: 1em;
