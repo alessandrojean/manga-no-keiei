@@ -163,7 +163,7 @@ public class MangasPanel extends JPanel
 		}
 	}
 
-	private void fillMangas()
+	public void fillMangas()
 	{
 
 		try (MangaDAO lMangaDAO = Main.DATABASE.getMangaDAO())

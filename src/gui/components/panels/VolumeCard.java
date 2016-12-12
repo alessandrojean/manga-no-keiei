@@ -1,7 +1,5 @@
 package gui.components.panels;
 
-import gui.Main;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -29,38 +27,39 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
 import model.Manga;
+import model.Volume;
 import utils.BorderUtils;
 import utils.Utilities;
 
 import com.bulenkov.iconloader.util.Gray;
 
-public class MangaCard extends JPanel implements MouseListener, MouseMotionListener
+public class VolumeCard extends JPanel implements MouseListener, MouseMotionListener
 {
 
-	private Manga manga;
+	private Volume volume;
 	private JButton btEdit;
 	private JButton btRemove;
 	private Component rigidArea;
 	private Component horizontalGlue;
-
+	
 	private JPopupMenu jpmOptions;
 	private JMenuItem jmiEdit;
 	private JMenuItem jmiRemove;
+	
+	private Color hoverColor = new Color(69,73,74);
 
-	private Color hoverColor = new Color(69, 73, 74);
-
-	public MangaCard(Manga manga)
+	public VolumeCard(Volume volume)
 	{
 		super();
-		this.manga = manga;
+		this.volume = volume;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+		
 		Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
-
+		
 		Box horizontalBox = Box.createHorizontalBox();
 		add(horizontalBox);
-
+		
 		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
 		horizontalBox.add(btEdit);
 		btEdit.setToolTipText("Editar");
@@ -73,10 +72,10 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		btEdit.setPreferredSize(new Dimension(16, 16));
 		btEdit.setMaximumSize(new Dimension(16, 16));
 		btEdit.addMouseListener(this);
-
+		
 		rigidArea = Box.createRigidArea(new Dimension(71, 16));
 		horizontalBox.add(rigidArea);
-
+		
 		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png")));
 		btRemove.setToolTipText("Deletar");
 		btRemove.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -89,10 +88,10 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		btRemove.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
 		btRemove.addMouseListener(this);
 		horizontalBox.add(btRemove);
-
+		
 		horizontalGlue = Box.createHorizontalGlue();
 		horizontalBox.add(horizontalGlue);
-
+		
 		jpmOptions = new JPopupMenu();
 		JMenu jmNew = new JMenu("Novo");
 		jmNew.setIcon(new ImageIcon(getClass().getResource("/images/plus_15.png")));
@@ -107,32 +106,32 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		jpmOptions.add(jmiEdit);
 		jmiRemove = new JMenuItem("Deletar", new ImageIcon(getClass().getResource("/images/delete_16.png")));
 		jpmOptions.add(jmiRemove);
-
+		
 		setBackground(hoverColor);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 	}
-
+	
 	public void addEditButtonActionListener(ActionListener actionListener)
 	{
 		btEdit.addActionListener(actionListener);
 		jmiEdit.addActionListener(actionListener);
 	}
-
+	
 	public void addRemoveButtonActionListener(ActionListener actionListener)
 	{
 		btRemove.addActionListener(actionListener);
 		jmiRemove.addActionListener(actionListener);
 	}
 
-	public Manga getManga()
+	public Volume getVolume()
 	{
-		return manga;
+		return volume;
 	}
 
-	public void setManga(Manga manga)
+	public void setVolume(Volume volume)
 	{
-		this.manga = manga;
+		this.volume = volume;
 		repaint();
 	}
 
@@ -148,7 +147,7 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		// Draw Poster
-		Image poster = manga.getPoster() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(manga.getPoster().toString()).getImage();
+		Image poster = volume.getPoster()==null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(volume.getPoster().toString()).getImage();
 		g2d.drawImage(poster, 0, 0, 105, height, null);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(105, 0, 105, height);
@@ -163,47 +162,35 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		g2d.setColor(getForeground());
 		g2d.setFont(getFont().deriveFont(Font.BOLD));
 		FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-		if (metrics.stringWidth(manga.getNationalName()) <= 190)
-			g2d.drawString(manga.getNationalName(), 110 + (195 - metrics.stringWidth(manga.getNationalName())) / 2, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+		if(metrics.stringWidth(volume.getTitle())<=190)
+			g2d.drawString(volume.getTitle(), 110 + (195 - metrics.stringWidth(volume.getTitle())) / 2, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		else
-			g2d.drawString(manga.getNationalName().substring(0, 25) + "...", 114, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+			g2d.drawString(volume.getTitle().substring(0, 25) + "...", 114, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 
 		// Draw Details
-		String details = String.format("%s \u00B7 %s", manga.getType(), manga.getEdition());
+		String details = String.format("%1$s \u00B7 R$%2$.2f", volume.getPublisher().getName(), volume.getTotalPrice());
 		metrics = getFontMetrics(getFont());
 		g2d.setFont(getFont());
 		g2d.drawString(details, 105 + (195 - metrics.stringWidth(details)) / 2, titleHeight + 16);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(110, titleHeight + 8 + metrics.getHeight(), width - 5, titleHeight + 8 + metrics.getHeight());
-
-		// Draw Rating
-		int yStar = titleHeight + 8 + metrics.getHeight() + 5;
-		int rating = manga.getRating();
-		int starWidth = 24 * 5;
-		Image starFull = new ImageIcon(getClass().getResource("/images/star_google.png")).getImage();
-		Image starOutline = new ImageIcon(getClass().getResource("/images/star_outline.png")).getImage();
-		for (int i = 0; i < 5; i++)
-		{
-			g2d.drawImage(i <= rating ? starFull : starOutline, 105 + (195 - starWidth) / 2 + 24 * i, yStar, 24, 24, null);
-		}
-		g2d.drawLine(110, yStar + 29, width - 5, yStar + 29);
-
-		// Draw Volumes
-		String volumes = String.valueOf(manga.getVolumes().size());
-		String quantity = "VOLUME" + (volumes.equals("1") ? "" : "S");
-		int yVolumes = yStar + 42;
+		details = String.format("%s \u00B7 %s", volume.getPaper(), volume.getSize());
+		g2d.setColor(getForeground());
+		g2d.drawString(details, 105 + (195 - metrics.stringWidth(details)) / 2, titleHeight + 18 + (metrics.getHeight()*2 + metrics.getAscent()) / 2);
+		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
+		g2d.drawLine(110, titleHeight + 16 + metrics.getHeight() * 2, width - 5, titleHeight + 16 + metrics.getHeight()*2);
+		
+		// Draw Number
+		String number = "#" + String.valueOf(volume.getNumber());
+		int yVolumes = titleHeight + 16 + metrics.getHeight() * 2;
 		g2d.setFont(getFont().deriveFont(30.0f));
 		metrics = getFontMetrics(getFont().deriveFont(30.0f));
 		g2d.setColor(getForeground());
-		int numberY = yVolumes + (metrics.getHeight()) / 2, numberHeight = metrics.getHeight();
-		g2d.drawString(volumes, 110 + (195 - metrics.stringWidth(volumes)) / 2, numberY);
-		g2d.setFont(getFont().deriveFont(Font.BOLD));
-		metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-		g2d.drawString(quantity, 110 + (195 - metrics.stringWidth(quantity)) / 2, yVolumes + numberHeight);
-
-		// Draw Button Background
+		g2d.drawString(number, 110 + (195 - metrics.stringWidth(number)) / 2, yVolumes + (height - yVolumes - metrics.getHeight())/2 + metrics.getAscent());
+		
+		//Draw Button Background
 		g2d.setPaint(new Color(0, 0, 0, 150));
-		g2d.fillRect(0, height - 21, 105, 26);
+		g2d.fillRect(0, height-21, 105, 26);
 
 		// Draw Border
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
@@ -227,11 +214,8 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
-		if (e.getX() > 105)
-			if (e.isPopupTrigger())
-				jpmOptions.show(e.getComponent(), e.getX(), e.getY());
-			else
-				Main.showVolumePanel(manga);
+		if(e.getX()>105 && e.isPopupTrigger())
+			jpmOptions.show(e.getComponent(), e.getX(), e.getY());
 	}
 
 	@Override
@@ -243,20 +227,20 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseExited(MouseEvent e)
 	{
-		setBackground(hoverColor);
+		setBackground(hoverColor);		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
-		if (e.getX() > 105 && e.isPopupTrigger())
+		if(e.getX()>105 && e.isPopupTrigger())
 			jpmOptions.show(e.getComponent(), e.getX(), e.getY());
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
-		if (e.getX() > 105 && e.isPopupTrigger())
+		if(e.getX()>105 && e.isPopupTrigger())
 			jpmOptions.show(e.getComponent(), e.getX(), e.getY());
 	}
 
@@ -264,13 +248,13 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseDragged(MouseEvent e)
 	{
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e)
 	{
-		if (e.getX() > 105)
+		if(e.getX()>105)
 			setCursor(new Cursor(Cursor.HAND_CURSOR));
 		else
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

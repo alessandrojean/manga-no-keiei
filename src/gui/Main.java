@@ -5,6 +5,7 @@ import gui.panels.HomePanel;
 import gui.panels.MangasPanel;
 import gui.panels.Panels;
 import gui.panels.PublishersPanel;
+import gui.panels.VolumesPanel;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -19,9 +20,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+import model.Manga;
 import utils.ColorUtils;
 
 import com.bulenkov.darcula.DarculaLaf;
@@ -34,8 +34,10 @@ public class Main extends JFrame
 	private JPanel contentPane;
 	private JPanel navigationPanel;
 	private static JPanel cardPanel;
-
+	
 	public static final Database DATABASE = new Database();
+	
+	public static MangasPanel MANGAS_PANEL;
 
 	/**
 	 * Launch the application.
@@ -93,7 +95,8 @@ public class Main extends JFrame
 		contentPane.add(cardPanel);
 
 		cardPanel.add(new HomePanel(), Panels.HOME);
-		cardPanel.add(new MangasPanel(), Panels.MANGAS_LIST);
+		MANGAS_PANEL = new MangasPanel();
+		cardPanel.add(MANGAS_PANEL, Panels.MANGAS_LIST);
 		cardPanel.add(new PublishersPanel(), Panels.PUBLISHERS_LIST);
 
 		setLocationRelativeTo(null);
@@ -103,5 +106,12 @@ public class Main extends JFrame
 	{
 		CardLayout lCardLayout = (CardLayout) cardPanel.getLayout();
 		lCardLayout.show(cardPanel, panel);
+	}
+	
+	public static void showVolumePanel(Manga m)
+	{
+		cardPanel.add(new VolumesPanel(m), Panels.VOLUMES_LIST+m.getId());
+		CardLayout lCardLayout = (CardLayout) cardPanel.getLayout();
+		lCardLayout.show(cardPanel, Panels.VOLUMES_LIST+m.getId());
 	}
 }

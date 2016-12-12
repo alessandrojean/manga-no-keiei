@@ -24,7 +24,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 	private static final String SQL_REMOVE = "delete from volumes where id_volume=?;";
 	private static final String SQL_SELECT_ALL = "select * from volumes, mangas where volumes.manga_volume=mangas.id_manga order by number_volume asc;";
 	private static final String SQL_SELECT_BY_ID = "select * from volumes, mangas where volumes.manga_volume=mangas.id_manga and volumes.id_volume=?;";
-	private static final String SQL_SELECT_BY_MANGA = "select * from volumes where manga_volume=? order by number_volume asc;";
+	private static final String SQL_SELECT_BY_MANGA = "select * from volumes,publishers where volumes.publisher_volume=publishers.id_publisher and volumes.manga_volume=? order by volumes.number_volume asc;";
 	private static final String SQL_SELECT_BY_PUBLISHER = "select * from volumes, mangas where volumes.manga_volume=mangas.id_manga and volumes.publisher_volume=?;";
 
 	public VolumeDAO(Connection connection)
@@ -294,7 +294,6 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 				lVolume.setIsbn(lResultSet.getString("isbn_volume"));
 				lVolume.setTitle(lResultSet.getString("title_volume"));
 				lVolume.setSubtitle(lResultSet.getString("subtitle_volume"));
-				lVolume.setPublisher(new Publisher(lResultSet.getInt("publisher_volume")));
 				lVolume.setTotalPrice(lResultSet.getDouble("total_price_volume"));
 				lVolume.setPaidPrice(lResultSet.getDouble("paid_price_volume"));
 				lVolume.setBelongsTo(lResultSet.getString("belongs_to_volume"));
@@ -309,6 +308,16 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 				lVolume.setObservations(lResultSet.getString("observations_volume"));
 				lVolume.setManga(manga);
 				lVolume.setPoster(ImageDatabase.selectImage(lVolume));
+				
+				Publisher lPublisher = new Publisher();
+				lPublisher.setId(lResultSet.getInt("id_publisher"));
+				lPublisher.setName(lResultSet.getString("name_publisher"));
+				lPublisher.setSite(lResultSet.getString("site_publisher"));
+				lPublisher.setHistory(lResultSet.getString("history_publisher"));
+				lPublisher.setFavorite(lResultSet.getBoolean("favorite_publisher"));
+				lPublisher.setLogo(ImageDatabase.selectImage(lPublisher));
+				
+				lVolume.setPublisher(lPublisher);
 				
 				result.add(lVolume);
 			}

@@ -320,7 +320,6 @@ public class VolumeDialog extends Dialog<Volume>
 		tfISBN.setText(result.getIsbn());
 		tfTitle.setText(result.getTitle());
 		tfSubtitle.setText(result.getSubtitle());
-		cbPublisher.setSelectedItem(result.getPublisher());
 		tfTotalPrice.setText(String.valueOf(result.getTotalPrice()));
 		tfPaidPrice.setText(String.valueOf(result.getPaidPrice()));
 		cbBelongsTo.setSelectedItem(result.getBelongsTo());
@@ -333,6 +332,11 @@ public class VolumeDialog extends Dialog<Volume>
 		chbProtectionPlastic.setSelected(result.isProtectionPlastic());
 		chbPlan.setSelected(result.isPlan());
 		taObservations.setText(result.getObservations());
+		imgPoster.setImage(result.getPoster());
+		
+		for(int i=0;i<cbPublisher.getModel().getSize();i++)
+			if(cbPublisher.getModel().getElementAt(i).getId()==result.getPublisher().getId())
+				cbPublisher.setSelectedIndex(i);
 	}
 
 	@Override

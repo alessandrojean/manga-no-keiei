@@ -90,7 +90,7 @@ public class ImageDatabase
 		else if (object instanceof Volume)
 		{
 			int id = ((Volume) object).getId();
-			result = new File(String.format(FILE_MANGA, id));
+			result = new File(String.format(FILE_VOLUME, id));
 		}
 		else if (object instanceof Publisher)
 		{
