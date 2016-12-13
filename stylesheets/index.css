@@ -13,19 +13,16 @@ code {
 }
 
 .masthead.segment {
-    min-height: 700px;
-    padding: 1em 0em;
-    background: transparent url("images/home_background.png") !important;
+    padding: 5rem 6rem;
+    background: transparent url("../images/home_background.png") !important;
 }
-.masthead .logo.item img {
-    margin-right: 1em;
+.masthead .secondary.inverted.menu
+{
+    margin-top: -4.5rem;
+    padding-bottom: 1.5rem;
 }
-.masthead .ui.menu .ui.button {
-    margin-left: 0.5em;
-}
+
 .masthead h1.ui.header {
-    margin-top: 3em;
-    margin-bottom: 0em;
     font-size: 4em;
     font-weight: normal;
 }
