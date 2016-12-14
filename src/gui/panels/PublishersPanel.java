@@ -33,8 +33,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import utils.ExceptionUtils;
+import locale.MessageSource;
 import model.Publisher;
+import utils.ExceptionUtils;
 import database.dao.PublisherDAO;
 
 public class PublishersPanel extends JPanel
@@ -64,14 +65,14 @@ public class PublishersPanel extends JPanel
 				lCardLayout.show(centerPanel, PANEL_CARDS);
 			}
 		});
-		btCards.setToolTipText("Mostrar cards");
+		btCards.setToolTipText(MessageSource.getInstance().getString("MangasPanel.btn.showCards"));
 		btCards.setSelected(true);
 		btCards.setPreferredSize(new Dimension(32, 32));
 		btCards.setIcon(new ImageIcon(PublishersPanel.class.getResource("/images/cards_16.png")));
 		jtOptions.add(btCards);
 
 		JToggleButton btTable = new JToggleButton("");
-		btTable.setToolTipText("Mostrar tabela");
+		btTable.setToolTipText(MessageSource.getInstance().getString("MangasPanel.btn.showTable"));
 		btTable.setPreferredSize(new Dimension(32, 32));
 		btTable.setIcon(new ImageIcon(PublishersPanel.class.getResource("/images/table_16.png")));
 		btTable.addActionListener(new ActionListener() {
@@ -92,7 +93,7 @@ public class PublishersPanel extends JPanel
 		Component horizontalGlue = Box.createHorizontalGlue();
 		jtOptions.add(horizontalGlue);
 
-		JButton btNewPublisher = new JButton("Novo");
+		JButton btNewPublisher = new JButton(MessageSource.getInstance().getString("Basics.new"));
 		btNewPublisher.addActionListener(new ActionListener() {
 
 			@Override
@@ -156,7 +157,7 @@ public class PublishersPanel extends JPanel
 			{
 				Publisher result = lPublisherDialog.getResult();
 				if (!lPublisherDAO.insert(result))
-					JOptionPane.showMessageDialog(null, "Houve um erro ao inserir a editora.\nPor favor, tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.insert"), MessageSource.getInstance().getString("Basics.thisPublisher") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 
 			}
 			catch (SQLException e)
@@ -200,7 +201,7 @@ public class PublishersPanel extends JPanel
 						try (PublisherDAO lPublisherDAO = Main.DATABASE.getPublisherDAO())
 						{
 							if (!lPublisherDAO.update(lPublisherDialog.getResult()))
-								JOptionPane.showMessageDialog(null, "Houve um erro ao editar a editora.\nPor favor, tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisPublisher") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 							lPublisherCard.setPublisher(lPublisherDialog.getResult());
 						}
 						catch (SQLException e)
@@ -215,12 +216,12 @@ public class PublishersPanel extends JPanel
 				@Override
 				public void actionPerformed(ActionEvent arg0)
 				{
-					if (JOptionPane.showConfirmDialog(null, "Você tem certeza que deseja remover esta editora?\nTodos os itens relacionados a esta editora serão removidos também.", "Confirmação de exclusão", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+					if (JOptionPane.showConfirmDialog(null, MessageSource.getInstance().getString("Basics.databaseRemoveConfirmation", new Object[] { MessageSource.getInstance().getString("Basics.thisPublisher") }), MessageSource.getInstance().getString("Basics.removeConfirmation"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 					{
 						try (PublisherDAO lPublisherDAO = Main.DATABASE.getPublisherDAO())
 						{
 							if (!lPublisherDAO.remove(lPublisherCard.getPublisher()))
-								JOptionPane.showMessageDialog(null, "Houve um erro ao deletar a editora.\nPor favor, tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.delete"), MessageSource.getInstance().getString("Basics.thisPublisher") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 							panelPublishers.remove(lPublisherCard);
 							panelPublishers.repaint();
 							panelPublishers.validate();
@@ -251,9 +252,9 @@ public class PublishersPanel extends JPanel
 				return false;
 			}
 		};
-		lDefaultTableModel.addColumn("ID");
-		lDefaultTableModel.addColumn("Nome");
-		lDefaultTableModel.addColumn("Site");
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("PublishersPanel.table.id"));
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("PublishersPanel.table.name"));
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("PublishersPanel.table.site"));
 
 		for (Publisher p : publishers)
 			lDefaultTableModel.addRow(new Object[] { p.getId(), p.getName(), p.getSite() });

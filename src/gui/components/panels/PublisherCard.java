@@ -13,20 +13,16 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 
-import model.Manga;
+import locale.MessageSource;
 import model.Publisher;
 import utils.BorderUtils;
 import utils.Utilities;
@@ -64,9 +60,9 @@ public class PublisherCard extends JPanel implements MouseListener
 
 		horizontalBox.add(Box.createRigidArea(new Dimension(2, 1)));
 
-		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
+		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png"))); 
 		horizontalBox.add(btEdit);
-		btEdit.setToolTipText("Editar");
+		btEdit.setToolTipText(MessageSource.getInstance().getString("Basics.edit")); 
 		btEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btEdit.setContentAreaFilled(false);
 		btEdit.setFocusPainted(false);
@@ -79,8 +75,8 @@ public class PublisherCard extends JPanel implements MouseListener
 		rigidArea = Box.createRigidArea(new Dimension(65, 16));
 		horizontalBox.add(rigidArea);
 
-		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png")));
-		btRemove.setToolTipText("Deletar");
+		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png"))); 
+		btRemove.setToolTipText(MessageSource.getInstance().getString("Basics.remove")); 
 		btRemove.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btRemove.setPreferredSize(new Dimension(16, 16));
 		btRemove.setOpaque(false);
@@ -95,9 +91,9 @@ public class PublisherCard extends JPanel implements MouseListener
 		horizontalBox.add(horizontalGlue);
 
 		jpmOptions = new JPopupMenu();
-		jmiEdit = new JMenuItem("Editar", new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
+		jmiEdit = new JMenuItem(MessageSource.getInstance().getString("Basics.edit"), new ImageIcon(getClass().getResource("/images/lead_pencil.png"))); 
 		jpmOptions.add(jmiEdit);
-		jmiRemove = new JMenuItem("Deletar", new ImageIcon(getClass().getResource("/images/delete_16.png")));
+		jmiRemove = new JMenuItem(MessageSource.getInstance().getString("Basics.remove"), new ImageIcon(getClass().getResource("/images/delete_16.png"))); 
 		jpmOptions.add(jmiRemove);
 
 		setBackground(hoverColor);
@@ -139,7 +135,7 @@ public class PublisherCard extends JPanel implements MouseListener
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		// Draw Poster
-		Image poster = publisher.getLogo() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(publisher.getLogo().toString()).getImage();
+		Image poster = publisher.getLogo() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(publisher.getLogo().toString()).getImage(); 
 		g2d.drawImage(poster, 0, 0, height, height, null);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(100, 0, 100, height);
@@ -157,11 +153,11 @@ public class PublisherCard extends JPanel implements MouseListener
 		if (metrics.stringWidth(publisher.getName()) <= 190)
 			g2d.drawString(publisher.getName(), 100 + (200 - metrics.stringWidth(publisher.getName())) / 2, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		else
-			g2d.drawString(publisher.getName().substring(0, 25) + "...", 105, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+			g2d.drawString(publisher.getName().substring(0, 25) + "...", 105, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent()); 
 
 		// Draw Volumes
 		String volumes = String.valueOf(publisher.getVolumes().size());
-		String quantity = "VOLUME" + (volumes.equals("1") ? "" : "S") + " PUBLICADO" + (volumes.equals("1") ? "" : "S");
+		String quantity = volumes.equals("1") ? MessageSource.getInstance().getString("PublisherCard.lbl.publishedVolumesSingular").toUpperCase() : MessageSource.getInstance().getString("PublisherCard.lbl.publishedVolumesPlural").toUpperCase(); 
 		int yVolumes = titleHeight + 20;
 		g2d.setFont(getFont().deriveFont(30.0f));
 		metrics = getFontMetrics(getFont().deriveFont(30.0f));

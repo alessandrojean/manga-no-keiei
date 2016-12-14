@@ -16,12 +16,14 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import locale.MessageSource;
 import model.Manga;
 import utils.ColorUtils;
 import utils.ExceptionUtils;
@@ -34,7 +36,7 @@ public class Main extends JFrame
 {
 
 	private JPanel contentPane;
-	private JPanel navigationPanel;
+	private static NavigationPanel navigationPanel;
 	private static JPanel cardPanel;
 
 	public static final Database DATABASE = new Database();
@@ -81,6 +83,13 @@ public class Main extends JFrame
 		List<Image> icons = Arrays.asList(new ImageIcon(getClass().getResource("/images/logo_16.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_32.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_64.png")).getImage(), new ImageIcon(getClass().getResource("/images/logo_128.png")).getImage());
 
 		setIconImages(icons);
+		init();
+
+		setLocationRelativeTo(null);
+	}
+	
+	public void init()
+	{
 		contentPane = new JPanel();
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout());
@@ -98,14 +107,25 @@ public class Main extends JFrame
 		cardPanel.add(MANGAS_PANEL, Panels.MANGAS_LIST);
 		cardPanel.add(new PublishersPanel(), Panels.PUBLISHERS_LIST);
 		cardPanel.add(new SettingsPanel(), Panels.SETTINGS);
-
-		setLocationRelativeTo(null);
 	}
 
 	public static void showPanel(String panel)
 	{
 		CardLayout lCardLayout = (CardLayout) cardPanel.getLayout();
 		lCardLayout.show(cardPanel, panel);
+		
+		int c = -1;
+		if(panel.equals(Panels.HOME))
+			c = NavigationPanel.BUTTON_HOME;
+		else if(panel.equals(Panels.MANGAS_LIST))
+			c = NavigationPanel.BUTTON_LIST;
+		else if(panel.equals(Panels.PUBLISHERS_LIST))
+			c = NavigationPanel.BUTTON_LIST_PUBLISHERS;
+		else if(panel.equals(Panels.SETTINGS))
+			c = NavigationPanel.BUTTON_SETTINGS;
+		
+		if(c>-1)
+			navigationPanel.selectButton(c);
 	}
 
 	public static void showVolumePanel(Manga m)

@@ -33,8 +33,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import utils.ExceptionUtils;
+import locale.MessageSource;
 import model.Manga;
+import utils.ExceptionUtils;
 import database.dao.MangaDAO;
 
 public class MangasPanel extends JPanel
@@ -45,7 +46,7 @@ public class MangasPanel extends JPanel
 
 	private List<Manga> mangas;
 
-	private static final String PANEL_CARDS = "cards", PANEL_TABLE = "table";
+	private static final String PANEL_CARDS = "cards", PANEL_TABLE = "table"; 
 	private JTable tableMangas;
 
 	public MangasPanel()
@@ -56,7 +57,7 @@ public class MangasPanel extends JPanel
 		jtOptions.setFloatable(false);
 		add(jtOptions, BorderLayout.NORTH);
 
-		JToggleButton btCards = new JToggleButton("");
+		JToggleButton btCards = new JToggleButton(""); 
 		btCards.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0)
 			{
@@ -64,16 +65,16 @@ public class MangasPanel extends JPanel
 				lCardLayout.show(centerPanel, PANEL_CARDS);
 			}
 		});
-		btCards.setToolTipText("Mostrar cards");
+		btCards.setToolTipText(MessageSource.getInstance().getString("MangasPanel.btn.showCards")); 
 		btCards.setSelected(true);
 		btCards.setPreferredSize(new Dimension(32, 32));
-		btCards.setIcon(new ImageIcon(MangasPanel.class.getResource("/images/cards_16.png")));
+		btCards.setIcon(new ImageIcon(MangasPanel.class.getResource("/images/cards_16.png"))); 
 		jtOptions.add(btCards);
 
-		JToggleButton btTable = new JToggleButton("");
-		btTable.setToolTipText("Mostrar tabela");
+		JToggleButton btTable = new JToggleButton(""); 
+		btTable.setToolTipText(MessageSource.getInstance().getString("MangasPanel.btn.showTable")); 
 		btTable.setPreferredSize(new Dimension(32, 32));
-		btTable.setIcon(new ImageIcon(MangasPanel.class.getResource("/images/table_16.png")));
+		btTable.setIcon(new ImageIcon(MangasPanel.class.getResource("/images/table_16.png"))); 
 		btTable.addActionListener(new ActionListener() {
 
 			@Override
@@ -92,7 +93,7 @@ public class MangasPanel extends JPanel
 		Component horizontalGlue = Box.createHorizontalGlue();
 		jtOptions.add(horizontalGlue);
 
-		JButton btNewManga = new JButton("Novo");
+		JButton btNewManga = new JButton(MessageSource.getInstance().getString("Basics.new")); 
 		btNewManga.addActionListener(new ActionListener() {
 
 			@Override
@@ -156,7 +157,7 @@ public class MangasPanel extends JPanel
 			{
 				Manga result = lMangaDialog.getResult();
 				if (!lMangaDAO.insert(result))
-					JOptionPane.showMessageDialog(null, "Houve um erro ao inserir o mangá.\nPor favor, tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.insert"), MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
 
 			}
 			catch (SQLException e)
@@ -200,7 +201,7 @@ public class MangasPanel extends JPanel
 						try (MangaDAO lMangaDAO = Main.DATABASE.getMangaDAO())
 						{
 							if (!lMangaDAO.update(lMangaDialog.getResult()))
-								JOptionPane.showMessageDialog(null, "Houve um erro ao editar o mangá.\nPor favor, tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
 							lMangaCard.setManga(lMangaDialog.getResult());
 						}
 						catch (SQLException e)
@@ -215,12 +216,12 @@ public class MangasPanel extends JPanel
 				@Override
 				public void actionPerformed(ActionEvent arg0)
 				{
-					if (JOptionPane.showConfirmDialog(null, "Você tem certeza que deseja remover este mangá?\nTodos os itens relacionados a este mangá serão removidos também.", "Confirmação de exclusão", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+					if (JOptionPane.showConfirmDialog(null, MessageSource.getInstance().getString("Basics.databaseRemoveConfirmation",new Object[]{MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.removeConfirmation"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) 
 					{
 						try (MangaDAO lMangaDAO = Main.DATABASE.getMangaDAO())
 						{
 							if (!lMangaDAO.remove(lMangaCard.getManga()))
-								JOptionPane.showMessageDialog(null, "Houve um erro ao deletar o mangá.\nPor favor, tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.delete"), MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
 							panelMangas.remove(lMangaCard);
 							panelMangas.repaint();
 							panelMangas.validate();
@@ -251,13 +252,13 @@ public class MangasPanel extends JPanel
 				return false;
 			}
 		};
-		lDefaultTableModel.addColumn("ID");
-		lDefaultTableModel.addColumn("Nome (Nacional)");
-		lDefaultTableModel.addColumn("Nome (Original)");
-		lDefaultTableModel.addColumn("Volumes");
-		lDefaultTableModel.addColumn("Tipo");
-		lDefaultTableModel.addColumn("Edição");
-		lDefaultTableModel.addColumn("Nota");
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("MangasPanel.table.id")); 
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("MangasPanel.table.nationalName")); 
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("MangasPanel.table.originalName")); 
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("MangasPanel.table.volumes")); 
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("MangasPanel.table.type")); 
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("MangasPanel.table.edition")); 
+		lDefaultTableModel.addColumn(MessageSource.getInstance().getString("MangasPanel.table.rating")); 
 
 		for (Manga m : mangas)
 			lDefaultTableModel.addRow(new Object[] { m.getId(), m.getNationalName(), m.getOriginalName(), m.getVolumes().size(), m.getType(), m.getEdition(), m.getRating() + 1 });

@@ -1,6 +1,7 @@
 package model;
 
 import java.io.File;
+import java.util.Currency;
 import java.util.Date;
 
 public class Volume
@@ -13,13 +14,13 @@ public class Volume
 	private String title;
 	private String subtitle;
 	private Publisher publisher;
+	private Currency currency;
 	private double totalPrice;
 	private double paidPrice;
-	private String belongsTo;
 	private String paper;
 	private String size;
-	private String gift;
-	private String age;
+	private Gift gift;
+	private Classification classification;
 	private boolean colorPages;
 	private boolean originalPlastic;
 	private boolean protectionPlastic;
@@ -135,16 +136,6 @@ public class Volume
 		this.paidPrice = paidPrice;
 	}
 
-	public String getBelongsTo()
-	{
-		return belongsTo;
-	}
-
-	public void setBelongsTo(String belongsTo)
-	{
-		this.belongsTo = belongsTo;
-	}
-
 	public String getPaper()
 	{
 		return paper;
@@ -165,24 +156,24 @@ public class Volume
 		this.size = size;
 	}
 
-	public String getGift()
+	public Gift getGift()
 	{
 		return gift;
 	}
 
-	public void setGift(String gift)
+	public void setGift(Gift gift)
 	{
 		this.gift = gift;
 	}
 
-	public String getAge()
+	public Classification getClassification()
 	{
-		return age;
+		return classification;
 	}
 
-	public void setAge(String age)
+	public void setClassification(Classification classification)
 	{
-		this.age = age;
+		this.classification = classification;
 	}
 
 	public boolean isColorPages()
@@ -253,6 +244,16 @@ public class Volume
 	public void setPoster(File poster)
 	{
 		this.poster = poster;
+	}
+
+	public Currency getCurrency()
+	{
+		return currency;
+	}
+
+	public void setCurrency(Currency currency)
+	{
+		this.currency = currency;
 	}
 
 	@Override

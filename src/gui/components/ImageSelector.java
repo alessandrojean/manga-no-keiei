@@ -30,9 +30,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import locale.MessageSource;
 import utils.ExceptionUtils;
 import utils.ImageUtils;
-import utils.LookAndFeelUtils;
 
 import com.bulenkov.iconloader.util.Gray;
 
@@ -52,8 +52,8 @@ public class ImageSelector extends JPanel implements MouseListener
 		Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
 
-		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/remove_16.png")));
-		btRemove.setToolTipText("Limpar imagem");
+		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/remove_16.png"))); 
+		btRemove.setToolTipText(MessageSource.getInstance().getString("ImageSelector.cleanImage")); 
 		btRemove.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btRemove.setContentAreaFilled(false);
 		btRemove.setFocusPainted(false);
@@ -71,12 +71,12 @@ public class ImageSelector extends JPanel implements MouseListener
 				repaint();
 				btRemove.setVisible(false);
 				setCursor(new Cursor(Cursor.HAND_CURSOR));
-				setToolTipText("Clique para abrir uma imagem");
+				setToolTipText(MessageSource.getInstance().getString("ImageSelector.openImage")); 
 			}
 		});
 		add(btRemove);
 
-		setToolTipText("Clique para abrir uma imagem");
+		setToolTipText(MessageSource.getInstance().getString("ImageSelector.openImage")); 
 
 		setBorder(new RoundedBorder(Gray._100));
 	}
@@ -127,13 +127,13 @@ public class ImageSelector extends JPanel implements MouseListener
 		if (image == null)
 		{			
 			JFileChooser lJFileChooser = new JFileChooser();
-			lJFileChooser.setFileFilter(new FileNameExtensionFilter("Imagens", ImageIO.getReaderFileSuffixes()));
+			lJFileChooser.setFileFilter(new FileNameExtensionFilter(MessageSource.getInstance().getString("ImageSelector.fc.images"), ImageIO.getReaderFileSuffixes())); 
 			if (lJFileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 			{
 				image = lJFileChooser.getSelectedFile();
 				btRemove.setVisible(true);
 				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				setToolTipText("");
+				setToolTipText(""); 
 				repaint();
 			}
 		}
@@ -172,7 +172,7 @@ public class ImageSelector extends JPanel implements MouseListener
 		{
 			btRemove.setVisible(true);
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			setToolTipText("");
+			setToolTipText(""); 
 		}
 	}
 }

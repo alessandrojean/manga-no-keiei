@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import locale.MessageSource;
 import model.Publisher;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
@@ -78,7 +79,7 @@ public class PublisherDialog extends Dialog<Publisher>
 
 	private void initComponents()
 	{
-		setTitle("Nova Editora");
+		setTitle(MessageSource.getInstance().getString("PublisherDialog.title"));
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 550, 330);
@@ -89,14 +90,14 @@ public class PublisherDialog extends Dialog<Publisher>
 		setContentPane(contentPane);
 
 		JPanel informationPanel = new JPanel();
-		informationPanel.setBorder(BorderUtils.createRoundedTitleBorder("Informa\u00E7\u00F5es"));
+		informationPanel.setBorder(BorderUtils.createRoundedTitleBorder(MessageSource.getInstance().getString("PublisherDialog.informationPanel.border.title")));
 		contentPane.add(informationPanel, BorderLayout.CENTER);
 		informationPanel.setLayout(new MigLayout("", "[grow][grow][grow][150px]", "[][][][150px]"));
 
-		JLabel lbName = new JLabel("Nome:");
+		JLabel lbName = new JLabel(MessageSource.getInstance().getString("PublisherDialog.lbl.name"));
 		informationPanel.add(lbName, "cell 0 0");
 
-		JLabel lbSite = new JLabel("Site:");
+		JLabel lbSite = new JLabel(MessageSource.getInstance().getString("PublisherDialog.lbl.site"));
 		informationPanel.add(lbSite, "cell 2 0");
 
 		tfName = new JTextField();
@@ -106,7 +107,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		tfSite = new JTextField();
 		informationPanel.add(tfSite, "cell 2 1 2 1,growx");
 
-		JLabel lbHistory = new JLabel("Hist\u00F3ria:");
+		JLabel lbHistory = new JLabel(MessageSource.getInstance().getString("PublisherDialog.lbl.history"));
 		informationPanel.add(lbHistory, "cell 0 2");
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -128,7 +129,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		Component horizontalGlue = Box.createHorizontalGlue();
 		buttonPanel.add(horizontalGlue);
 
-		JButton btOK = new JButton("OK");
+		JButton btOK = new JButton(MessageSource.getInstance().getString("Basics.ok"));
 		btOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -140,7 +141,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		getRootPane().setDefaultButton(btOK);
 		buttonPanel.add(btOK);
 
-		JButton btCancel = new JButton("Cancelar");
+		JButton btCancel = new JButton(MessageSource.getInstance().getString("Basics.cancel"));
 		btCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -151,7 +152,7 @@ public class PublisherDialog extends Dialog<Publisher>
 		btCancel.setMnemonic('C');
 		buttonPanel.add(btCancel);
 
-		JButton btClear = new JButton("Limpar");
+		JButton btClear = new JButton(MessageSource.getInstance().getString("Basics.clean"));
 		btClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{

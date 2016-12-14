@@ -7,9 +7,11 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -17,11 +19,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.MouseInputAdapter;
 
 import utils.ExceptionUtils;
 
@@ -32,6 +32,8 @@ public class Splash extends JFrame
 	
 	public static final String PROJECT_NAME = "Manga no Keiei";
 	public static final String PROJECT_VERSION = "v1.0";
+	
+	public static Main MAIN;
 
 	private JPanel contentPane;
 	private JProgressBar progressBar;
@@ -125,8 +127,8 @@ public class Splash extends JFrame
 
 	private void showMain()
 	{
-		Main lMain = new Main();
-		lMain.setVisible(true);
+		MAIN = new Main();
+		MAIN.setVisible(true);
 		setVisible(false);
 		dispose();
 	}

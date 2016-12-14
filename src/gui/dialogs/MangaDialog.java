@@ -12,6 +12,8 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.ImageProducer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -30,7 +32,11 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import locale.MessageSource;
+import model.Gender;
 import model.Manga;
+import model.MangaEdition;
+import model.MangaType;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
 import utils.ComboBoxUtils;
@@ -52,15 +58,12 @@ public class MangaDialog extends Dialog<Manga>
 	private JTextField tfStamp;
 	private ImageSelector imgPoster;
 
-	private JComboBox<String> cbType;
-	private JComboBox<String> cbEdition;
+	private JComboBox<MangaType> cbType;
+	private JComboBox<MangaEdition> cbEdition;
 	private LevelBar lbsRating;
 	private JTextArea taObservations;
 	private CheckedComboBox<CheckableItem> cbGenders;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args)
 	{
 		try
@@ -91,17 +94,17 @@ public class MangaDialog extends Dialog<Manga>
 	{
 		initComponents();
 	}
-	
+
 	public MangaDialog(Manga manga)
 	{
 		result = manga;
 		initComponents();
 		updateFields();
 	}
-	
+
 	private void initComponents()
 	{
-		setTitle("Novo Mang\u00E1");
+		setTitle(MessageSource.getInstance().getString("MangaDialog.title"));
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 870, 450);
@@ -129,18 +132,18 @@ public class MangaDialog extends Dialog<Manga>
 		 * informationPanel.setBackground(new Color(1.0f, 1.0f, 1.0f, 0.0f));
 		 * informationPanel.addMouseMotionListener(d); */
 		JPanel informationPanel = new JPanel();
-		informationPanel.setBorder(BorderUtils.createRoundedTitleBorder("Informa\u00E7\u00F5es"));
+		informationPanel.setBorder(BorderUtils.createRoundedTitleBorder(MessageSource.getInstance().getString("MangaDialog.informationPanel.border.title")));
 		// informationPanel.setBorder(new RoundedTitleBorder("Informações",
 		// Color.WHITE, Color.BLUE, 10, 10, 0, 0));
 		contentPane.add(informationPanel, BorderLayout.CENTER);
 		informationPanel.setLayout(new MigLayout("", "[grow][grow][grow][grow][220px]", "[][][][][][][][][][grow]"));
 
-		JLabel lbNationalName = new JLabel("<html>Nome <i>(nacional)</i>:</html>");
+		JLabel lbNationalName = new JLabel(String.format("<html>%s</html>", MessageSource.getInstance().getString("MangaDialog.lbl.nationalName")));
 		informationPanel.add(lbNationalName, "cell 0 0");
 
-		JLabel lbOriginalName = new JLabel("<html>Nome <i>(original)</i>:</html>");
+		JLabel lbOriginalName = new JLabel(String.format("<html>%s</html>", MessageSource.getInstance().getString("MangaDialog.lbl.originalName")));
 		informationPanel.add(lbOriginalName, "cell 2 0");
-		
+
 		imgPoster = new ImageSelector();
 		informationPanel.add(imgPoster, "cell 4 0 1 10,grow");
 
@@ -151,20 +154,20 @@ public class MangaDialog extends Dialog<Manga>
 		tfOriginalName = new JTextField();
 		informationPanel.add(tfOriginalName, "cell 2 1 2 1,growx");
 
-		JLabel lbType = new JLabel("Tipo:");
+		JLabel lbType = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.type"));
 		informationPanel.add(lbType, "cell 0 2");
 
-		JLabel lbSerialization = new JLabel("Serializa\u00E7\u00E3o:");
+		JLabel lbSerialization = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.serialization"));
 		informationPanel.add(lbSerialization, "cell 1 2");
 
-		JLabel lbStartDate = new JLabel("<html>Data <i>(in\u00EDcio)</i>:</html>");
+		JLabel lbStartDate = new JLabel(String.format("<html>%s</html>", MessageSource.getInstance().getString("MangaDialog.lbl.startDate")));
 		informationPanel.add(lbStartDate, "cell 2 2");
 
-		JLabel lbFinishDate = new JLabel("<html>Data <i>(fim)</i>:</html>");
+		JLabel lbFinishDate = new JLabel(String.format("<html>%s</html>", MessageSource.getInstance().getString("MangaDialog.lbl.finishDate")));
 		informationPanel.add(lbFinishDate, "cell 3 2");
 
 		cbType = new JComboBox<>();
-		cbType.setModel(new DefaultComboBoxModel<String>(new String[] { "Mang\u00E1", "Manhwa", "Manhua", "Manfr\u00E1", "Doujinshin", "HQ", "Novel", "Light Novel" }));
+		cbType.setModel(new DefaultComboBoxModel<MangaType>(MangaType.values()));
 		informationPanel.add(cbType, "cell 0 3,growx");
 
 		tfSerialization = new JTextField();
@@ -176,32 +179,31 @@ public class MangaDialog extends Dialog<Manga>
 		tfFinishDate = new JFormattedTextField(FormUtils.getMaskFormatter(FormUtils.MASK_FORMATTER_DATE));
 		informationPanel.add(tfFinishDate, "cell 3 3,growx,aligny top");
 
-		JLabel lbAuthors = new JLabel("Autores:");
+		JLabel lbAuthors = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.authors"));
 		informationPanel.add(lbAuthors, "cell 0 4");
 
-		JLabel lbEdition = new JLabel("Edi\u00E7\u00E3o:");
+		JLabel lbEdition = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.edition"));
 		informationPanel.add(lbEdition, "cell 2 4");
 
-		JLabel lbStamp = new JLabel("Selo:");
+		JLabel lbStamp = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.stamp"));
 		informationPanel.add(lbStamp, "cell 3 4");
 
 		tfAuthors = new JTextField();
 		informationPanel.add(tfAuthors, "cell 0 5 2 1,growx");
 
 		cbEdition = new JComboBox<>();
-		cbEdition.setModel(new DefaultComboBoxModel<String>(new String[] { "Tanko", "Meio-Tanko", "Dois em um", "Tr\u00EAs em um", "Luxo", "Kanzenban", "Capa dura", "Revista", "Reimpress\u00E3o", "Relan\u00E7amento" }));
-		cbEdition.setEditable(true);
+		cbEdition.setModel(new DefaultComboBoxModel<MangaEdition>(MangaEdition.values()));
 		informationPanel.add(cbEdition, "cell 2 5,growx");
 
 		tfStamp = new JTextField();
 		informationPanel.add(tfStamp, "cell 3 5,growx");
 
-		JLabel lbGenders = new JLabel("G\u00EAneros:");
+		JLabel lbGenders = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.genders"));
 		informationPanel.add(lbGenders, "cell 0 6");
 
-		CheckableItem[] items = ComboBoxUtils.toCheckableItemArray(MangaUtils.getGenders());
+		CheckableItem[] items = ComboBoxUtils.toCheckableItemArray(Gender.values());
 
-		JLabel lbRating = new JLabel("Nota:");
+		JLabel lbRating = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.rating"));
 		informationPanel.add(lbRating, "cell 3 6");
 
 		cbGenders = new CheckedComboBox<CheckableItem>(new DefaultComboBoxModel<CheckableItem>(items));
@@ -215,7 +217,7 @@ public class MangaDialog extends Dialog<Manga>
 		lbsRating = new LevelBar(defaultIcon, yStar, 1);
 		informationPanel.add(lbsRating, "cell 3 7");
 
-		JLabel lbObservations = new JLabel("Observa\u00E7\u00F5es:");
+		JLabel lbObservations = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.observations"));
 		informationPanel.add(lbObservations, "cell 0 8");
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -234,7 +236,7 @@ public class MangaDialog extends Dialog<Manga>
 		Component horizontalGlue = Box.createHorizontalGlue();
 		buttonPanel.add(horizontalGlue);
 
-		JButton btOK = new JButton("OK");
+		JButton btOK = new JButton(MessageSource.getInstance().getString("Basics.ok"));
 		btOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -246,7 +248,7 @@ public class MangaDialog extends Dialog<Manga>
 		getRootPane().setDefaultButton(btOK);
 		buttonPanel.add(btOK);
 
-		JButton btCancel = new JButton("Cancelar");
+		JButton btCancel = new JButton(MessageSource.getInstance().getString("Basics.cancel"));
 		btCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -257,7 +259,7 @@ public class MangaDialog extends Dialog<Manga>
 		btCancel.setMnemonic('C');
 		buttonPanel.add(btCancel);
 
-		JButton btClear = new JButton("Limpar");
+		JButton btClear = new JButton(MessageSource.getInstance().getString("Basics.clean"));
 		btClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -268,7 +270,7 @@ public class MangaDialog extends Dialog<Manga>
 		btClear.setMnemonic('L');
 		buttonPanel.add(btClear);
 	}
-	
+
 	@Override
 	protected void updateFields()
 	{
@@ -281,12 +283,12 @@ public class MangaDialog extends Dialog<Manga>
 		tfAuthors.setText(result.getAuthors());
 		cbEdition.setSelectedItem(result.getEdition());
 		tfStamp.setText(result.getStamp());
-		cbGenders.setSelectedItems(result.getGenders().split(";"));
+		cbGenders.setSelectedItems(result.getGenders());
 		lbsRating.setLevel(result.getRating());
 		taObservations.setText(result.getObservations());
 		imgPoster.setImage(result.getPoster());
 	}
-	
+
 	@Override
 	protected void clearFields()
 	{
@@ -305,30 +307,36 @@ public class MangaDialog extends Dialog<Manga>
 		imgPoster.setImage(null);
 		tfNationalName.requestFocus();
 	}
-	
+
 	@Override
 	protected Manga generateResult()
 	{
 		Manga result = new Manga();
-		if(this.result!=null)
+		if (this.result != null)
 		{
 			result.setId(this.result.getId());
 			result.setVolumes(this.result.getVolumes());
 		}
 		result.setNationalName(tfNationalName.getText());
 		result.setOriginalName(tfOriginalName.getText());
-		result.setType(String.valueOf(cbType.getSelectedItem()));
+		result.setType((MangaType) cbType.getSelectedItem());
 		result.setSerialization(tfSerialization.getText());
 		result.setStartDate(DateUtils.toDate(tfStartDate.getText()));
 		result.setFinishDate(DateUtils.toDate(tfFinishDate.getText()));
 		result.setAuthors(tfAuthors.getText());
-		result.setEdition(String.valueOf(cbEdition.getSelectedItem()));
+		result.setEdition((MangaEdition) cbEdition.getSelectedItem());
 		result.setStamp(tfStamp.getText());
-		result.setGenders(ComboBoxUtils.toString(cbGenders.getSelectedItems()));
+
+		List<Gender> genders = new ArrayList<Gender>();
+		for(int i=0;i<cbGenders.getModel().getSize();i++)
+			if(cbGenders.getItemAt(i).isSelected())
+				genders.add(Gender.fromValue(i));
+
+		result.setGenders(genders);
 		result.setRating(lbsRating.getLevel());
 		result.setObservations(taObservations.getText());
 		result.setPoster(imgPoster.getImage());
-		
+
 		return result;
 	}
 
@@ -341,9 +349,9 @@ public class MangaDialog extends Dialog<Manga>
 			return false;
 		if (tfSerialization.getText().equals(""))
 			return false;
-		if(!FormUtils.validateDate(tfStartDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
+		if (!FormUtils.validateDate(tfStartDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
 			return false;
-		if(!FormUtils.validateDate(tfFinishDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
+		if (!FormUtils.validateDate(tfFinishDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
 			return false;
 		if (tfStartDate.getText().equals(""))
 			return false;

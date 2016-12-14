@@ -16,6 +16,8 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import javax.swing.plaf.basic.BasicComboPopup;
 
+import model.Gender;
+
 public class CheckedComboBox<E extends CheckableItem> extends JComboBox<E>
 {
 	private boolean keepOpen;
@@ -55,6 +57,27 @@ public class CheckedComboBox<E extends CheckableItem> extends JComboBox<E>
 				for(int j=0;j<items.length;j++)
 				{
 					if(item.getText().equals(items[j]))
+					{
+						item.setSelected(true);
+						break;
+					}
+				}
+			}
+			setSelectedIndex(-1);
+			updateUI();
+		}
+	}
+	
+	public void setSelectedItems(List<Gender> items)
+	{
+		if(getModel()!=null)
+		{
+			for(int i = 0; i< getModel().getSize();i++)
+			{
+				CheckableItem item = getModel().getElementAt(i);
+				for(int j=0;j<items.size();j++)
+				{
+					if(item.getText().equals(items.get(j).toString()))
 					{
 						item.setSelected(true);
 						break;

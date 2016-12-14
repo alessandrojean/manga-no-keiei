@@ -1,6 +1,7 @@
 package model;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,17 +12,17 @@ public class Manga
 	private int id;
 	private String nationalName;
 	private String originalName;
-	private String type;
+	private MangaType type;
 	private String serialization;
 	private Date startDate;
 	private Date finishDate;
 	private String authors;
-	private String edition;
+	private MangaEdition edition;
 	private String stamp;
-	private String genders;
+	private List<Gender> genders;
 	private int rating;
 	private String observations;
-	
+
 	private File poster;
 
 	private List<Volume> volumes;
@@ -74,12 +75,12 @@ public class Manga
 		this.originalName = originalName;
 	}
 
-	public String getType()
+	public MangaType getType()
 	{
 		return type;
 	}
 
-	public void setType(String type)
+	public void setType(MangaType type)
 	{
 		this.type = type;
 	}
@@ -124,12 +125,12 @@ public class Manga
 		this.authors = authors;
 	}
 
-	public String getEdition()
+	public MangaEdition getEdition()
 	{
 		return edition;
 	}
 
-	public void setEdition(String edition)
+	public void setEdition(MangaEdition edition)
 	{
 		this.edition = edition;
 	}
@@ -144,14 +145,35 @@ public class Manga
 		this.stamp = stamp;
 	}
 
-	public String getGenders()
+	public List<Gender> getGenders()
 	{
 		return genders;
 	}
 
-	public void setGenders(String genders)
+	public String getGendersAsString()
+	{
+		String result = "";
+
+		for (int i = 0; i < genders.size(); i++)
+			result += genders.get(i).getValue() + (i == genders.size() - 1 ? "" : ";");
+
+		return result;
+	}
+
+	public void setGenders(List<Gender> genders)
 	{
 		this.genders = genders;
+	}
+
+	public void setGenders(String genders)
+	{
+		List<Gender> gendersList = new ArrayList<Gender>();
+		String[] gendersSplitted = genders.split(";");
+
+		for (String s : gendersSplitted)
+			gendersList.add(Gender.fromValue(Integer.parseInt(s)));
+
+		this.genders = gendersList;
 	}
 
 	public int getRating()

@@ -11,26 +11,17 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 
+import locale.MessageSource;
 import model.Manga;
 import utils.BorderUtils;
 import utils.Utilities;
-
-import com.bulenkov.iconloader.util.Gray;
 
 public class MangaHeader extends JPanel
 {
@@ -40,10 +31,6 @@ public class MangaHeader extends JPanel
 	private JButton btRemove;
 	private Component rigidArea;
 	private Component horizontalGlue;
-	
-	private JPopupMenu jpmOptions;
-	private JMenuItem jmiEdit;
-	private JMenuItem jmiRemove;
 	
 	private Color hoverColor = new Color(69,73,74);
 
@@ -63,9 +50,9 @@ public class MangaHeader extends JPanel
 		
 		horizontalBox.add(Box.createRigidArea(new Dimension(11,1)));
 		
-		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
+		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png"))); 
 		horizontalBox.add(btEdit);
-		btEdit.setToolTipText("Editar");
+		btEdit.setToolTipText(MessageSource.getInstance().getString("Basics.edit")); 
 		btEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btEdit.setContentAreaFilled(false);
 		btEdit.setFocusPainted(false);
@@ -77,8 +64,8 @@ public class MangaHeader extends JPanel
 		rigidArea = Box.createRigidArea(new Dimension(88, 16));
 		horizontalBox.add(rigidArea);
 		
-		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png")));
-		btRemove.setToolTipText("Deletar");
+		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png"))); 
+		btRemove.setToolTipText(MessageSource.getInstance().getString("Basics.remove")); 
 		btRemove.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btRemove.setPreferredSize(new Dimension(16, 16));
 		btRemove.setOpaque(false);
@@ -91,34 +78,17 @@ public class MangaHeader extends JPanel
 		horizontalGlue = Box.createHorizontalGlue();
 		horizontalBox.add(horizontalGlue);
 		
-		jpmOptions = new JPopupMenu();
-		JMenu jmNew = new JMenu("Novo");
-		jmNew.setIcon(new ImageIcon(getClass().getResource("/images/plus_15.png")));
-		JMenuItem jmiNewVolume = new JMenuItem("Volume");
-		jmNew.add(jmiNewVolume);
-		JMenuItem jmiNewGift = new JMenuItem("Brinde");
-		jmNew.add(jmiNewGift);
-		jpmOptions.add(jmNew);
-		JSeparator jsSeparator = new JSeparator();
-		jpmOptions.add(jsSeparator);
-		jmiEdit = new JMenuItem("Editar", new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
-		jpmOptions.add(jmiEdit);
-		jmiRemove = new JMenuItem("Deletar", new ImageIcon(getClass().getResource("/images/delete_16.png")));
-		jpmOptions.add(jmiRemove);
-		
 		setBackground(hoverColor);
 	}
 	
 	public void addEditButtonActionListener(ActionListener actionListener)
 	{
 		btEdit.addActionListener(actionListener);
-		jmiEdit.addActionListener(actionListener);
 	}
 	
 	public void addRemoveButtonActionListener(ActionListener actionListener)
 	{
 		btRemove.addActionListener(actionListener);
-		jmiRemove.addActionListener(actionListener);
 	}
 
 	public Manga getManga()
@@ -144,7 +114,7 @@ public class MangaHeader extends JPanel
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		// Draw Poster
-		Image poster = manga.getPoster()==null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(manga.getPoster().toString()).getImage();
+		Image poster = manga.getPoster()==null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(manga.getPoster().toString()).getImage(); 
 		g2d.drawImage(poster, 6, 6, 130, height-12, null);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawRect(5, 5, 131, height -11);
@@ -157,7 +127,7 @@ public class MangaHeader extends JPanel
 		g2d.drawString(manga.getNationalName(), 145, yTitle);
 
 		// Draw Details
-		String details = String.format("%s \u00B7 %s", manga.getType(), manga.getEdition());
+		String details = String.format("%s \u00B7 %s", manga.getType(), manga.getEdition()); 
 		metrics = getFontMetrics(getFont());
 		g2d.setFont(getFont());
 		g2d.drawString(details, 145, yTitle + hTitle / 2 + 5);
@@ -168,8 +138,8 @@ public class MangaHeader extends JPanel
 		int yStar = yTitle+hTitle/2+5 + metrics.getHeight() / 2 + 5;
 		int rating = manga.getRating();
 		int starWidth = 24 * 5;
-		Image starFull = new ImageIcon(getClass().getResource("/images/star_google.png")).getImage();
-		Image starOutline = new ImageIcon(getClass().getResource("/images/star_outline.png")).getImage();
+		Image starFull = new ImageIcon(getClass().getResource("/images/star_google.png")).getImage(); 
+		Image starOutline = new ImageIcon(getClass().getResource("/images/star_outline.png")).getImage(); 
 		for (int i = 0; i < 5; i++)
 		{
 			g2d.drawImage(i <= rating ? starFull : starOutline, 145 + 24*i, yStar, 24, 24, null);
@@ -178,7 +148,7 @@ public class MangaHeader extends JPanel
 
 		// Draw Volumes
 		String volumes = String.valueOf(manga.getVolumes().size());
-		String quantity = "VOLUME" + (volumes.equals("1") ? "" : "S");
+		String quantity = volumes.equals("1") ? MessageSource.getInstance().getString("MangaHeader.lbl.volumeSingular").toUpperCase() : MessageSource.getInstance().getString("MangaHeader.lbl.volumePlural").toUpperCase(); 
 		int yVolumes = yStar + 42;
 		g2d.setFont(getFont().deriveFont(30.0f));
 		metrics = getFontMetrics(getFont().deriveFont(30.0f));

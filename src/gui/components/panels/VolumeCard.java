@@ -13,20 +13,16 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 
-import model.Manga;
+import locale.MessageSource;
 import model.Volume;
 import utils.BorderUtils;
 import utils.Utilities;
@@ -64,9 +60,9 @@ public class VolumeCard extends JPanel implements MouseListener
 
 		horizontalBox.add(Box.createRigidArea(new Dimension(2, 1)));
 
-		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
+		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png"))); 
 		horizontalBox.add(btEdit);
-		btEdit.setToolTipText("Editar");
+		btEdit.setToolTipText(MessageSource.getInstance().getString("Basics.edit")); 
 		btEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btEdit.setContentAreaFilled(false);
 		btEdit.setFocusPainted(false);
@@ -79,8 +75,8 @@ public class VolumeCard extends JPanel implements MouseListener
 		rigidArea = Box.createRigidArea(new Dimension(70, 16));
 		horizontalBox.add(rigidArea);
 
-		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png")));
-		btRemove.setToolTipText("Deletar");
+		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png"))); 
+		btRemove.setToolTipText(MessageSource.getInstance().getString("Basics.remove")); 
 		btRemove.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btRemove.setPreferredSize(new Dimension(16, 16));
 		btRemove.setOpaque(false);
@@ -95,9 +91,9 @@ public class VolumeCard extends JPanel implements MouseListener
 		horizontalBox.add(horizontalGlue);
 
 		jpmOptions = new JPopupMenu();
-		jmiEdit = new JMenuItem("Editar", new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
+		jmiEdit = new JMenuItem(MessageSource.getInstance().getString("Basics.edit"), new ImageIcon(getClass().getResource("/images/lead_pencil.png"))); 
 		jpmOptions.add(jmiEdit);
-		jmiRemove = new JMenuItem("Deletar", new ImageIcon(getClass().getResource("/images/delete_16.png")));
+		jmiRemove = new JMenuItem(MessageSource.getInstance().getString("Basics.remove"), new ImageIcon(getClass().getResource("/images/delete_16.png"))); 
 		jpmOptions.add(jmiRemove);
 
 		setBackground(hoverColor);
@@ -139,7 +135,7 @@ public class VolumeCard extends JPanel implements MouseListener
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		// Draw Poster
-		Image poster = volume.getPoster() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(volume.getPoster().toString()).getImage();
+		Image poster = volume.getPoster() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(volume.getPoster().toString()).getImage(); 
 		g2d.drawImage(poster, 0, 0, 105, height, null);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(105, 0, 105, height);
@@ -157,23 +153,23 @@ public class VolumeCard extends JPanel implements MouseListener
 		if (metrics.stringWidth(volume.getTitle()) <= 190)
 			g2d.drawString(volume.getTitle(), 105 + (195 - metrics.stringWidth(volume.getTitle())) / 2, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		else
-			g2d.drawString(volume.getTitle().substring(0, 25) + "...", 110, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+			g2d.drawString(volume.getTitle().substring(0, 25) + "...", 110, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent()); 
 
 		// Draw Details
-		String details = String.format("%1$s \u00B7 R$%2$.2f", volume.getPublisher().getName(), volume.getTotalPrice());
+		String details = String.format("%1$s \u00B7 R$%2$.2f", volume.getPublisher().getName(), volume.getTotalPrice()); 
 		metrics = getFontMetrics(getFont());
 		g2d.setFont(getFont());
 		g2d.drawString(details, 105 + (195 - metrics.stringWidth(details)) / 2, titleHeight + 16);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(110, titleHeight + 8 + metrics.getHeight(), width - 5, titleHeight + 8 + metrics.getHeight());
-		details = String.format("%s \u00B7 %s", volume.getPaper(), volume.getSize());
+		details = String.format("%s \u00B7 %s", volume.getPaper(), volume.getSize()); 
 		g2d.setColor(getForeground());
 		g2d.drawString(details, 105 + (195 - metrics.stringWidth(details)) / 2, titleHeight + 18 + (metrics.getHeight() * 2 + metrics.getAscent()) / 2);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(110, titleHeight + 16 + metrics.getHeight() * 2, width - 5, titleHeight + 16 + metrics.getHeight() * 2);
 
 		// Draw Number
-		String number = "#" + String.valueOf(volume.getNumber());
+		String number = "#" + String.valueOf(volume.getNumber()); 
 		int yVolumes = titleHeight + 16 + metrics.getHeight() * 2;
 		g2d.setFont(getFont().deriveFont(30.0f));
 		metrics = getFontMetrics(getFont().deriveFont(30.0f));

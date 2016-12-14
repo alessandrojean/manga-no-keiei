@@ -17,7 +17,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -28,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
+import locale.MessageSource;
 import model.Manga;
 import utils.BorderUtils;
 import utils.Utilities;
@@ -60,14 +60,14 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 
 		Box horizontalBox = Box.createHorizontalBox();
 		add(horizontalBox);
-		
-		add(Box.createRigidArea(new Dimension(1,3)));
-		
-		horizontalBox.add(Box.createRigidArea(new Dimension(2,1)));
+
+		add(Box.createRigidArea(new Dimension(1, 3)));
+
+		horizontalBox.add(Box.createRigidArea(new Dimension(2, 1)));
 
 		btEdit = new JButton(new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
 		horizontalBox.add(btEdit);
-		btEdit.setToolTipText("Editar");
+		btEdit.setToolTipText(MessageSource.getInstance().getString("Basics.edit"));
 		btEdit.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btEdit.setContentAreaFilled(false);
 		btEdit.setFocusPainted(false);
@@ -81,7 +81,7 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		horizontalBox.add(rigidArea);
 
 		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/delete_16.png")));
-		btRemove.setToolTipText("Deletar");
+		btRemove.setToolTipText(MessageSource.getInstance().getString("Basics.remove"));
 		btRemove.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btRemove.setPreferredSize(new Dimension(16, 16));
 		btRemove.setOpaque(false);
@@ -96,18 +96,18 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		horizontalBox.add(horizontalGlue);
 
 		jpmOptions = new JPopupMenu();
-		JMenu jmNew = new JMenu("Novo");
+		JMenu jmNew = new JMenu(MessageSource.getInstance().getString("Basics.new"));
 		jmNew.setIcon(new ImageIcon(getClass().getResource("/images/plus_15.png")));
-		JMenuItem jmiNewVolume = new JMenuItem("Volume");
+		JMenuItem jmiNewVolume = new JMenuItem(MessageSource.getInstance().getString("MangaCard.jmi.newVolume"));
 		jmNew.add(jmiNewVolume);
-		JMenuItem jmiNewGift = new JMenuItem("Brinde");
+		JMenuItem jmiNewGift = new JMenuItem(MessageSource.getInstance().getString("MangaCard.jmi.newGift"));
 		jmNew.add(jmiNewGift);
 		jpmOptions.add(jmNew);
 		JSeparator jsSeparator = new JSeparator();
 		jpmOptions.add(jsSeparator);
-		jmiEdit = new JMenuItem("Editar", new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
+		jmiEdit = new JMenuItem(MessageSource.getInstance().getString("Basics.edit"), new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
 		jpmOptions.add(jmiEdit);
-		jmiRemove = new JMenuItem("Deletar", new ImageIcon(getClass().getResource("/images/delete_16.png")));
+		jmiRemove = new JMenuItem(MessageSource.getInstance().getString("Basics.remove"), new ImageIcon(getClass().getResource("/images/delete_16.png")));
 		jpmOptions.add(jmiRemove);
 
 		setBackground(hoverColor);
@@ -192,7 +192,7 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 
 		// Draw Volumes
 		String volumes = String.valueOf(manga.getVolumes().size());
-		String quantity = "VOLUME" + (volumes.equals("1") ? "" : "S");
+		String quantity = volumes.equals("1") ? MessageSource.getInstance().getString("MangaCard.lbl.volumeSingular").toUpperCase() : MessageSource.getInstance().getString("MangaCard.lbl.volumePlural").toUpperCase();
 		int yVolumes = yStar + 42;
 		g2d.setFont(getFont().deriveFont(30.0f));
 		metrics = getFontMetrics(getFont().deriveFont(30.0f));

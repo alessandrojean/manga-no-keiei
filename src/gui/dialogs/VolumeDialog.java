@@ -10,6 +10,10 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Currency;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -29,6 +33,9 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import locale.MessageSource;
+import model.Classification;
+import model.Gift;
 import model.Manga;
 import model.Publisher;
 import model.Volume;
@@ -55,15 +62,15 @@ public class VolumeDialog extends Dialog<Volume>
 
 	private Manga manga;
 	private JComboBox<Publisher> cbPublisher;
-	private JComboBox<String> cbBelongsTo;
-	private JComboBox<String> cbPaper;
-	private JComboBox<String> cbGift;
-	private JComboBox<String> cbAge;
+	private JComboBox<Gift> cbGift;
+	private JComboBox<Classification> cbClassification;
 	private JCheckBox chbColorPages;
 	private JCheckBox chbOriginalPlastic;
 	private JCheckBox chbProtectionPlastic;
 	private JCheckBox chbPlan;
 	private JTextArea taObservations;
+	private JComboBox<Currency> cbCurrency;
+	private JTextField tfPaper;
 
 	/**
 	 * Launch the application.
@@ -94,12 +101,16 @@ public class VolumeDialog extends Dialog<Volume>
 		});
 	}
 
+	/**
+	 * @wbp.parser.constructor
+	 */
 	public VolumeDialog(Manga manga)
 	{
 		this.manga = manga;
 
 		initComponents();
 		fillPublishers();
+		fillCurrency();
 	}
 
 	public VolumeDialog(Volume volume)
@@ -107,12 +118,13 @@ public class VolumeDialog extends Dialog<Volume>
 		result = volume;
 		initComponents();
 		fillPublishers();
+		fillCurrency();
 		updateFields();
 	}
 
 	private void initComponents()
 	{
-		setTitle("Novo Volume");
+		setTitle(MessageSource.getInstance().getString("VolumeDialog.title"));
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 870, 450);
@@ -123,20 +135,20 @@ public class VolumeDialog extends Dialog<Volume>
 		setContentPane(contentPane);
 
 		JPanel informationPanel = new JPanel();
-		informationPanel.setBorder(BorderUtils.createRoundedTitleBorder("Informa\u00E7\u00F5es", this.result != null ? this.result.getManga().getNationalName() : manga.getNationalName()));
+		informationPanel.setBorder(BorderUtils.createRoundedTitleBorder(MessageSource.getInstance().getString("VolumeDialog.informationPanel.border.title"), this.result != null ? this.result.getManga().getNationalName() : manga.getNationalName()));
 		contentPane.add(informationPanel, BorderLayout.CENTER);
 		informationPanel.setLayout(new MigLayout("", "[grow][grow][grow][grow][220px]", "[][][][][][][][][][][grow]"));
 
-		JLabel lblVolume = new JLabel("<html>Volume <i>(#)</i>:</html>");
+		JLabel lblVolume = new JLabel(String.format("<html>%s <i>(#)</i>:</html>", MessageSource.getInstance().getString("VolumeDialog.lbl.volumeNumber")));
 		informationPanel.add(lblVolume, "cell 0 0");
 
-		JLabel lbChecklistDate = new JLabel("<html>Data <i>(checklist)</i>:</html>");
+		JLabel lbChecklistDate = new JLabel(String.format("<html>%s <i>(checklist)</i>:</html>", MessageSource.getInstance().getString("VolumeDialog.lbl.date")));
 		informationPanel.add(lbChecklistDate, "cell 1 0");
 
-		JLabel lbBarcode = new JLabel("C\u00F3digo de barras:");
+		JLabel lbBarcode = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.barcode"));
 		informationPanel.add(lbBarcode, "cell 2 0");
 
-		JLabel lbISBN = new JLabel("ISBN:");
+		JLabel lbISBN = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.isbn"));
 		informationPanel.add(lbISBN, "cell 3 0");
 
 		imgPoster = new ImageSelector();
@@ -158,10 +170,10 @@ public class VolumeDialog extends Dialog<Volume>
 		informationPanel.add(tfISBN, "cell 3 1,growx");
 		tfISBN.setColumns(10);
 
-		JLabel lbTitle = new JLabel("T\u00EDtulo:");
+		JLabel lbTitle = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.title"));
 		informationPanel.add(lbTitle, "cell 0 2");
 
-		JLabel lbSubtitle = new JLabel("Subt\u00EDtulo:");
+		JLabel lbSubtitle = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.subtitle"));
 		informationPanel.add(lbSubtitle, "cell 2 2");
 
 		tfTitle = new JTextField();
@@ -172,77 +184,74 @@ public class VolumeDialog extends Dialog<Volume>
 		informationPanel.add(tfSubtitle, "cell 2 3 2 1,growx");
 		tfSubtitle.setColumns(10);
 
-		JLabel lbPublisher = new JLabel("Editora:");
+		JLabel lbPublisher = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.publisher"));
 		informationPanel.add(lbPublisher, "cell 0 4");
 
-		JLabel lbTotalPrice = new JLabel("<html>Pre\u00E7o <i>(total)</i>:</html>");
-		informationPanel.add(lbTotalPrice, "cell 1 4");
+		JLabel lbCurrency = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.currency"));
+		informationPanel.add(lbCurrency, "cell 1 4");
 
-		JLabel lbPaidPrice = new JLabel("<html>Pre\u00E7o <i>(pago)</i>:</html>");
-		informationPanel.add(lbPaidPrice, "cell 2 4");
+		JLabel lbTotalPrice = new JLabel(String.format("<html>%s</html>", MessageSource.getInstance().getString("VolumeDialog.lbl.totalPrice")));
+		informationPanel.add(lbTotalPrice, "cell 2 4");
 
-		JLabel lbBelongsTo = new JLabel("Pertence a:");
-		informationPanel.add(lbBelongsTo, "cell 3 4");
+		JLabel lbPaidPrice = new JLabel(String.format("<html>%s</html>", MessageSource.getInstance().getString("VolumeDialog.lbl.paidPrice")));
+		informationPanel.add(lbPaidPrice, "cell 3 4");
 
 		cbPublisher = new JComboBox<>();
 		informationPanel.add(cbPublisher, "cell 0 5,growx");
 
+		cbCurrency = new JComboBox<>();
+		cbCurrency.setModel(new DefaultComboBoxModel<Currency>());
+		informationPanel.add(cbCurrency, "cell 1 5,growx");
+
 		tfTotalPrice = new JTextField();
-		informationPanel.add(tfTotalPrice, "cell 1 5,growx,aligny top");
+		informationPanel.add(tfTotalPrice, "cell 2 5,growx,aligny top");
 		tfTotalPrice.setColumns(10);
 
 		tfPaidPrice = new JTextField();
-		informationPanel.add(tfPaidPrice, "cell 2 5,growx,aligny top");
+		informationPanel.add(tfPaidPrice, "cell 3 5,growx,aligny top");
 		tfPaidPrice.setColumns(10);
 
-		cbBelongsTo = new JComboBox<>();
-		cbBelongsTo.setModel(new DefaultComboBoxModel<String>(new String[] { "Box" }));
-		cbBelongsTo.setEditable(true);
-		informationPanel.add(cbBelongsTo, "cell 3 5,growx");
-
-		JLabel lbPaper = new JLabel("Papel:");
+		JLabel lbPaper = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.paper"));
 		informationPanel.add(lbPaper, "cell 0 6");
 
-		JLabel lblTamanho = new JLabel("Tamanho:");
+		JLabel lblTamanho = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.size"));
 		informationPanel.add(lblTamanho, "cell 1 6");
 
-		JLabel lbGift = new JLabel("Brinde:");
+		JLabel lbGift = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.gift"));
 		informationPanel.add(lbGift, "cell 2 6");
 
-		JLabel lbAge = new JLabel("Classifica\u00E7\u00E3o:");
+		JLabel lbAge = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.classification"));
 		informationPanel.add(lbAge, "cell 3 6");
-
-		cbPaper = new JComboBox<String>();
-		cbPaper.setEditable(true);
-		cbPaper.setModel(new DefaultComboBoxModel<String>(new String[] { "Jornal", "Offset", "Couchet" }));
-		informationPanel.add(cbPaper, "cell 0 7,growx");
+		
+		tfPaper = new JTextField();
+		informationPanel.add(tfPaper, "cell 0 7,growx");
+		tfPaper.setColumns(10);
 
 		tfSize = new JTextField();
 		informationPanel.add(tfSize, "cell 1 7,growx,aligny top");
 		tfSize.setColumns(10);
 
-		cbGift = new JComboBox<String>();
-		cbGift.setEditable(true);
-		cbGift.setModel(new DefaultComboBoxModel<String>(new String[] { "Marcador", "Cart\u00E3o-Postal", "Poster", "Sobre-capa", "Card", "CD/DVD" }));
+		cbGift = new JComboBox<>();
+		cbGift.setModel(new DefaultComboBoxModel<Gift>(Gift.values()));
 		informationPanel.add(cbGift, "cell 2 7,growx");
 
-		cbAge = new JComboBox<String>();
-		cbAge.setModel(new DefaultComboBoxModel<String>(new String[] { "Livre", "10+", "12+", "14+", "16+", "18+" }));
-		informationPanel.add(cbAge, "cell 3 7,growx");
+		cbClassification = new JComboBox<>();
+		cbClassification.setModel(new DefaultComboBoxModel<Classification>(Classification.values()));
+		informationPanel.add(cbClassification, "cell 3 7,growx");
 
-		chbColorPages = new JCheckBox("P\u00E1ginas coloridas");
+		chbColorPages = new JCheckBox(MessageSource.getInstance().getString("VolumeDialog.chb.colorPages"));
 		informationPanel.add(chbColorPages, "cell 0 8");
 
-		chbOriginalPlastic = new JCheckBox("Embalagem Original");
+		chbOriginalPlastic = new JCheckBox(MessageSource.getInstance().getString("VolumeDialog.chb.originalPlastic"));
 		informationPanel.add(chbOriginalPlastic, "cell 1 8");
 
-		chbProtectionPlastic = new JCheckBox("Pl\u00E1stico de Prote\u00E7\u00E3o");
+		chbProtectionPlastic = new JCheckBox(MessageSource.getInstance().getString("VolumeDialog.chb.protectionPlastic"));
 		informationPanel.add(chbProtectionPlastic, "cell 2 8");
 
-		chbPlan = new JCheckBox("Assinatura");
+		chbPlan = new JCheckBox(MessageSource.getInstance().getString("VolumeDialog.chb.plan"));
 		informationPanel.add(chbPlan, "cell 3 8");
 
-		JLabel lbObservations = new JLabel("Observa\u00E7\u00F5es:");
+		JLabel lbObservations = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.observations"));
 		informationPanel.add(lbObservations, "cell 0 9");
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -261,7 +270,7 @@ public class VolumeDialog extends Dialog<Volume>
 		Component horizontalGlue = Box.createHorizontalGlue();
 		buttonPanel.add(horizontalGlue);
 
-		JButton btOK = new JButton("OK");
+		JButton btOK = new JButton(MessageSource.getInstance().getString("Basics.ok"));
 		btOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -273,7 +282,7 @@ public class VolumeDialog extends Dialog<Volume>
 		getRootPane().setDefaultButton(btOK);
 		buttonPanel.add(btOK);
 
-		JButton btCancel = new JButton("Cancelar");
+		JButton btCancel = new JButton(MessageSource.getInstance().getString("Basics.cancel"));
 		btCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -284,7 +293,7 @@ public class VolumeDialog extends Dialog<Volume>
 		btCancel.setMnemonic('C');
 		buttonPanel.add(btCancel);
 
-		JButton btClear = new JButton("Limpar");
+		JButton btClear = new JButton(MessageSource.getInstance().getString("Basics.clean"));
 		btClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -294,6 +303,23 @@ public class VolumeDialog extends Dialog<Volume>
 		btClear.setPreferredSize(new Dimension(81, 32));
 		btClear.setMnemonic('L');
 		buttonPanel.add(btClear);
+	}
+
+	private void fillCurrency()
+	{
+		List<Currency> currencies = new ArrayList<Currency>(Currency.getAvailableCurrencies());
+		Collections.sort(currencies, new Comparator<Currency>() {
+
+			@Override
+			public int compare(Currency o1, Currency o2)
+			{
+				return o1.getCurrencyCode().compareTo(o2.getCurrencyCode());
+			}
+		});
+		for(Currency c : currencies)
+			cbCurrency.addItem(c);
+		
+		cbCurrency.setSelectedItem(Currency.getInstance(MessageSource.ACTUAL_LOCALE));
 	}
 
 	private void fillPublishers()
@@ -320,13 +346,13 @@ public class VolumeDialog extends Dialog<Volume>
 		tfISBN.setText(result.getIsbn());
 		tfTitle.setText(result.getTitle());
 		tfSubtitle.setText(result.getSubtitle());
+		cbCurrency.setSelectedItem(result.getCurrency());
 		tfTotalPrice.setText(String.valueOf(result.getTotalPrice()));
 		tfPaidPrice.setText(String.valueOf(result.getPaidPrice()));
-		cbBelongsTo.setSelectedItem(result.getBelongsTo());
-		cbPaper.setSelectedItem(result.getPaper());
+		tfPaper.setText(result.getPaper());
 		tfSize.setText(result.getSize());
 		cbGift.setSelectedItem(result.getGift());
-		cbAge.setSelectedItem(result.getAge());
+		cbClassification.setSelectedItem(result.getClassification());
 		chbColorPages.setSelected(result.isColorPages());
 		chbOriginalPlastic.setSelected(result.isOriginalPlastic());
 		chbProtectionPlastic.setSelected(result.isProtectionPlastic());
@@ -349,13 +375,13 @@ public class VolumeDialog extends Dialog<Volume>
 		tfTitle.setText("");
 		tfSubtitle.setText("");
 		cbPublisher.setSelectedIndex(0);
+		cbCurrency.setSelectedItem(Currency.getInstance(MessageSource.ACTUAL_LOCALE));
 		tfTotalPrice.setText("");
 		tfPaidPrice.setText("");
-		cbBelongsTo.setSelectedIndex(0);
-		cbPaper.setSelectedIndex(0);
+		tfPaper.setText("");
 		tfSize.setText("");
 		cbGift.setSelectedIndex(0);
-		cbAge.setSelectedIndex(0);
+		cbClassification.setSelectedIndex(0);
 		chbColorPages.setSelected(false);
 		chbOriginalPlastic.setSelected(false);
 		chbProtectionPlastic.setSelected(false);
@@ -383,13 +409,13 @@ public class VolumeDialog extends Dialog<Volume>
 		result.setTitle(tfTitle.getText());
 		result.setSubtitle(tfSubtitle.getText());
 		result.setPublisher((Publisher) cbPublisher.getSelectedItem());
+		result.setCurrency((Currency) cbCurrency.getSelectedItem());
 		result.setTotalPrice(Double.parseDouble(tfTotalPrice.getText().replace(",", ".")));
 		result.setPaidPrice(Double.parseDouble(tfPaidPrice.getText().replace(",", ".")));
-		result.setBelongsTo(cbBelongsTo.getSelectedItem().toString());
-		result.setPaper(cbPaper.getSelectedItem().toString());
+		result.setPaper(tfPaper.getText());
 		result.setSize(tfSize.getText());
-		result.setGift(cbGift.getSelectedItem().toString());
-		result.setAge(cbAge.getSelectedItem().toString());
+		result.setGift((Gift) cbGift.getSelectedItem());
+		result.setClassification((Classification) cbClassification.getSelectedItem());
 		result.setColorPages(chbColorPages.isSelected());
 		result.setOriginalPlastic(chbOriginalPlastic.isSelected());
 		result.setProtectionPlastic(chbProtectionPlastic.isSelected());
@@ -418,7 +444,7 @@ public class VolumeDialog extends Dialog<Volume>
 			return false;
 		if (!FormUtils.validateDouble(tfPaidPrice.getText()))
 			return false;
-		if (cbAge.getSelectedIndex() == -1)
+		if (cbClassification.getSelectedIndex() == -1)
 			return false;
 
 		return true;
