@@ -11,7 +11,7 @@ public class MessageSource
 	private static final String BUNDLE_NAME = "locale.messages";
 
 	private ResourceBundle resourceBundle;
-	
+
 	public static Locale ACTUAL_LOCALE;
 
 	private static MessageSource INSTANCE;
@@ -38,10 +38,15 @@ public class MessageSource
 			INSTANCE = new MessageSource(newLocale);
 		else if (!ACTUAL_LOCALE.equals(newLocale))
 			INSTANCE = new MessageSource(newLocale);
-		
+
 		ACTUAL_LOCALE = newLocale;
 
 		return INSTANCE;
+	}
+
+	public static ResourceBundle getResourceBundleInLocale(Locale locale)
+	{
+		return ResourceBundle.getBundle(BUNDLE_NAME, locale);
 	}
 
 	public String getString(String key)
@@ -74,7 +79,7 @@ public class MessageSource
 
 		locales[0] = Locale.US;
 		locales[1] = new Locale("pt", "BR");
-		
+
 		return locales;
 	}
 }

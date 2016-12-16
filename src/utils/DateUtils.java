@@ -43,6 +43,9 @@ public class DateUtils
 
 	public static String toString(Date date)
 	{
+		if(date==null)
+			return "";
+		
 		SimpleDateFormat lSimpleDateFormat = new SimpleDateFormat(DEFAULT_DATE_FORMAT);
 		return lSimpleDateFormat.format(date);
 	}

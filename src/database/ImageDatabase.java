@@ -3,9 +3,12 @@ package database;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
 import model.Manga;
 import model.Publisher;
 import model.Volume;
+import myanimelist.model.MALManga;
 
 import org.apache.commons.io.FileUtils;
 
@@ -18,44 +21,59 @@ public class ImageDatabase
 	public static final String FILE_MANGA = DEFAULT_FOLDER + File.separator + "mangas" + File.separator + "%d.png";
 	public static final String FILE_VOLUME = DEFAULT_FOLDER + File.separator + "volumes" + File.separator + "%d.png";
 	public static final String FILE_PUBLISHER = DEFAULT_FOLDER + File.separator + "publishers" + File.separator + "%d.png";
+	public static final String FILE_MYANIMELIST = DEFAULT_FOLDER + File.separator + "myanimelist" + File.separator + "%d.png";
 
 	public static void insertImage(Object object)
 	{
-		String file = "";
-		File image = null;
-		if (object instanceof Manga)
+		try
 		{
-			int id = ((Manga) object).getId();
-			file = String.format(FILE_MANGA, id);
-			image = ((Manga) object).getPoster();
-		}
-		else if (object instanceof Volume)
-		{
-			int id = ((Volume) object).getId();
-			file = String.format(FILE_VOLUME, id);
-			image = ((Volume) object).getPoster();
-		}
-		else if (object instanceof Publisher)
-		{
-			int id = ((Publisher) object).getId();
-			file = String.format(FILE_PUBLISHER, id);
-			image = ((Publisher) object).getLogo();
-		}
-		if (image == null)
-			return;
+			String file = "";
+			File image = null;
+			if (object instanceof MALManga)
+			{
+				int id = ((MALManga) object).getId();
+				file = String.format(FILE_MYANIMELIST, id);
+				File f = new File(file);
+				if (!f.getParentFile().exists())
+					f.getParentFile().mkdirs();
 
-		File f = new File(file);
-		if (!f.getParentFile().exists())
-			f.getParentFile().mkdirs();
-		if (!f.toString().equals(image.toString()))
-			try
+				((MALManga) object).setImage(ImageIO.read(((MALManga) object).getImageUrl()));
+				ImageIO.write(((MALManga) object).getImage(), "png", f);
+				((MALManga) object).setImageFile(f);
+				return;
+			}
+
+			if (object instanceof Manga)
 			{
+				int id = ((Manga) object).getId();
+				file = String.format(FILE_MANGA, id);
+				image = ((Manga) object).getPoster();
+			}
+			else if (object instanceof Volume)
+			{
+				int id = ((Volume) object).getId();
+				file = String.format(FILE_VOLUME, id);
+				image = ((Volume) object).getPoster();
+			}
+			else if (object instanceof Publisher)
+			{
+				int id = ((Publisher) object).getId();
+				file = String.format(FILE_PUBLISHER, id);
+				image = ((Publisher) object).getLogo();
+			}
+			if (image == null)
+				return;
+
+			File f = new File(file);
+			if (!f.getParentFile().exists())
+				f.getParentFile().mkdirs();
+			if (!f.toString().equals(image.toString()))
 				FileUtils.copyFile(image, f);
-			}
-			catch (IOException e)
-			{
-				ExceptionUtils.showExceptionDialog(null, e);
-			}
+		}
+		catch (IOException e)
+		{
+			ExceptionUtils.showExceptionDialog(null, e);
+		}
 
 	}
 
@@ -76,6 +94,11 @@ public class ImageDatabase
 		{
 			int id = ((Publisher) object).getId();
 			result = new File(String.format(FILE_PUBLISHER, id));
+		}
+		else if (object instanceof MALManga)
+		{
+			int id = ((MALManga) object).getId();
+			result = new File(String.format(FILE_MYANIMELIST, id));
 		}
 
 		return result.exists() ? result : null;

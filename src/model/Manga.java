@@ -172,6 +172,7 @@ public class Manga
 
 		for (String s : gendersSplitted)
 			gendersList.add(Gender.fromValue(Integer.parseInt(s)));
+		
 
 		this.genders = gendersList;
 	}

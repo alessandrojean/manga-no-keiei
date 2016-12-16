@@ -37,6 +37,7 @@ import model.Gender;
 import model.Manga;
 import model.MangaEdition;
 import model.MangaType;
+import myanimelist.model.MALManga;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
 import utils.ComboBoxUtils;
@@ -63,6 +64,8 @@ public class MangaDialog extends Dialog<Manga>
 	private LevelBar lbsRating;
 	private JTextArea taObservations;
 	private CheckedComboBox<CheckableItem> cbGenders;
+
+	private JButton btnMyanimelist;
 
 	public static void main(String[] args)
 	{
@@ -201,7 +204,7 @@ public class MangaDialog extends Dialog<Manga>
 		JLabel lbGenders = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.genders"));
 		informationPanel.add(lbGenders, "cell 0 6");
 
-		CheckableItem[] items = ComboBoxUtils.toCheckableItemArray(Gender.values());
+		CheckableItem[] items = ComboBoxUtils.toCheckableItemArray(Gender.getValuesOrdered());
 
 		JLabel lbRating = new JLabel(MessageSource.getInstance().getString("MangaDialog.lbl.rating"));
 		informationPanel.add(lbRating, "cell 3 6");
@@ -232,6 +235,30 @@ public class MangaDialog extends Dialog<Manga>
 		JPanel buttonPanel = new JPanel();
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+
+		btnMyanimelist = new JButton("MyAnimeList");
+		btnMyanimelist.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				MyAnimeListDialog lMyAnimeListDialog = new MyAnimeListDialog(MangaDialog.this);
+				if (lMyAnimeListDialog.showDialog() == MyAnimeListDialog.APPROVE_OPTION)
+				{
+					MALManga lMALManga = lMyAnimeListDialog.getResult();
+					tfOriginalName.setText(lMALManga.getName());
+					tfStartDate.setText(DateUtils.toString(lMALManga.getStartDate()));
+					tfFinishDate.setText(DateUtils.toString(lMALManga.getEndDate()));
+					imgPoster.setImage(lMALManga.getImageFile());
+					tfAuthors.setText(lMALManga.getAuthors());
+					tfSerialization.setText(lMALManga.getSerialization());
+					cbGenders.setSelectedItems(lMALManga.getGenders());
+					lbsRating.setLevel(((int) lMALManga.getScore() / 2) - 1);
+					cbType.setSelectedItem(lMALManga.getType());
+				}
+			}
+		});
+		buttonPanel.add(btnMyanimelist);
 
 		Component horizontalGlue = Box.createHorizontalGlue();
 		buttonPanel.add(horizontalGlue);
@@ -287,6 +314,7 @@ public class MangaDialog extends Dialog<Manga>
 		lbsRating.setLevel(result.getRating());
 		taObservations.setText(result.getObservations());
 		imgPoster.setImage(result.getPoster());
+		btnMyanimelist.setVisible(false);
 	}
 
 	@Override
@@ -328,9 +356,11 @@ public class MangaDialog extends Dialog<Manga>
 		result.setStamp(tfStamp.getText());
 
 		List<Gender> genders = new ArrayList<Gender>();
-		for(int i=0;i<cbGenders.getModel().getSize();i++)
-			if(cbGenders.getItemAt(i).isSelected())
-				genders.add(Gender.fromValue(i));
+		for (int i = 0; i < cbGenders.getModel().getSize(); i++)
+			if (cbGenders.getItemAt(i).isSelected())
+				for(Gender g : Gender.values())
+					if(g.toString().equals(cbGenders.getItemAt(i).getText()))
+						genders.add(g);
 
 		result.setGenders(genders);
 		result.setRating(lbsRating.getLevel());
@@ -347,21 +377,14 @@ public class MangaDialog extends Dialog<Manga>
 			return false;
 		if (cbType.getSelectedIndex() == -1)
 			return false;
-		if (tfSerialization.getText().equals(""))
-			return false;
 		if (!FormUtils.validateDate(tfStartDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
 			return false;
-		if (!FormUtils.validateDate(tfFinishDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
-			return false;
-		if (tfStartDate.getText().equals(""))
-			return false;
-		if (tfFinishDate.getText().equals(""))
-			return false;
+		if (tfStartDate.getValue()!=null)
+			if (!FormUtils.validateDate(tfFinishDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
+				return false;
 		if (tfAuthors.getText().equals(""))
 			return false;
 		if (cbEdition.getSelectedItem() == null)
-			return false;
-		if (tfStamp.getText().equals(""))
 			return false;
 		if (!FormUtils.validateCheckedComboBox(cbGenders))
 			return false;

@@ -41,7 +41,7 @@ public class Dialog<T> extends JDialog
 	
 	protected boolean validateFields()
 	{
-		return false;
+		return true;
 	}
 	
 	public int showDialog()
