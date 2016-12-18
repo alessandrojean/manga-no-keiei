@@ -35,6 +35,10 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 
+import javax.swing.UIManager;
+
+import com.bulenkov.iconloader.util.DoubleColor;
+
 import utils.Utilities;
 
 /**
@@ -45,36 +49,37 @@ public class RoundedTitleBorder extends RoundedBorder
 {
 	private final String title;
 	private String info;
-	private final Color backgroundColor;
+	private final Color[] backgroundColor;
 
-	public RoundedTitleBorder(String title, Color lineColor, Color backgroundColor)
+	public RoundedTitleBorder(String title, Color lineColor, Color[] backgroundColor)
 	{
 		super(lineColor);
 		this.title = title;
 		this.backgroundColor = backgroundColor;
 	}
 
-	public RoundedTitleBorder(String title, Color lineColor, Color backgroundColor, int cornerRadius)
+	public RoundedTitleBorder(String title, Color lineColor, Color[] backgroundColor, int cornerRadius)
 	{
 		super(lineColor, cornerRadius);
 		this.title = title;
 		this.backgroundColor = backgroundColor;
 	}
 
-	public RoundedTitleBorder(String title, Color lineColor, Color backgroundColor, int br1, int br2, int br3, int br4)
+	public RoundedTitleBorder(String title, Color lineColor, Color[] backgroundColor, int br1, int br2, int br3, int br4)
 	{
 		super(lineColor, br1, br2, br3, br4);
 		this.title = title;
 		this.backgroundColor = backgroundColor;
 	}
 
-	public RoundedTitleBorder(String title, String info, Color lineColor, Color backgroundColor, int br1, int br2, int br3, int br4)
+	public RoundedTitleBorder(String title, String info, Color lineColor, Color[] backgroundColor, int br1, int br2, int br3, int br4)
 	{
 		super(lineColor, br1, br2, br3, br4);
 		this.title = title;
 		this.info = info;
 		this.backgroundColor = backgroundColor;
 	}
+	
 
 	public Insets getBorderInsets(Component c, Insets insets)
 	{
@@ -96,7 +101,8 @@ public class RoundedTitleBorder extends RoundedBorder
 		// Creates title bar
 		Graphics2D g2 = (Graphics2D) g.create();
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setPaint(backgroundColor);
+		//GradientPaint lGradientPaint = new GradientPaint(0, 0, c1, 0, titleHeight, c2);
+		g2.setPaint(backgroundColor.length<2 ? backgroundColor[0] : new GradientPaint(0, 0, backgroundColor[0], 0, titleHeight, backgroundColor[1]));
 		Path2D titlebar;
 		if (cornerRadius > 0)
 			titlebar = getRoundRect(x, y, width - 1, titleHeight - 1, cornerRadius, cornerRadius, 0, 0);

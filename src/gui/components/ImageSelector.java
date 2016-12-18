@@ -33,6 +33,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import locale.MessageSource;
 import utils.ExceptionUtils;
 import utils.ImageUtils;
+import utils.PreferencesUtils;
 
 import com.bulenkov.iconloader.util.Gray;
 
@@ -41,6 +42,8 @@ public class ImageSelector extends JPanel implements MouseListener
 	private JButton btRemove;
 
 	private File image;
+	
+	private static final String LAST_FOLDER = "lastFolder";
 
 	public ImageSelector()
 	{
@@ -126,7 +129,8 @@ public class ImageSelector extends JPanel implements MouseListener
 	{
 		if (image == null)
 		{			
-			JFileChooser lJFileChooser = new JFileChooser();
+			String path = PreferencesUtils.get().get(LAST_FOLDER, System.getProperty("user.home"));
+			JFileChooser lJFileChooser = new JFileChooser(path);
 			lJFileChooser.setFileFilter(new FileNameExtensionFilter(MessageSource.getInstance().getString("ImageSelector.fc.images"), ImageIO.getReaderFileSuffixes())); 
 			if (lJFileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 			{
@@ -135,6 +139,7 @@ public class ImageSelector extends JPanel implements MouseListener
 				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				setToolTipText(""); 
 				repaint();
+				PreferencesUtils.get().put(LAST_FOLDER, lJFileChooser.getSelectedFile().getPath());
 			}
 		}
 	}

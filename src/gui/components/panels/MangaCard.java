@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -156,7 +157,7 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		g2d.drawLine(105, 0, 105, height);
 
 		// Draw Title Background
-		g2d.setColor(BorderUtils.DEFAULT_BACKGROUND_COLOR);
+		g2d.setPaint(new GradientPaint(0, 0, BorderUtils.DEFAULT_BACKGROUND_TOP_COLOR, 0, titleHeight, BorderUtils.DEFAULT_BACKGROUND_BOTTOM_COLOR));
 		g2d.fillRect(106, 0, width - 105, titleHeight);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(106, titleHeight, width, titleHeight);

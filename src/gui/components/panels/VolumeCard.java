@@ -6,6 +6,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -141,7 +142,7 @@ public class VolumeCard extends JPanel implements MouseListener
 		g2d.drawLine(105, 0, 105, height);
 
 		// Draw Title Background
-		g2d.setColor(BorderUtils.DEFAULT_BACKGROUND_COLOR);
+		g2d.setPaint(new GradientPaint(0, 0, BorderUtils.DEFAULT_BACKGROUND_TOP_COLOR, 0, titleHeight, BorderUtils.DEFAULT_BACKGROUND_BOTTOM_COLOR));
 		g2d.fillRect(106, 0, width - 105, titleHeight);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(106, titleHeight, width, titleHeight);
@@ -156,7 +157,7 @@ public class VolumeCard extends JPanel implements MouseListener
 			g2d.drawString(volume.getTitle().substring(0, 25) + "...", 110, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent()); 
 
 		// Draw Details
-		String details = String.format("%1$s \u00B7 %2%3$.2f", volume.getPublisher().getName(), volume.getCurrency().getSymbol(), volume.getTotalPrice()); 
+		String details = String.format("%1$s \u00B7 %2$s%3$.2f", volume.getPublisher().getName(), volume.getCurrency().getSymbol(), volume.getTotalPrice()); 
 		metrics = getFontMetrics(getFont());
 		g2d.setFont(getFont());
 		g2d.drawString(details, 105 + (195 - metrics.stringWidth(details)) / 2, titleHeight + 16);

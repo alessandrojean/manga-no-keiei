@@ -32,7 +32,6 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import api.mal.model.MALManga;
 import locale.MessageSource;
 import model.Gender;
 import model.Manga;
@@ -44,7 +43,7 @@ import utils.ComboBoxUtils;
 import utils.DateUtils;
 import utils.FormUtils;
 import utils.ImageUtils;
-import utils.MangaUtils;
+import api.mal.model.MALManga;
 
 public class MangaDialog extends Dialog<Manga>
 {
