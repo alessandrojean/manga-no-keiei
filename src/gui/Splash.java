@@ -31,7 +31,7 @@ public class Splash extends JFrame
 {
 	
 	public static final String PROJECT_NAME = "Manga no Keiei";
-	public static final String PROJECT_VERSION = "v1.0";
+	public static final String PROJECT_VERSION = "v1.3";
 	
 	public static Main MAIN;
 
