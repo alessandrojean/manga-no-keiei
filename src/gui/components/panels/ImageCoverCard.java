@@ -13,10 +13,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import net.coobird.thumbnailator.Thumbnails;
 import utils.BorderUtils;
 import utils.Utilities;
 import api.mal.model.MALManga;
@@ -32,6 +36,8 @@ public class ImageCoverCard extends JPanel implements MouseListener
 	private Color hoverColor = new Color(69, 73, 74);
 
 	private Runnable clickListener;
+	
+	private BufferedImage coverResized;
 
 	public Runnable getClickListener()
 	{
@@ -83,9 +89,19 @@ public class ImageCoverCard extends JPanel implements MouseListener
 		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-		// Draw Poster
-		Image poster = imageCover.getThumbnailFile() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(imageCover.getThumbnailFile().toString()).getImage();
-		g2d.drawImage(poster, 0, 0, width, height, null);
+		// Draw Cover
+		if (coverResized == null)
+			try
+			{
+				BufferedImage cover = imageCover.getNormalFile() == null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(imageCover.getNormalFile());
+				coverResized = Thumbnails.of(cover).size(width, height).asBufferedImage();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		g2d.drawImage(coverResized, 0, 0, width, height, null);
 
 		String volume = String.format("#%d", imageCover.getVolume());
 		FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));

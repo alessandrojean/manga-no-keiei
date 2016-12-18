@@ -13,10 +13,14 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import net.coobird.thumbnailator.Thumbnails;
 import utils.BorderUtils;
 import utils.Utilities;
 import api.mal.model.MALManga;
@@ -31,6 +35,8 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 	private Color hoverColor = new Color(69, 73, 74);
 
 	private Runnable clickListener;
+	
+	private BufferedImage posterResized;
 
 	public Runnable getClickListener()
 	{
@@ -60,6 +66,7 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 	public void setMALManga(MALManga manga)
 	{
 		this.manga = manga;
+		posterResized = null;
 		repaint();
 	}
 
@@ -75,8 +82,18 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		// Draw Poster
-		Image poster = manga.getImageFile() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(manga.getImageFile().toString()).getImage();
-		g2d.drawImage(poster, 0, 0, 64, 100, null);
+		if (posterResized == null)
+			try
+			{
+				BufferedImage poster = manga.getImageFile() == null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(manga.getImageFile());
+				posterResized = Thumbnails.of(poster).size(64, 100).asBufferedImage();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		g2d.drawImage(posterResized, 0, 0, 64, 100, null);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(64, 0, 64, height);
 

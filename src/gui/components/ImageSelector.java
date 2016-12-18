@@ -30,6 +30,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import net.coobird.thumbnailator.Thumbnails;
 import locale.MessageSource;
 import utils.ExceptionUtils;
 import utils.ImageUtils;
@@ -42,8 +43,10 @@ public class ImageSelector extends JPanel implements MouseListener
 	private JButton btRemove;
 
 	private File image;
-	
+
 	private static final String LAST_FOLDER = "lastFolder";
+
+	private BufferedImage imageResized;
 
 	public ImageSelector()
 	{
@@ -55,8 +58,8 @@ public class ImageSelector extends JPanel implements MouseListener
 		Component verticalGlue = Box.createVerticalGlue();
 		add(verticalGlue);
 
-		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/remove_16.png"))); 
-		btRemove.setToolTipText(MessageSource.getInstance().getString("ImageSelector.cleanImage")); 
+		btRemove = new JButton(new ImageIcon(getClass().getResource("/images/remove_16.png")));
+		btRemove.setToolTipText(MessageSource.getInstance().getString("ImageSelector.cleanImage"));
 		btRemove.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btRemove.setContentAreaFilled(false);
 		btRemove.setFocusPainted(false);
@@ -71,15 +74,16 @@ public class ImageSelector extends JPanel implements MouseListener
 			public void actionPerformed(ActionEvent arg0)
 			{
 				image = null;
+				imageResized = null;
 				repaint();
 				btRemove.setVisible(false);
 				setCursor(new Cursor(Cursor.HAND_CURSOR));
-				setToolTipText(MessageSource.getInstance().getString("ImageSelector.openImage")); 
+				setToolTipText(MessageSource.getInstance().getString("ImageSelector.openImage"));
 			}
 		});
 		add(btRemove);
 
-		setToolTipText(MessageSource.getInstance().getString("ImageSelector.openImage")); 
+		setToolTipText(MessageSource.getInstance().getString("ImageSelector.openImage"));
 
 		setBorder(new RoundedBorder(Gray._100));
 	}
@@ -91,29 +95,31 @@ public class ImageSelector extends JPanel implements MouseListener
 		Graphics2D g2d = (Graphics2D) g.create();
 		if (image != null)
 		{
-			BufferedImage bi;
-			try
-			{
-				bi = ImageIO.read(image);
-				g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-				g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-				Shape clip = new RoundRectangle2D.Double(0, 0, (int) getSize().getWidth(), (int) getSize().getHeight(), 8, 8);
-				g2d.setClip(clip);
-				g2d.drawImage(bi, 0, 0, (int) getSize().getWidth(), (int) getSize().getHeight(), null);
-				g2d.setPaint(new Color(0, 0, 0, 100));
-				g2d.fillRect(0, (int) getSize().getHeight() - 22, (int) getSize().getWidth(), 22);
-				g2d.setFont(getFont().deriveFont(Font.BOLD));
-				g2d.setColor(Color.WHITE);
-				FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-				String size = ImageUtils.readableFileSize(image.length());
-				int y = (int) getSize().getHeight() - 22 + ((metrics.getHeight()));
-				int x = (int) getSize().getWidth() - 5 - metrics.stringWidth(size);
-				g2d.drawString(size, x, y);
-			}
-			catch (IOException e)
-			{
-				ExceptionUtils.showExceptionDialog(null, e);
-			}
+
+			g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			Shape clip = new RoundRectangle2D.Double(0, 0, (int) getSize().getWidth(), (int) getSize().getHeight(), 8, 8);
+			g2d.setClip(clip);
+			if (imageResized == null)
+				try
+				{
+					BufferedImage bi = ImageIO.read(image);
+					imageResized = Thumbnails.of(bi).size((int) getSize().getWidth(), (int) getSize().getHeight()).asBufferedImage();
+				}
+				catch (IOException e)
+				{
+					ExceptionUtils.showExceptionDialog(null, e);
+				}
+			g2d.drawImage(imageResized, 0, 0, (int) getSize().getWidth(), (int) getSize().getHeight(), null);
+			g2d.setPaint(new Color(0, 0, 0, 100));
+			g2d.fillRect(0, (int) getSize().getHeight() - 22, (int) getSize().getWidth(), 22);
+			g2d.setFont(getFont().deriveFont(Font.BOLD));
+			g2d.setColor(Color.WHITE);
+			FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
+			String size = ImageUtils.readableFileSize(image.length());
+			int y = (int) getSize().getHeight() - 22 + ((metrics.getHeight()));
+			int x = (int) getSize().getWidth() - 5 - metrics.stringWidth(size);
+			g2d.drawString(size, x, y);
 		}
 		g2d.dispose();
 	}
@@ -128,16 +134,16 @@ public class ImageSelector extends JPanel implements MouseListener
 	public void mouseClicked(MouseEvent e)
 	{
 		if (image == null)
-		{			
+		{
 			String path = PreferencesUtils.get().get(LAST_FOLDER, System.getProperty("user.home"));
 			JFileChooser lJFileChooser = new JFileChooser(path);
-			lJFileChooser.setFileFilter(new FileNameExtensionFilter(MessageSource.getInstance().getString("ImageSelector.fc.images"), ImageIO.getReaderFileSuffixes())); 
+			lJFileChooser.setFileFilter(new FileNameExtensionFilter(MessageSource.getInstance().getString("ImageSelector.fc.images"), ImageIO.getReaderFileSuffixes()));
 			if (lJFileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 			{
 				image = lJFileChooser.getSelectedFile();
 				btRemove.setVisible(true);
 				setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				setToolTipText(""); 
+				setToolTipText("");
 				repaint();
 				PreferencesUtils.get().put(LAST_FOLDER, lJFileChooser.getSelectedFile().getPath());
 			}
@@ -173,11 +179,11 @@ public class ImageSelector extends JPanel implements MouseListener
 	{
 		this.image = image;
 		repaint();
-		if(image!=null)
+		if (image != null)
 		{
 			btRemove.setVisible(true);
 			setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			setToolTipText(""); 
+			setToolTipText("");
 		}
 	}
 }

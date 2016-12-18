@@ -2,18 +2,24 @@ package gui.dialogs;
 
 import gui.components.panels.MALMangaCard;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.JComponent;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -22,15 +28,16 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
-import org.json.JSONException;
-
-import api.mal.MyAnimeList;
-import api.mal.model.MALManga;
-import utils.ExceptionUtils;
 import locale.MessageSource;
 import net.miginfocom.swing.MigLayout;
 
-import javax.swing.JLabel;
+import org.json.JSONException;
+
+import utils.BorderUtils;
+import utils.ExceptionUtils;
+import utils.Utilities;
+import api.mal.MyAnimeList;
+import api.mal.model.MALManga;
 
 public class MyAnimeListDialog extends Dialog<MALManga>
 {
@@ -79,6 +86,7 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 		setResizable(false);
 		setTitle("MyAnimeList");
 		setBounds(100, 100, 400, 500);
+		
 		getContentPane().setLayout(new MigLayout("", "[grow][]", "[][grow][]"));
 
 		textField = new JTextField();

@@ -11,13 +11,17 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import net.coobird.thumbnailator.Thumbnails;
 import locale.MessageSource;
 import model.Manga;
 import utils.BorderUtils;
@@ -33,6 +37,8 @@ public class MangaHeader extends JPanel
 	private Component horizontalGlue;
 	
 	private Color hoverColor = new Color(69,73,74);
+	
+	private BufferedImage posterResized;
 
 	public MangaHeader(Manga manga)
 	{
@@ -99,6 +105,7 @@ public class MangaHeader extends JPanel
 	public void setManga(Manga manga)
 	{
 		this.manga = manga;
+		posterResized = null;
 		repaint();
 	}
 
@@ -114,8 +121,18 @@ public class MangaHeader extends JPanel
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		// Draw Poster
-		Image poster = manga.getPoster()==null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(manga.getPoster().toString()).getImage(); 
-		g2d.drawImage(poster, 6, 6, 130, height-12, null);
+		if (posterResized == null)
+			try
+			{
+				BufferedImage poster = manga.getPoster() == null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(manga.getPoster());
+				posterResized = Thumbnails.of(poster).size(130, height - 12).asBufferedImage();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		g2d.drawImage(posterResized, 6, 6, 130, height-12, null);
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawRect(5, 5, 131, height -11);
 

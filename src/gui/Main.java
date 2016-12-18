@@ -15,6 +15,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,6 +43,8 @@ public class Main extends JFrame
 	public static final Database DATABASE = new Database();
 
 	public static MangasPanel MANGAS_PANEL;
+
+	private static HashMap<String, Boolean> volumesPanel;
 
 	/**
 	 * Launch the application.
@@ -87,7 +90,7 @@ public class Main extends JFrame
 
 		setLocationRelativeTo(null);
 	}
-	
+
 	public void init()
 	{
 		contentPane = new JPanel();
@@ -107,30 +110,36 @@ public class Main extends JFrame
 		cardPanel.add(MANGAS_PANEL, Panels.MANGAS_LIST);
 		cardPanel.add(new PublishersPanel(), Panels.PUBLISHERS_LIST);
 		cardPanel.add(new SettingsPanel(), Panels.SETTINGS);
+		
+		volumesPanel = new HashMap<String, Boolean>();
 	}
 
 	public static void showPanel(String panel)
 	{
 		CardLayout lCardLayout = (CardLayout) cardPanel.getLayout();
 		lCardLayout.show(cardPanel, panel);
-		
+
 		int c = -1;
-		if(panel.equals(Panels.HOME))
+		if (panel.equals(Panels.HOME))
 			c = NavigationPanel.BUTTON_HOME;
-		else if(panel.equals(Panels.MANGAS_LIST))
+		else if (panel.equals(Panels.MANGAS_LIST))
 			c = NavigationPanel.BUTTON_LIST;
-		else if(panel.equals(Panels.PUBLISHERS_LIST))
+		else if (panel.equals(Panels.PUBLISHERS_LIST))
 			c = NavigationPanel.BUTTON_LIST_PUBLISHERS;
-		else if(panel.equals(Panels.SETTINGS))
+		else if (panel.equals(Panels.SETTINGS))
 			c = NavigationPanel.BUTTON_SETTINGS;
-		
-		if(c>-1)
+
+		if (c > -1)
 			navigationPanel.selectButton(c);
 	}
 
 	public static void showVolumePanel(Manga m)
 	{
-		cardPanel.add(new VolumesPanel(m), Panels.VOLUMES_LIST + m.getId());
+		if (!volumesPanel.containsKey(Panels.VOLUMES_LIST + m.getId()))
+		{
+			cardPanel.add(new VolumesPanel(m), Panels.VOLUMES_LIST + m.getId());
+			volumesPanel.put(Panels.VOLUMES_LIST + m.getId(), true);
+		}
 		CardLayout lCardLayout = (CardLayout) cardPanel.getLayout();
 		lCardLayout.show(cardPanel, Panels.VOLUMES_LIST + m.getId());
 	}

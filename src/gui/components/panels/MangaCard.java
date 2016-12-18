@@ -17,7 +17,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -28,6 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
+import net.coobird.thumbnailator.Thumbnails;
 import locale.MessageSource;
 import model.Manga;
 import utils.BorderUtils;
@@ -49,6 +53,8 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 	private JMenuItem jmiRemove;
 
 	private Color hoverColor = new Color(69, 73, 74);
+
+	private BufferedImage posterResized;
 
 	public MangaCard(Manga manga)
 	{
@@ -136,6 +142,7 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 	public void setManga(Manga manga)
 	{
 		this.manga = manga;
+		posterResized = null;
 		repaint();
 	}
 
@@ -151,8 +158,19 @@ public class MangaCard extends JPanel implements MouseListener, MouseMotionListe
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		// Draw Poster
-		Image poster = manga.getPoster() == null ? new ImageIcon(getClass().getResource("/images/sample_poster.jpg")).getImage() : new ImageIcon(manga.getPoster().toString()).getImage();
-		g2d.drawImage(poster, 0, 0, 105, height, null);
+		if (posterResized == null)
+			try
+			{
+				BufferedImage poster = manga.getPoster() == null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(manga.getPoster());
+				posterResized = Thumbnails.of(poster).size(105, height).asBufferedImage();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		g2d.drawImage(posterResized, 0, 0, 105, height, null);
+
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(105, 0, 105, height);
 

@@ -7,6 +7,7 @@ Helps in the administration of your manga collection.
 - **[MigLayout](https://github.com/mikaelgrev/miglayout)** *v4.2+* 
 - **[OKHttp](http://github.com/square/okhttp)** *v3.5.0+*
 - **[SQLite JDBC](https://github.com/xerial/sqlite-jdbc)** *v3.8.11.1+*
+- **[Thumbnailator](https://github.com/coobird/thumbnailator)** *v0.4.8+*
 
 ## License
 
