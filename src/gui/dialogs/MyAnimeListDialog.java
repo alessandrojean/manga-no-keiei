@@ -24,10 +24,10 @@ import javax.swing.UIManager;
 
 import org.json.JSONException;
 
+import api.mal.MyAnimeList;
+import api.mal.model.MALManga;
 import utils.ExceptionUtils;
 import locale.MessageSource;
-import myanimelist.MyAnimeList;
-import myanimelist.model.MALManga;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.JLabel;

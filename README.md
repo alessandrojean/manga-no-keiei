@@ -5,6 +5,7 @@ Helps in the administration of your manga collection.
 - **[Apache Commons IO](https://github.com/apache/commons-io)** *v2.5+*
 - **[Darcula Look and Feel](https://github.com/bulenkov/darcula)** *v1.0+* 
 - **[MigLayout](https://github.com/mikaelgrev/miglayout)** *v4.2+* 
+- **[OKHttp](http://github.com/square/okhttp)** *v3.5.0+*
 - **[SQLite JDBC](https://github.com/xerial/sqlite-jdbc)** *v3.8.11.1+*
 
 ## License

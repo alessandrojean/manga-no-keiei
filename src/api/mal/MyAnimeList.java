@@ -1,14 +1,18 @@
-package myanimelist;
+package api.mal;
 
+import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.imageio.ImageIO;
+
 import model.Gender;
 import model.MangaType;
-import myanimelist.model.MALManga;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +24,7 @@ import org.jsoup.select.Elements;
 
 import utils.RequestUtils;
 import utils.UrlUtils;
+import api.mal.model.MALManga;
 import database.ImageDatabase;
 
 public class MyAnimeList
@@ -27,10 +32,18 @@ public class MyAnimeList
 
 	private static final String SEARCH_URL = "https://myanimelist.net/search/prefix.json";
 
+	private static final String FILE_MYANIMELIST = ImageDatabase.DEFAULT_FOLDER + File.separator + "myanimelist" + File.separator + "%d.png";
+
 	public static List<MALManga> search(String keyword) throws IOException, JSONException
 	{
 		List<MALManga> results = new ArrayList<MALManga>();
-		String json = RequestUtils.getGet(UrlUtils.toURI(SEARCH_URL), new String[] { "type", "keyword", "v" }, new String[] { "manga", keyword, "1" });
+
+		HashMap<String, String> parameters = new HashMap<String, String>();
+		parameters.put("type", "manga");
+		parameters.put("keyword", keyword);
+		parameters.put("v", "1");
+
+		String json = RequestUtils.get(SEARCH_URL, parameters);
 		JSONArray items = new JSONObject(json).getJSONArray("categories").getJSONObject(0).getJSONArray("items");
 
 		for (int i = 0; i < items.length(); i++)
@@ -39,7 +52,7 @@ public class MyAnimeList
 
 			MALManga lMalManga = new MALManga();
 			lMalManga.setId(jo.getInt("id"));
-			lMalManga.setName(jo.getString("name"));
+			lMalManga.setOriginalName(jo.getString("name"));
 			lMalManga.setUrl(UrlUtils.toURL(jo.getString("url")));
 			lMalManga.setImageUrl(UrlUtils.toURL(jo.getString("image_url")));
 			lMalManga.setThumbnailUrl(UrlUtils.toURL(jo.getString("thumbnail_url")));
@@ -60,9 +73,9 @@ public class MyAnimeList
 
 			lMalManga.setEsScore(jo.getDouble("es_score"));
 
-			File image = ImageDatabase.selectImage(lMalManga);
+			File image = selectImage(lMalManga);
 			if (image == null)
-				ImageDatabase.insertImage(lMalManga);
+				insertImage(lMalManga);
 			else
 				lMalManga.setImageFile(image);
 
@@ -74,13 +87,15 @@ public class MyAnimeList
 
 	public static void fillInformation(MALManga manga) throws IOException
 	{
-		Document lDocument = Jsoup.connect(manga.getUrl().toString()).userAgent(RequestUtils.USER_AGENT).timeout(0).get();
+		String html = RequestUtils.get(manga.getUrl().toString());
+
+		Document lDocument = Jsoup.parse(html);
 
 		Element sidebar = lDocument.getElementsByClass("js-scrollfix-bottom").get(0);
 		Element img = sidebar.getElementsByTag("img").get(0);
 		manga.setImageUrl(UrlUtils.toURL(img.attr("src")));
-		ImageDatabase.insertImage(manga);
-		
+		insertImage(manga);
+
 		Elements elementDarkText = lDocument.getElementsByClass("dark_text");
 		for (Element e : elementDarkText)
 		{
@@ -128,7 +143,39 @@ public class MyAnimeList
 			}
 		}
 
-		
+	}
 
+	private static void insertImage(MALManga object) throws IOException
+	{
+		File f = new File(String.format(FILE_MYANIMELIST, object.getId()));
+		if (!f.getParentFile().exists())
+			f.getParentFile().mkdirs();
+
+		if (!f.exists())
+		{
+			InputStream lInputStream = RequestUtils.getInputStream(object.getImageUrl().toString());
+
+			object.setImage(ImageIO.read(lInputStream));
+			ImageIO.write(object.getImage(), "png", f);
+		}
+		else
+		{
+			Image i = ImageIO.read(f);
+			if (i.getWidth(null) <= 116 && i.getHeight(null) <= 180)
+			{
+				InputStream lInputStream = RequestUtils.getInputStream(object.getImageUrl().toString());
+
+				object.setImage(ImageIO.read(lInputStream));
+				ImageIO.write(object.getImage(), "png", f);
+			}
+		}
+		object.setImageFile(f);
+	}
+
+	private static File selectImage(MALManga object)
+	{
+		File result = new File(String.format(FILE_MYANIMELIST, object.getId()));
+
+		return result.exists() ? result : null;
 	}
 }

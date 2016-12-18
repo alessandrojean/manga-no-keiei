@@ -1,4 +1,4 @@
-package myanimelist.model;
+package api.mal.model;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -12,13 +12,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import model.Gender;
+import model.Manga;
 import model.MangaType;
 
-public class MALManga
+public class MALManga extends Manga
 {
-	private int id;
-	private MangaType type;
-	private String name;
 	private URL url;
 	private URL imageUrl;
 	private URL thumbnailUrl;
@@ -27,12 +25,6 @@ public class MALManga
 	private double score;
 	private String status;
 	private double esScore;
-
-	private Date startDate;
-	private Date endDate;
-	private String authors;
-	private String serialization;
-	private List<Gender> genders;
 
 	private static final String DATE_YEAR_PATTERN = "yyyy";
 	private static final String DATE_FULL_PATTERN = "MMM dd, yyyy";
@@ -43,36 +35,6 @@ public class MALManga
 	public MALManga()
 	{
 		super();
-	}
-
-	public int getId()
-	{
-		return id;
-	}
-
-	public void setId(int id)
-	{
-		this.id = id;
-	}
-
-	public MangaType getType()
-	{
-		return type;
-	}
-
-	public void setType(MangaType type)
-	{
-		this.type = type;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
 	}
 
 	public URL getUrl()
@@ -166,16 +128,6 @@ public class MALManga
 		this.image = image;
 	}
 
-	public Date getStartDate()
-	{
-		return startDate;
-	}
-
-	public Date getEndDate()
-	{
-		return endDate;
-	}
-
 	public File getImageFile()
 	{
 		return imageFile;
@@ -186,35 +138,6 @@ public class MALManga
 		this.imageFile = imageFile;
 	}
 
-	public String getAuthors()
-	{
-		return authors;
-	}
-
-	public void setAuthors(String authors)
-	{
-		this.authors = authors;
-	}
-
-	public String getSerialization()
-	{
-		return serialization;
-	}
-
-	public void setSerialization(String serialization)
-	{
-		this.serialization = serialization;
-	}
-
-	public List<Gender> getGenders()
-	{
-		return genders;
-	}
-
-	public void setGenders(List<Gender> genders)
-	{
-		this.genders = genders;
-	}
 
 	private void fillDates()
 	{
@@ -236,7 +159,7 @@ public class MALManga
 					if (lMatcher.group(2).length() >= 4)
 					{
 						lSimpleDateFormat = new SimpleDateFormat(lMatcher.group(2).length() == 4 ? DATE_YEAR_PATTERN : DATE_FULL_PATTERN, Locale.US);
-						endDate = lSimpleDateFormat.parse(lMatcher.group(2));
+						finishDate = lSimpleDateFormat.parse(lMatcher.group(2));
 					}
 				}
 			}
@@ -250,6 +173,6 @@ public class MALManga
 	@Override
 	public String toString()
 	{
-		return "MALManga [id=" + id + ", type=" + type + ", name=" + name + ", score=" + score + "]";
+		return "MALManga [id=" + id + ", type=" + type + ", name=" + originalName + ", score=" + score + "]";
 	}
 }

@@ -32,12 +32,12 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import api.mal.model.MALManga;
 import locale.MessageSource;
 import model.Gender;
 import model.Manga;
 import model.MangaEdition;
 import model.MangaType;
-import myanimelist.model.MALManga;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
 import utils.ComboBoxUtils;
@@ -246,9 +246,9 @@ public class MangaDialog extends Dialog<Manga>
 				if (lMyAnimeListDialog.showDialog() == MyAnimeListDialog.APPROVE_OPTION)
 				{
 					MALManga lMALManga = lMyAnimeListDialog.getResult();
-					tfOriginalName.setText(lMALManga.getName());
+					tfOriginalName.setText(lMALManga.getOriginalName());
 					tfStartDate.setText(DateUtils.toString(lMALManga.getStartDate()));
-					tfFinishDate.setText(DateUtils.toString(lMALManga.getEndDate()));
+					tfFinishDate.setText(DateUtils.toString(lMALManga.getFinishDate()));
 					imgPoster.setImage(lMALManga.getImageFile());
 					tfAuthors.setText(lMALManga.getAuthors());
 					tfSerialization.setText(lMALManga.getSerialization());

@@ -16,9 +16,9 @@ import java.awt.event.MouseMotionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import myanimelist.model.MALManga;
 import utils.BorderUtils;
 import utils.Utilities;
+import api.mal.model.MALManga;
 
 import com.bulenkov.iconloader.util.Gray;
 
@@ -89,7 +89,7 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 		g2d.setColor(getForeground());
 		g2d.setFont(getFont().deriveFont(Font.BOLD));
 		FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-		String mangaName = manga.getName();
+		String mangaName = manga.getOriginalName();
 		if (metrics.stringWidth(mangaName) >= width - 75 - metrics.stringWidth("(" + manga.getType() + ")"))
 		{
 			String temp = "";
@@ -102,7 +102,7 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 			g2d.drawString(temp, 69, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		}
 		else
-			g2d.drawString(manga.getName(), 69, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+			g2d.drawString(manga.getOriginalName(), 69, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		metrics = getFontMetrics(getFont().deriveFont(Font.ITALIC));
 		g2d.setFont(getFont().deriveFont(Font.ITALIC));
 		g2d.drawString("(" + manga.getType() + ")", width - 5 - metrics.stringWidth("(" + manga.getType() + ")"), (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());

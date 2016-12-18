@@ -1,24 +1,20 @@
 package utils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.util.ArrayList;
+import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicNameValuePair;
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+import org.json.JSONObject;
 
 public class RequestUtils
 {
@@ -30,131 +26,274 @@ public class RequestUtils
 	public static final String XML_HTTP_REQUEST = "XMLHttpRequest";
 
 	private static HashMap<String, String> requestHashMap = new HashMap<String, String>();
+	private static HashMap<String, InputStream> requestInputStream = new HashMap<String, InputStream>();
 
-	public static String getGet(URI url) throws ClientProtocolException, IOException
+	private static OkHttpClient getClient()
 	{
-		if (requestHashMap.containsKey("GET:" + url.toString()))
-			return requestHashMap.get("GET:" + url.toString());
-
-		HttpClient lHttpClient = HttpClientBuilder.create().build();
-		HttpGet lHttpGet = new HttpGet(url);
-
-		lHttpGet.addHeader("User-Agent", USER_AGENT);
-		lHttpGet.addHeader(X_REQUESTED_WITH, XML_HTTP_REQUEST);
-
-		HttpResponse lHttpResponse = lHttpClient.execute(lHttpGet);
-
-		String response = null;
-		if (lHttpResponse.getStatusLine().getStatusCode() == 200)
-		{
-			response = IOUtils.toString(new BufferedReader(new InputStreamReader(lHttpResponse.getEntity().getContent())));
-			requestHashMap.put("GET:" + url.toString(), response);
-		}
-
-		return response;
+		return new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build();
 	}
 
-	public static String getGet(URI url, String[] parametersNames, String[] parametersValues) throws IOException
+	private static String addParametersToUrl(String url, HashMap<String, String> parameters)
 	{
-		String response = null;
+		HttpUrl.Builder lHttpUrlBuilder = HttpUrl.parse(url).newBuilder();
+		for (Map.Entry<String, String> entry : parameters.entrySet())
+			lHttpUrlBuilder.addQueryParameter(entry.getKey(), entry.getValue());
+		return lHttpUrlBuilder.build().toString();
+	}
+
+	public static String get(String url) throws IOException
+	{
+		if (requestHashMap.containsKey("GET:" + url))
+			return requestHashMap.get("GET:" + url);
+
 		try
 		{
-			url = addParamsToURI(url, parametersNames, parametersValues);
+			OkHttpClient lOkHttpClient = getClient();
 
-			if (requestHashMap.containsKey("GET:" + url.toString()))
-				return requestHashMap.get("GET:" + url.toString());
+			Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).build();
 
-			HttpClient lHttpClient = HttpClientBuilder.create().build();
-			HttpGet lHttpGet = new HttpGet(url);
-
-			lHttpGet.addHeader("User-Agent", USER_AGENT);
-			lHttpGet.addHeader(X_REQUESTED_WITH, XML_HTTP_REQUEST);
-
-			HttpResponse lHttpResponse = lHttpClient.execute(lHttpGet);
-
-			if (lHttpResponse.getStatusLine().getStatusCode() == 200)
+			Response lResponse = lOkHttpClient.newCall(request).execute();
+			if (!lResponse.isSuccessful())
+				throw new IOException("Unexpected code " + lResponse);
+			else
 			{
-				response = IOUtils.toString(new BufferedReader(new InputStreamReader(lHttpResponse.getEntity().getContent())));
-				requestHashMap.put("GET:" + url.toString(), response);
+				String response = lResponse.body().string();
+				requestHashMap.put("GET:" + url, response);
+				return response;
 			}
 		}
 		catch (IOException e)
 		{
-			return getGet(url, parametersNames, parametersValues, true);
+			return get(url, true);
 		}
-
-		return response;
 	}
 
-	public static String getGet(URI url, String[] parametersNames, String[] parametersValues, boolean retry) throws ClientProtocolException, IOException
+	private static String get(String url, boolean retry) throws IOException
 	{
-		url = addParamsToURI(url, parametersNames, parametersValues);
+		if (requestHashMap.containsKey("GET:" + url))
+			return requestHashMap.get("GET:" + url);
 
-		if (requestHashMap.containsKey("GET:" + url.toString()))
-			return requestHashMap.get("GET:" + url.toString());
+		OkHttpClient lOkHttpClient = getClient();
 
-		HttpClient lHttpClient = HttpClientBuilder.create().build();
-		HttpGet lHttpGet = new HttpGet(url);
+		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).build();
 
-		lHttpGet.addHeader("User-Agent", USER_AGENT);
-		lHttpGet.addHeader(X_REQUESTED_WITH, XML_HTTP_REQUEST);
-
-		HttpResponse lHttpResponse = lHttpClient.execute(lHttpGet);
-
-		String response = null;
-		if (lHttpResponse.getStatusLine().getStatusCode() == 200)
+		Response lResponse = lOkHttpClient.newCall(request).execute();
+		if (!lResponse.isSuccessful())
+			throw new IOException("Unexpected code " + lResponse);
+		else
 		{
-			response = IOUtils.toString(new BufferedReader(new InputStreamReader(lHttpResponse.getEntity().getContent())));
-			requestHashMap.put("GET:" + url.toString(), response);
+			String response = lResponse.body().string();
+			requestHashMap.put("GET:" + url, response);
+			return response;
 		}
-
-		return response;
 	}
 
-	private static URI addParamsToURI(URI uri, String[] parametersNames, String[] parametersValues)
+	public static String get(String url, HashMap<String, String> queryParameters) throws IOException
 	{
-		String url = uri.toString();
-		if (!url.endsWith("?"))
-			url += "?";
+		url = addParametersToUrl(url, queryParameters);
 
-		List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-		for (int i = 0; i < parametersNames.length; i++)
-			parameters.add(new BasicNameValuePair(parametersNames[i], parametersValues[i]));
+		if (requestHashMap.containsKey("GET:" + url))
+			return requestHashMap.get("GET:" + url);
 
-		String paramString = URLEncodedUtils.format(parameters, "utf-8");
-		url += paramString;
-
-		return UrlUtils.toURI(url);
-	}
-
-	public static String getPost(URI url, String[] parametersNames, String[] parametersValues) throws ClientProtocolException, IOException
-	{
-		URI urlWithParams = addParamsToURI(url, parametersNames, parametersValues);
-		if (requestHashMap.containsKey("POST:" + urlWithParams.toString()))
-			return requestHashMap.get("POST:" + urlWithParams.toString());
-
-		HttpClient lHttpClient = HttpClientBuilder.create().build();
-		HttpPost lHttpPost = new HttpPost(url);
-
-		lHttpPost.addHeader("User-Agent", USER_AGENT);
-		lHttpPost.addHeader(X_REQUESTED_WITH, XML_HTTP_REQUEST);
-
-		List<NameValuePair> urlParameters = new ArrayList<>();
-		for (int i = 0; i < parametersNames.length; i++)
-			urlParameters.add(new BasicNameValuePair(parametersNames[i], parametersValues[i]));
-
-		lHttpPost.setEntity(new UrlEncodedFormEntity(urlParameters));
-
-		HttpResponse lHttpResponse = lHttpClient.execute(lHttpPost);
-
-		String response = null;
-		if (lHttpResponse.getStatusLine().getStatusCode() == 200)
+		try
 		{
-			response = IOUtils.toString(new BufferedReader(new InputStreamReader(lHttpResponse.getEntity().getContent())));
-			requestHashMap.put("POST:" + urlWithParams.toString(), response);
-		}
+			OkHttpClient lOkHttpClient = getClient();
 
-		return response;
+			Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).build();
+
+			Response lResponse = lOkHttpClient.newCall(request).execute();
+			if (!lResponse.isSuccessful())
+				throw new IOException("Unexpected code " + lResponse);
+			else
+			{
+				String response = lResponse.body().string();
+				requestHashMap.put("GET:" + url, response);
+				return response;
+			}
+		}
+		catch (IOException e)
+		{
+			return get(url, queryParameters, true);
+		}
+	}
+
+	private static String get(String url, HashMap<String, String> queryParameters, boolean retry) throws IOException
+	{
+		url = addParametersToUrl(url, queryParameters);
+
+		if (requestHashMap.containsKey("GET:" + url))
+			return requestHashMap.get("GET:" + url);
+
+		OkHttpClient lOkHttpClient = getClient();
+
+		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).build();
+
+		Response lResponse = lOkHttpClient.newCall(request).execute();
+		if (!lResponse.isSuccessful())
+			throw new IOException("Unexpected code " + lResponse);
+		else
+		{
+			String response = lResponse.body().string();
+			requestHashMap.put("GET:" + url, response);
+			return response;
+		}
+	}
+
+	public static InputStream getInputStream(String url) throws IOException
+	{
+		if (requestInputStream.containsKey("GET:" + url))
+			return requestInputStream.get("GET:" + url);
+
+		try
+		{
+			OkHttpClient lOkHttpClient = getClient();
+
+			Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).build();
+
+			Response lResponse = lOkHttpClient.newCall(request).execute();
+			if (!lResponse.isSuccessful())
+				throw new IOException("Unexpected code " + lResponse);
+			else
+			{
+				InputStream response = lResponse.body().byteStream();
+				requestInputStream.put("GET:" + url, response);
+				return response;
+			}
+		}
+		catch (IOException e)
+		{
+			return getInputStream(url, true);
+		}
+	}
+
+	private static InputStream getInputStream(String url, boolean retry) throws IOException
+	{
+		if (requestInputStream.containsKey("GET:" + url))
+			return requestInputStream.get("GET:" + url);
+
+		OkHttpClient lOkHttpClient = getClient();
+
+		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).build();
+
+		Response lResponse = lOkHttpClient.newCall(request).execute();
+		if (!lResponse.isSuccessful())
+			throw new IOException("Unexpected code " + lResponse);
+		else
+		{
+			InputStream response = lResponse.body().byteStream();
+			requestInputStream.put("GET:" + url, response);
+			return response;
+		}
+	}
+
+	public static String post(String url, HashMap<String, String> formParameters) throws IOException
+	{
+		String urlWithParams = addParametersToUrl(url, formParameters);
+		if (requestHashMap.containsKey("POST:" + urlWithParams))
+			return requestHashMap.get("POST:" + urlWithParams);
+
+		try
+		{
+			OkHttpClient lOkHttpClient = getClient();
+
+			FormBody.Builder lFormBodyBuilder = new FormBody.Builder();
+			for (Map.Entry<String, String> entry : formParameters.entrySet())
+				lFormBodyBuilder.add(entry.getKey(), entry.getValue());
+
+			Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).post(lFormBodyBuilder.build()).build();
+
+			Response lResponse = lOkHttpClient.newCall(request).execute();
+			if (!lResponse.isSuccessful())
+				throw new IOException("Unexpected code " + lResponse);
+			else
+			{
+				String response = lResponse.body().string();
+				requestHashMap.put("POST:" + urlWithParams, response);
+				return response;
+			}
+		}
+		catch (IOException e)
+		{
+			return post(url, formParameters, true);
+		}
+	}
+
+	private static String post(String url, HashMap<String, String> formParameters, boolean retry) throws IOException
+	{
+		String urlWithParams = addParametersToUrl(url, formParameters);
+		if (requestHashMap.containsKey("POST:" + urlWithParams))
+			return requestHashMap.get("POST:" + urlWithParams);
+
+		OkHttpClient lOkHttpClient = getClient();
+
+		FormBody.Builder lFormBodyBuilder = new FormBody.Builder();
+		for (Map.Entry<String, String> entry : formParameters.entrySet())
+			lFormBodyBuilder.add(entry.getKey(), entry.getValue());
+
+		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).post(lFormBodyBuilder.build()).build();
+
+		Response lResponse = lOkHttpClient.newCall(request).execute();
+		if (!lResponse.isSuccessful())
+			throw new IOException("Unexpected code " + lResponse);
+		else
+		{
+			String response = lResponse.body().string();
+			requestHashMap.put("POST:" + urlWithParams, response);
+			return response;
+		}
+	}
+
+	public static String post(String url, JSONObject jsonObject) throws IOException
+	{
+		if (requestHashMap.containsKey("POST:" + url))
+			return requestHashMap.get("POST:" + url);
+
+		try
+		{
+			OkHttpClient lOkHttpClient = getClient();
+
+			MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+			RequestBody lRequestBody = RequestBody.create(JSON, jsonObject.toString());
+
+			Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).post(lRequestBody).build();
+
+			Response lResponse = lOkHttpClient.newCall(request).execute();
+			if (!lResponse.isSuccessful())
+				throw new IOException("Unexpected code " + lResponse);
+			else
+			{
+				String response = lResponse.body().string();
+				requestHashMap.put("POST:" + url, response);
+				return response;
+			}
+		}
+		catch (IOException e)
+		{
+			return post(url, jsonObject, true);
+		}
+	}
+
+	private static String post(String url, JSONObject jsonObject, boolean retry) throws IOException
+	{
+		if (requestHashMap.containsKey("POST:" + url))
+			return requestHashMap.get("POST:" + url);
+
+		OkHttpClient lOkHttpClient = getClient();
+
+		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+		RequestBody lRequestBody = RequestBody.create(JSON, jsonObject.toString());
+
+		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).post(lRequestBody).build();
+
+		Response lResponse = lOkHttpClient.newCall(request).execute();
+		if (!lResponse.isSuccessful())
+			throw new IOException("Unexpected code " + lResponse);
+		else
+		{
+			String response = lResponse.body().string();
+			requestHashMap.put("POST:" + url, response);
+			return response;
+		}
 	}
 
 }

@@ -266,6 +266,21 @@ public class VolumeDialog extends Dialog<Volume>
 		JPanel buttonPanel = new JPanel();
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+		
+		JButton btMCD = new JButton("MangaCoverDatabase");
+		btMCD.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0)
+			{
+				MangaCoverDatabaseDialog lMangaCoverDatabaseSearchDialog = new MangaCoverDatabaseDialog(VolumeDialog.this);
+				if(lMangaCoverDatabaseSearchDialog.showDialog()==MangaCoverDatabaseDialog.APPROVE_OPTION)
+				{
+					imgPoster.setImage(lMangaCoverDatabaseSearchDialog.getResult().getNormalFile());
+				}
+			}
+		});
+		buttonPanel.add(btMCD);
 
 		Component horizontalGlue = Box.createHorizontalGlue();
 		buttonPanel.add(horizontalGlue);

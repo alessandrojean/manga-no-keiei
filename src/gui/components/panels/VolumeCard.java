@@ -156,7 +156,7 @@ public class VolumeCard extends JPanel implements MouseListener
 			g2d.drawString(volume.getTitle().substring(0, 25) + "...", 110, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent()); 
 
 		// Draw Details
-		String details = String.format("%1$s \u00B7 R$%2$.2f", volume.getPublisher().getName(), volume.getTotalPrice()); 
+		String details = String.format("%1$s \u00B7 %2%3$.2f", volume.getPublisher().getName(), volume.getCurrency().getSymbol(), volume.getTotalPrice()); 
 		metrics = getFontMetrics(getFont());
 		g2d.setFont(getFont());
 		g2d.drawString(details, 105 + (195 - metrics.stringWidth(details)) / 2, titleHeight + 16);

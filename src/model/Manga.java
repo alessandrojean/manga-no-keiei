@@ -9,19 +9,19 @@ import javax.swing.ImageIcon;
 
 public class Manga
 {
-	private int id;
-	private String nationalName;
-	private String originalName;
-	private MangaType type;
-	private String serialization;
-	private Date startDate;
-	private Date finishDate;
-	private String authors;
-	private MangaEdition edition;
-	private String stamp;
-	private List<Gender> genders;
-	private int rating;
-	private String observations;
+	protected int id;
+	protected String nationalName;
+	protected String originalName;
+	protected MangaType type;
+	protected String serialization;
+	protected Date startDate;
+	protected Date finishDate;
+	protected String authors;
+	protected MangaEdition edition;
+	protected String stamp;
+	protected List<Gender> genders;
+	protected int rating;
+	protected String observations;
 
 	private File poster;
 

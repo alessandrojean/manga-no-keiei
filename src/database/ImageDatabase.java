@@ -1,5 +1,6 @@
 package database;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -8,11 +9,12 @@ import javax.imageio.ImageIO;
 import model.Manga;
 import model.Publisher;
 import model.Volume;
-import myanimelist.model.MALManga;
 
 import org.apache.commons.io.FileUtils;
 
 import utils.ExceptionUtils;
+import api.mal.model.MALManga;
+import api.mcd.model.ImageCover;
 
 public class ImageDatabase
 {
@@ -22,6 +24,7 @@ public class ImageDatabase
 	public static final String FILE_VOLUME = DEFAULT_FOLDER + File.separator + "volumes" + File.separator + "%d.png";
 	public static final String FILE_PUBLISHER = DEFAULT_FOLDER + File.separator + "publishers" + File.separator + "%d.png";
 	public static final String FILE_MYANIMELIST = DEFAULT_FOLDER + File.separator + "myanimelist" + File.separator + "%d.png";
+	public static final String FILE_MANGA_COVER_DATABASE = DEFAULT_FOLDER + File.separator + "mcd" + File.separator + "%d_%d.png";
 
 	public static void insertImage(Object object)
 	{
@@ -29,20 +32,6 @@ public class ImageDatabase
 		{
 			String file = "";
 			File image = null;
-			if (object instanceof MALManga)
-			{
-				int id = ((MALManga) object).getId();
-				file = String.format(FILE_MYANIMELIST, id);
-				File f = new File(file);
-				if (!f.getParentFile().exists())
-					f.getParentFile().mkdirs();
-
-				((MALManga) object).setImage(ImageIO.read(((MALManga) object).getImageUrl()));
-				ImageIO.write(((MALManga) object).getImage(), "png", f);
-				((MALManga) object).setImageFile(f);
-				return;
-			}
-
 			if (object instanceof Manga)
 			{
 				int id = ((Manga) object).getId();
@@ -77,6 +66,7 @@ public class ImageDatabase
 
 	}
 
+	
 	public static File selectImage(Object object)
 	{
 		File result = null;
@@ -94,11 +84,6 @@ public class ImageDatabase
 		{
 			int id = ((Publisher) object).getId();
 			result = new File(String.format(FILE_PUBLISHER, id));
-		}
-		else if (object instanceof MALManga)
-		{
-			int id = ((MALManga) object).getId();
-			result = new File(String.format(FILE_MYANIMELIST, id));
 		}
 
 		return result.exists() ? result : null;
