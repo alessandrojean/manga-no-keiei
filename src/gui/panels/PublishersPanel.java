@@ -168,7 +168,7 @@ public class PublishersPanel extends JPanel
 		}
 	}
 
-	private void fillPublishers()
+	public void fillPublishers()
 	{
 
 		try (PublisherDAO lPublisherDAO = Main.DATABASE.getPublisherDAO())

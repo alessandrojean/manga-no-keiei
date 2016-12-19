@@ -18,6 +18,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -156,6 +157,8 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 	{
 		SwingWorker<Void, Void> lSwingWorker = new SwingWorker<Void, Void>() {
 
+			private boolean worked = true;
+
 			@Override
 			protected Void doInBackground() throws Exception
 			{
@@ -179,7 +182,7 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 				}
 				catch (IOException | JSONException e)
 				{
-					ExceptionUtils.showExceptionDialog(null, e);
+					worked = false;
 				}
 
 				return null;
@@ -188,7 +191,7 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 			@Override
 			protected void done()
 			{
-				if (mangaCover.getCovers() != null)
+				if (worked)
 				{
 					progressBar.setIndeterminate(false);
 					lbStatus.setText("");
@@ -215,7 +218,11 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 					panelResults.setPreferredSize(new Dimension(300, 155 * divide));
 				}
 				else
-					showImages();
+				{
+					int option = JOptionPane.showConfirmDialog(MangaCoverDatabaseDialog.this, MessageSource.getInstance().getString("Basics.serverError"), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+					if (option == JOptionPane.YES_OPTION)
+						search();
+				}
 
 				super.done();
 			}
@@ -227,6 +234,8 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 	private void downloadNormalFile()
 	{
 		SwingWorker<Void, Void> lSwingWorker = new SwingWorker<Void, Void>() {
+
+			private boolean worked = true;
 
 			@Override
 			protected Void doInBackground() throws Exception
@@ -249,7 +258,7 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 				}
 				catch (IOException e)
 				{
-					ExceptionUtils.showExceptionDialog(null, e);
+					worked = false;
 				}
 
 				return null;
@@ -258,7 +267,14 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 			@Override
 			protected void done()
 			{
-				approveOption();
+				if (worked)
+					approveOption();
+				else
+				{
+					int option = JOptionPane.showConfirmDialog(MangaCoverDatabaseDialog.this, MessageSource.getInstance().getString("Basics.serverError"), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+					if (option == JOptionPane.YES_OPTION)
+						downloadNormalFile();
+				}
 			}
 
 		};
@@ -268,6 +284,8 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 	private void search()
 	{
 		SwingWorker<List<MangaCover>, Void> lSwingWorker = new SwingWorker<List<MangaCover>, Void>() {
+
+			private boolean worked = true;
 
 			@Override
 			protected List<MangaCover> doInBackground() throws Exception
@@ -291,7 +309,7 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 				}
 				catch (IOException | JSONException e)
 				{
-					ExceptionUtils.showExceptionDialog(null, e);
+					worked = false;
 				}
 
 				return result;
@@ -300,18 +318,25 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 			@Override
 			protected void done()
 			{
-				try
+				if (worked)
+					try
+					{
+						progressBar.setIndeterminate(false);
+						lbStatus.setText("");
+						textField.setEnabled(true);
+						List<MangaCover> results = get();
+						for (MangaCover m : results)
+							((DefaultListModel<MangaCover>) listResults.getModel()).addElement(m);
+					}
+					catch (InterruptedException | ExecutionException e)
+					{
+						ExceptionUtils.showExceptionDialog(null, e);
+					}
+				else
 				{
-					progressBar.setIndeterminate(false);
-					lbStatus.setText("");
-					textField.setEnabled(true);
-					List<MangaCover> results = get();
-					for (MangaCover m : results)
-						((DefaultListModel<MangaCover>) listResults.getModel()).addElement(m);
-				}
-				catch (InterruptedException | ExecutionException e)
-				{
-					ExceptionUtils.showExceptionDialog(null, e);
+					int option = JOptionPane.showConfirmDialog(MangaCoverDatabaseDialog.this, MessageSource.getInstance().getString("Basics.serverError"), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+					if (option == JOptionPane.YES_OPTION)
+						search();
 				}
 
 				super.done();

@@ -7,36 +7,32 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import model.Volume;
 import net.coobird.thumbnailator.Thumbnails;
 import utils.BorderUtils;
 import utils.Utilities;
-import api.mal.model.MALManga;
 import api.mcd.model.ImageCover;
 
 import com.bulenkov.iconloader.util.Gray;
 
-public class ImageCoverCard extends JPanel implements MouseListener
+public class SimpleVolumeCard extends JPanel implements MouseListener
 {
 
-	private ImageCover imageCover;
+	private Volume volume;
 
 	private Color hoverColor = new Color(69, 73, 74);
 
 	private Runnable clickListener;
-	
+
 	private BufferedImage coverResized;
 
 	public Runnable getClickListener()
@@ -49,10 +45,10 @@ public class ImageCoverCard extends JPanel implements MouseListener
 		this.clickListener = clickListener;
 	}
 
-	public ImageCoverCard(ImageCover imageCover)
+	public SimpleVolumeCard(Volume volume)
 	{
 		super();
-		this.imageCover = imageCover;
+		this.volume = volume;
 
 		setBackground(hoverColor);
 		addMouseListener(this);
@@ -60,14 +56,14 @@ public class ImageCoverCard extends JPanel implements MouseListener
 		setCursor(new Cursor(Cursor.HAND_CURSOR));
 	}
 
-	public ImageCover getImageCover()
+	public Volume getVolume()
 	{
-		return imageCover;
+		return volume;
 	}
 
-	public void setImageCover(ImageCover imageCover)
+	public void setVolume(Volume volume)
 	{
-		this.imageCover = imageCover;
+		this.volume = volume;
 		repaint();
 	}
 
@@ -93,7 +89,7 @@ public class ImageCoverCard extends JPanel implements MouseListener
 		if (coverResized == null)
 			try
 			{
-				BufferedImage cover = imageCover.getThumbnailFile() == null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(imageCover.getThumbnailFile());
+				BufferedImage cover = volume.getPoster() == null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(volume.getPoster());
 				coverResized = Thumbnails.of(cover).size(width, height).asBufferedImage();
 			}
 			catch (IOException e)
@@ -103,14 +99,14 @@ public class ImageCoverCard extends JPanel implements MouseListener
 			}
 		g2d.drawImage(coverResized, 0, 0, width, height, null);
 
-		String volume = String.format("#%d", imageCover.getVolume());
+		String volume = String.format("#%s", this.volume.getNumber());
 		FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-		
-		g2d.setPaint(new Color(0,0,0,150));
-		g2d.fillRect(0, height - metrics.getHeight()-5, width, height);
-		
+
+		g2d.setPaint(new Color(0, 0, 0, 150));
+		g2d.fillRect(0, height - metrics.getHeight() - 5, width, height);
+
 		// Draw Details
-		
+
 		g2d.setFont(getFont().deriveFont(Font.BOLD));
 		g2d.setColor(Color.WHITE);
 		g2d.drawString(volume, width - 5 - metrics.stringWidth(volume), height - 5);
@@ -131,7 +127,7 @@ public class ImageCoverCard extends JPanel implements MouseListener
 	@Override
 	public Dimension getPreferredSize()
 	{
-		return new Dimension(107, 150);
+		return new Dimension(112, 157);
 	}
 
 	@Override

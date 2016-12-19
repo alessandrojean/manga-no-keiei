@@ -26,9 +26,11 @@ public class Volume
 	private boolean protectionPlastic;
 	private boolean plan;
 	private String observations;
+	private boolean favorite;
+	private Date insertDate;
 
 	private Manga manga;
-	
+
 	private File poster;
 
 	public Volume()
@@ -254,6 +256,26 @@ public class Volume
 	public void setCurrency(Currency currency)
 	{
 		this.currency = currency;
+	}
+
+	public boolean isFavorite()
+	{
+		return favorite;
+	}
+
+	public void setFavorite(boolean favorite)
+	{
+		this.favorite = favorite;
+	}
+
+	public Date getInsertDate()
+	{
+		return insertDate;
+	}
+
+	public void setInsertDate(Date insertDate)
+	{
+		this.insertDate = insertDate;
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 
 import net.coobird.thumbnailator.Thumbnails;
 import locale.MessageSource;
@@ -46,6 +47,7 @@ public class VolumeCard extends JPanel implements MouseListener
 	private JPopupMenu jpmOptions;
 	private JMenuItem jmiEdit;
 	private JMenuItem jmiRemove;
+	private JMenuItem jmiFavorite;
 
 	private Color hoverColor = new Color(69, 73, 74);
 
@@ -98,6 +100,9 @@ public class VolumeCard extends JPanel implements MouseListener
 		horizontalBox.add(horizontalGlue);
 
 		jpmOptions = new JPopupMenu();
+		jmiFavorite = new JMenuItem(MessageSource.getInstance().getString(volume.isFavorite() ? "Basics.unfavorite" : "Basics.favorite"), new ImageIcon(getClass().getResource(volume.isFavorite() ? "/images/star_outline_16.png" : "/images/star_google_16.png")));
+		jpmOptions.add(jmiFavorite);
+		jpmOptions.add(new JSeparator());
 		jmiEdit = new JMenuItem(MessageSource.getInstance().getString("Basics.edit"), new ImageIcon(getClass().getResource("/images/lead_pencil.png")));
 		jpmOptions.add(jmiEdit);
 		jmiRemove = new JMenuItem(MessageSource.getInstance().getString("Basics.remove"), new ImageIcon(getClass().getResource("/images/delete_16.png")));
@@ -119,6 +124,11 @@ public class VolumeCard extends JPanel implements MouseListener
 		jmiRemove.addActionListener(actionListener);
 	}
 
+	public void addFavoriteButtonActionListener(ActionListener actionListener)
+	{
+		jmiFavorite.addActionListener(actionListener);
+	}
+
 	public Volume getVolume()
 	{
 		return volume;
@@ -128,6 +138,8 @@ public class VolumeCard extends JPanel implements MouseListener
 	{
 		this.volume = volume;
 		posterResized = null;
+		jmiFavorite.setIcon(new ImageIcon(getClass().getResource(volume.isFavorite() ? "/images/star_outline_16.png" : "/images/star_google_16.png")));
+		jmiFavorite.setText(MessageSource.getInstance().getString(volume.isFavorite() ? "Basics.unfavorite" : "Basics.favorite"));
 		repaint();
 	}
 

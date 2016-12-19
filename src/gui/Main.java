@@ -43,6 +43,8 @@ public class Main extends JFrame
 	public static final Database DATABASE = new Database();
 
 	public static MangasPanel MANGAS_PANEL;
+	public static HomePanel HOME_PANEL;
+	public static PublishersPanel PUBLISHERS_PANEL;
 
 	private static HashMap<String, Boolean> volumesPanel;
 
@@ -105,12 +107,14 @@ public class Main extends JFrame
 		cardPanel.setBackground(Color.GREEN);
 		contentPane.add(cardPanel);
 
-		cardPanel.add(new HomePanel(), Panels.HOME);
+		HOME_PANEL = new HomePanel();
+		cardPanel.add(HOME_PANEL, Panels.HOME);
 		MANGAS_PANEL = new MangasPanel();
 		cardPanel.add(MANGAS_PANEL, Panels.MANGAS_LIST);
-		cardPanel.add(new PublishersPanel(), Panels.PUBLISHERS_LIST);
+		PUBLISHERS_PANEL = new PublishersPanel();
+		cardPanel.add(PUBLISHERS_PANEL, Panels.PUBLISHERS_LIST);
 		cardPanel.add(new SettingsPanel(), Panels.SETTINGS);
-		
+
 		volumesPanel = new HashMap<String, Boolean>();
 	}
 

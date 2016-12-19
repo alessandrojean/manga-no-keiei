@@ -29,10 +29,11 @@ import com.bulenkov.darcula.DarculaLaf;
 
 public class Splash extends JFrame
 {
-	
+
 	public static final String PROJECT_NAME = "Manga no Keiei";
-	public static final String PROJECT_VERSION = "v1.3.1";
-	
+	public static final String PROJECT_VERSION = "v1.3.2";
+	public static final int DATABASE_VERSION = 1;
+
 	public static Main MAIN;
 
 	private JPanel contentPane;

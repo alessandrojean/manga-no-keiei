@@ -75,7 +75,7 @@ public class VolumesPanel extends JPanel
 					try (MangaDAO lMangaDAO = Main.DATABASE.getMangaDAO())
 					{
 						if (!lMangaDAO.update(lMangaDialog.getResult()))
-							JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
+							JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisManga") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 						mhManga.setManga(lMangaDialog.getResult());
 					}
 					catch (SQLException e)
@@ -91,12 +91,12 @@ public class VolumesPanel extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				if (JOptionPane.showConfirmDialog(null, MessageSource.getInstance().getString("Basics.databaseRemoveConfirmation",new Object[]{MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.removeConfirmation"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) 
+				if (JOptionPane.showConfirmDialog(null, MessageSource.getInstance().getString("Basics.databaseRemoveConfirmation", new Object[] { MessageSource.getInstance().getString("Basics.thisManga") }), MessageSource.getInstance().getString("Basics.removeConfirmation"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 				{
 					try (MangaDAO lMangaDAO = Main.DATABASE.getMangaDAO())
 					{
 						if (!lMangaDAO.remove(mhManga.getManga()))
-							JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.delete"), MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
+							JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.delete"), MessageSource.getInstance().getString("Basics.thisManga") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 					}
 					catch (SQLException e)
 					{
@@ -213,8 +213,9 @@ public class VolumesPanel extends JPanel
 			{
 				Volume result = lVolumeDialog.getResult();
 				if (!lVolumeDAO.insert(result))
-					JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.insert"), MessageSource.getInstance().getString("Basics.thisVolume")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
-
+					JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.insert"), MessageSource.getInstance().getString("Basics.thisVolume") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
+				else
+					Main.HOME_PANEL.updateLastInserted(result);
 			}
 			catch (SQLException e)
 			{
@@ -232,6 +233,7 @@ public class VolumesPanel extends JPanel
 			manga = lMangaDAO.select(manga.getId());
 			mhManga.setManga(manga);
 			Main.MANGAS_PANEL.fillMangas();
+			Main.PUBLISHERS_PANEL.fillPublishers();
 			fillCards();
 			fillTable();
 		}
@@ -259,7 +261,7 @@ public class VolumesPanel extends JPanel
 						try (VolumeDAO lVolumeDAO = Main.DATABASE.getVolumeDAO())
 						{
 							if (!lVolumeDAO.update(lVolumeDialog.getResult()))
-								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisVolume")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
+								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisVolume") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 							lVolumeCard.setVolume(lVolumeDialog.getResult());
 						}
 						catch (SQLException e)
@@ -274,18 +276,37 @@ public class VolumesPanel extends JPanel
 				@Override
 				public void actionPerformed(ActionEvent arg0)
 				{
-					if (JOptionPane.showConfirmDialog(null, MessageSource.getInstance().getString("Basics.databaseRemoveConfirmation",new Object[]{MessageSource.getInstance().getString("Basics.thisVolume")}), MessageSource.getInstance().getString("Basics.removeConfirmation"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) 
+					if (JOptionPane.showConfirmDialog(null, MessageSource.getInstance().getString("Basics.databaseRemoveConfirmation", new Object[] { MessageSource.getInstance().getString("Basics.thisVolume") }), MessageSource.getInstance().getString("Basics.removeConfirmation"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 					{
 						try (VolumeDAO lVolumeDAO = Main.DATABASE.getVolumeDAO())
 						{
 							if (!lVolumeDAO.remove(lVolumeCard.getVolume()))
-								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.delete"), MessageSource.getInstance().getString("Basics.thisVolume")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
+								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.delete"), MessageSource.getInstance().getString("Basics.thisVolume") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 						}
 						catch (SQLException e)
 						{
 							ExceptionUtils.showExceptionDialog(null, e);
 						}
 						fillVolumes();
+					}
+				}
+			});
+			lVolumeCard.addFavoriteButtonActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent arg0)
+				{
+					try (VolumeDAO lVolumeDAO = Main.DATABASE.getVolumeDAO())
+					{
+						Volume v = lVolumeCard.getVolume();
+						v.setFavorite(!v.isFavorite());
+						if (!lVolumeDAO.update(v))
+							JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisVolume") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
+						lVolumeCard.setVolume(v);
+					}
+					catch (SQLException e)
+					{
+						ExceptionUtils.showExceptionDialog(null, e);
 					}
 				}
 			});

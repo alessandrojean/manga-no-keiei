@@ -245,8 +245,8 @@ public class RequestUtils
 
 	public static String post(String url, JSONObject jsonObject) throws IOException
 	{
-		if (requestHashMap.containsKey("POST:" + url))
-			return requestHashMap.get("POST:" + url);
+		if (requestHashMap.containsKey("POST:" + url+jsonObject.toString()))
+			return requestHashMap.get("POST:" + url+jsonObject.toString());
 
 		try
 		{
@@ -275,8 +275,8 @@ public class RequestUtils
 
 	private static String post(String url, JSONObject jsonObject, boolean retry) throws IOException
 	{
-		if (requestHashMap.containsKey("POST:" + url))
-			return requestHashMap.get("POST:" + url);
+		if (requestHashMap.containsKey("POST:" + url+jsonObject.toString()))
+			return requestHashMap.get("POST:" + url+jsonObject.toString());
 
 		OkHttpClient lOkHttpClient = getClient();
 

@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -86,7 +87,7 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 		setResizable(false);
 		setTitle("MyAnimeList");
 		setBounds(100, 100, 400, 500);
-		
+
 		getContentPane().setLayout(new MigLayout("", "[grow][]", "[][grow][]"));
 
 		textField = new JTextField();
@@ -128,6 +129,8 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 	{
 		SwingWorker<List<MALManga>, Void> lSwingWorker = new SwingWorker<List<MALManga>, Void>() {
 
+			private boolean worked = true;
+
 			@Override
 			protected List<MALManga> doInBackground() throws Exception
 			{
@@ -139,7 +142,7 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 						progressBar.setIndeterminate(true);
 						panelResults.removeAll();
 						panelResults.repaint();
-						panelResults.setPreferredSize(new Dimension(1,1));
+						panelResults.setPreferredSize(new Dimension(1, 1));
 						textField.setEnabled(false);
 						lbStatus.setText(MessageSource.getInstance().getString("MyAnimeListDialog.searching"));
 					}
@@ -152,7 +155,7 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 				}
 				catch (IOException | JSONException e)
 				{
-					ExceptionUtils.showExceptionDialog(null, e);
+					worked = false;
 				}
 
 				return result;
@@ -161,33 +164,40 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 			@Override
 			protected void done()
 			{
-				try
-				{
-					progressBar.setIndeterminate(false);
-					lbStatus.setText("");
-					textField.setEnabled(true);
-					List<MALManga> results = get();
-					for (MALManga m : results)
+				if (worked)
+					try
 					{
-						MALMangaCard lMalMangaCard = new MALMangaCard(m);
-						lMalMangaCard.setClickListener(new Runnable() {
+						progressBar.setIndeterminate(false);
+						lbStatus.setText("");
+						textField.setEnabled(true);
+						List<MALManga> results = get();
+						for (MALManga m : results)
+						{
+							MALMangaCard lMalMangaCard = new MALMangaCard(m);
+							lMalMangaCard.setClickListener(new Runnable() {
 
-							@Override
-							public void run()
-							{
-								result = m;
-								fillInformation();
-							}
-						});
-						panelResults.add(lMalMangaCard);
+								@Override
+								public void run()
+								{
+									result = m;
+									fillInformation();
+								}
+							});
+							panelResults.add(lMalMangaCard);
+						}
+						panelResults.revalidate();
+						panelResults.repaint();
+						panelResults.setPreferredSize(new Dimension(300, 105 * results.size()));
 					}
-					panelResults.revalidate();
-					panelResults.repaint();
-					panelResults.setPreferredSize(new Dimension(300, 105 * results.size()));
-				}
-				catch (InterruptedException | ExecutionException e)
+					catch (InterruptedException | ExecutionException e)
+					{
+						ExceptionUtils.showExceptionDialog(null, e);
+					}
+				else
 				{
-					ExceptionUtils.showExceptionDialog(null, e);
+					int option = JOptionPane.showConfirmDialog(MyAnimeListDialog.this, MessageSource.getInstance().getString("Basics.serverError"), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+					if (option == JOptionPane.YES_OPTION)
+						search();
 				}
 
 				super.done();
@@ -200,6 +210,8 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 	private void fillInformation()
 	{
 		SwingWorker<Void, Void> lSwingWorker = new SwingWorker<Void, Void>() {
+
+			private boolean worked = true;
 
 			@Override
 			protected Void doInBackground() throws Exception
@@ -224,7 +236,7 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 				}
 				catch (IOException e)
 				{
-					ExceptionUtils.showExceptionDialog(null, e);
+					worked = false;
 				}
 				return null;
 			}
@@ -232,7 +244,15 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 			@Override
 			protected void done()
 			{
-				approveOption();
+				if (worked)
+					approveOption();
+				else
+				{
+					int option = JOptionPane.showConfirmDialog(MyAnimeListDialog.this, MessageSource.getInstance().getString("Basics.serverError"), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
+					if (option == JOptionPane.YES_OPTION)
+						fillInformation();
+				}
+
 			}
 
 		};

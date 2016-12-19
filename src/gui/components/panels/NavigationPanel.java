@@ -1,7 +1,10 @@
 package gui.components.panels;
 
 import gui.Main;
+import gui.Splash;
+import gui.components.RoundedCornerButton;
 import gui.components.RoundedCornerToggleButton;
+import gui.dialogs.LicenseDialog;
 import gui.panels.Panels;
 
 import java.awt.BorderLayout;
@@ -10,6 +13,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 
 import javax.swing.AbstractButton;
@@ -17,7 +22,9 @@ import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 import locale.MessageSource;
 import utils.ColorUtils;
@@ -33,7 +40,7 @@ public class NavigationPanel extends JPanel
 	private RoundedCornerToggleButton buttonList;
 	private RoundedCornerToggleButton buttonPublisherList;
 	private RoundedCornerToggleButton buttonSettings;
-	private RoundedCornerToggleButton buttonHelp;
+	private RoundedCornerButton buttonHelp;
 	private ButtonGroup buttonGroup;
 
 	public NavigationPanel(Color backgroundColor)
@@ -124,12 +131,33 @@ public class NavigationPanel extends JPanel
 
 		box.add(Box.createRigidArea(GAP_SIZE));
 
-		buttonHelp = new RoundedCornerToggleButton();
+		buttonHelp = new RoundedCornerButton();
 		buttonHelp.setIcon(new ImageIcon(getClass().getResource("/images/help.png")));
 		buttonHelp.setColors(ColorUtils.HexToRGB("#2196F3"), ColorUtils.HexToRGB("#1976D2"));
 		buttonHelp.setToolTipText(MessageSource.getInstance().getString("NavigationPanel.btn.help"));
 		buttonHelp.setAlignmentX(CENTER_ALIGNMENT);
 		buttonHelp.setMaximumSize(BUTTON_SIZE);
+		buttonHelp.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				JMenuItem jmiLicense = new JMenuItem(MessageSource.getInstance().getString("NavigationPanel.jmi.license"));
+				jmiLicense.addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent arg0)
+					{
+						LicenseDialog lLicenseDialog = new LicenseDialog(Splash.MAIN);
+						lLicenseDialog.showDialog();
+					}
+				});
+				JPopupMenu jpmHelp = new JPopupMenu();
+				jpmHelp.add(jmiLicense);
+				
+				jpmHelp.show(buttonHelp, buttonHelp.getWidth(), (int) (buttonHelp.getHeight()-jpmHelp.getPreferredSize().getHeight()));
+			}
+		});
 		box.add(buttonHelp);
 
 		box.add(Box.createRigidArea(GAP_SIZE));
@@ -141,7 +169,6 @@ public class NavigationPanel extends JPanel
 		buttonGroup.add(buttonList);
 		buttonGroup.add(buttonPublisherList);
 		buttonGroup.add(buttonSettings);
-		buttonGroup.add(buttonHelp);
 	}
 
 	public void selectButton(int button)
@@ -160,9 +187,6 @@ public class NavigationPanel extends JPanel
 				break;
 			case BUTTON_SETTINGS:
 				search = buttonSettings;
-				break;
-			case BUTTON_HELP:
-				search = buttonHelp;
 				break;
 		}
 
