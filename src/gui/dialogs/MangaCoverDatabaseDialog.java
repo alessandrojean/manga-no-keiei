@@ -31,18 +31,16 @@ import javax.swing.event.ListSelectionListener;
 
 import locale.MessageSource;
 import net.miginfocom.swing.MigLayout;
-
-import org.json.JSONException;
-
 import utils.ExceptionUtils;
 import api.mcd.MangaCoverDatabase;
 import api.mcd.model.ImageCover;
-import api.mcd.model.MangaCover;
+import api.mcd.model.Search;
+import api.mcd.model.Serie;
 
 public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 {
 	private JTextField textField;
-	private JList<MangaCover> listResults;
+	private JList<String> listResults;
 	private JPanel panelResults;
 
 	private JProgressBar progressBar;
@@ -51,7 +49,8 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 
 	private JPanel panelCard;
 
-	private MangaCover mangaCover;
+	private int selectedSerie;
+	private Search search;
 
 	/**
 	 * Launch the application.
@@ -109,7 +108,7 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 		panelCard = new JPanel();
 		panelCard.setLayout(new CardLayout());
 
-		listResults = new JList<MangaCover>();
+		listResults = new JList<String>();
 		listResults.addListSelectionListener(new ListSelectionListener() {
 
 			@Override
@@ -117,13 +116,13 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 			{
 				if (!e.getValueIsAdjusting())
 				{
-					mangaCover = listResults.getSelectedValue();
+					selectedSerie = Integer.parseInt(search.getResults().get(listResults.getSelectedIndex()).get(0));
 					((CardLayout) panelCard.getLayout()).show(panelCard, "images");
 					showImages();
 				}
 			}
 		});
-		listResults.setModel(new DefaultListModel<MangaCover>());
+		listResults.setModel(new DefaultListModel<String>());
 		listResults.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 		scrollPane = new JScrollPane(listResults);
@@ -155,12 +154,12 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 
 	private void showImages()
 	{
-		SwingWorker<Void, Void> lSwingWorker = new SwingWorker<Void, Void>() {
+		SwingWorker<Serie, Void> lSwingWorker = new SwingWorker<Serie, Void>() {
 
 			private boolean worked = true;
 
 			@Override
-			protected Void doInBackground() throws Exception
+			protected Serie doInBackground() throws Exception
 			{
 				SwingUtilities.invokeLater(new Runnable() {
 
@@ -176,52 +175,60 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 					}
 				});
 
+				Serie serie = null;
 				try
 				{
-					MangaCoverDatabase.fillInformation(mangaCover);
+					serie = MangaCoverDatabase.getSerie(selectedSerie);
 				}
-				catch (IOException | JSONException e)
+				catch (IOException e)
 				{
+					e.printStackTrace();
 					worked = false;
 				}
 
-				return null;
+				return serie;
 			}
 
 			@Override
 			protected void done()
 			{
+				progressBar.setIndeterminate(false);
+				lbStatus.setText("");
 				if (worked)
-				{
-					progressBar.setIndeterminate(false);
-					lbStatus.setText("");
-					panelResults.removeAll();
-					for (ImageCover i : mangaCover.getCovers())
+					try
 					{
-						ImageCoverCard lImageCoverCard = new ImageCoverCard(i);
-						lImageCoverCard.setClickListener(new Runnable() {
+						Serie result = get();
 
-							@Override
-							public void run()
-							{
-								result = i;
-								downloadNormalFile();
-							}
-						});
-						panelResults.add(lImageCoverCard);
+						for (ImageCover i : result.getCovers().get("a"))
+						{
+							ImageCoverCard lImageCoverCard = new ImageCoverCard(i);
+							lImageCoverCard.setClickListener(new Runnable() {
+
+								@Override
+								public void run()
+								{
+									MangaCoverDatabaseDialog.this.result = i;
+									downloadNormalFile();
+								}
+							});
+							panelResults.add(lImageCoverCard);
+						}
+						panelResults.revalidate();
+						panelResults.repaint();
+
+						int horizontalCards = (panelResults.getWidth() - 15) / 107;
+						int divide = (int) Math.ceil((double) result.getCovers().get("a").size() / horizontalCards);
+						panelResults.setPreferredSize(new Dimension(300, 155 * divide));
 					}
-					panelResults.revalidate();
-					panelResults.repaint();
-
-					int horizontalCards = (panelResults.getWidth() - 15) / 107;
-					int divide = (int) Math.ceil((double) mangaCover.getCovers().size() / horizontalCards);
-					panelResults.setPreferredSize(new Dimension(300, 155 * divide));
-				}
+					catch (InterruptedException | ExecutionException e)
+					{
+						ExceptionUtils.showExceptionDialog(null, e);
+					}
 				else
 				{
 					int option = JOptionPane.showConfirmDialog(MangaCoverDatabaseDialog.this, MessageSource.getInstance().getString("Basics.serverError"), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
 					if (option == JOptionPane.YES_OPTION)
-						search();
+						showImages();
 				}
 
 				super.done();
@@ -283,12 +290,12 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 
 	private void search()
 	{
-		SwingWorker<List<MangaCover>, Void> lSwingWorker = new SwingWorker<List<MangaCover>, Void>() {
+		SwingWorker<Search, Void> lSwingWorker = new SwingWorker<Search, Void>() {
 
 			private boolean worked = true;
 
 			@Override
-			protected List<MangaCover> doInBackground() throws Exception
+			protected Search doInBackground() throws Exception
 			{
 				SwingUtilities.invokeLater(new Runnable() {
 
@@ -296,18 +303,18 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 					public void run()
 					{
 						progressBar.setIndeterminate(true);
-						((DefaultListModel<MangaCover>) listResults.getModel()).removeAllElements();
+						((DefaultListModel<String>) listResults.getModel()).removeAllElements();
 						textField.setEnabled(false);
 						lbStatus.setText(MessageSource.getInstance().getString("MangaCoverDatabaseDialog.searching"));
 					}
 				});
 
-				List<MangaCover> result = null;
+				Search result = null;
 				try
 				{
 					result = MangaCoverDatabase.search(textField.getText());
 				}
-				catch (IOException | JSONException e)
+				catch (IOException e)
 				{
 					worked = false;
 				}
@@ -318,15 +325,16 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 			@Override
 			protected void done()
 			{
+				progressBar.setIndeterminate(false);
+				lbStatus.setText("");
+				textField.setEnabled(true);
 				if (worked)
 					try
 					{
-						progressBar.setIndeterminate(false);
-						lbStatus.setText("");
-						textField.setEnabled(true);
-						List<MangaCover> results = get();
-						for (MangaCover m : results)
-							((DefaultListModel<MangaCover>) listResults.getModel()).addElement(m);
+						Search results = get();
+						search = results;
+						for (List<String> l : results.getResults())
+							((DefaultListModel<String>) listResults.getModel()).addElement(l.get(1));
 					}
 					catch (InterruptedException | ExecutionException e)
 					{

@@ -12,11 +12,7 @@ import java.util.Locale;
 import javax.imageio.ImageIO;
 
 import model.Gender;
-import model.MangaType;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,7 +20,11 @@ import org.jsoup.select.Elements;
 
 import utils.RequestUtils;
 import utils.UrlUtils;
-import api.mal.model.MALManga;
+import api.mal.model.Item;
+import api.mal.model.Search;
+
+import com.google.gson.Gson;
+
 import database.ImageDatabase;
 
 public class MyAnimeList
@@ -34,58 +34,29 @@ public class MyAnimeList
 
 	private static final String FILE_MYANIMELIST = ImageDatabase.DEFAULT_FOLDER + File.separator + "myanimelist" + File.separator + "%d.png";
 
-	public static List<MALManga> search(String keyword) throws IOException, JSONException
+	public static Search search(String keyword) throws IOException
 	{
-		List<MALManga> results = new ArrayList<MALManga>();
-
 		HashMap<String, String> parameters = new HashMap<String, String>();
 		parameters.put("type", "manga");
 		parameters.put("keyword", keyword);
 		parameters.put("v", "1");
 
 		String json = RequestUtils.get(SEARCH_URL, parameters);
-		JSONArray items = new JSONObject(json).getJSONArray("categories").getJSONObject(0).getJSONArray("items");
 
-		for (int i = 0; i < items.length(); i++)
+		Search response = new Gson().fromJson(json, Search.class);
+		for (Item i : response.getCategories().get(0).getItems())
 		{
-			JSONObject jo = items.getJSONObject(i);
-
-			MALManga lMalManga = new MALManga();
-			lMalManga.setId(jo.getInt("id"));
-			lMalManga.setOriginalName(jo.getString("name"));
-			lMalManga.setUrl(UrlUtils.toURL(jo.getString("url")));
-			lMalManga.setImageUrl(UrlUtils.toURL(jo.getString("image_url")));
-			lMalManga.setThumbnailUrl(UrlUtils.toURL(jo.getString("thumbnail_url")));
-
-			JSONObject payload = jo.getJSONObject("payload");
-
-			for (MangaType m : MangaType.values())
-				if (m.toString(Locale.US).equals(payload.getString("media_type")))
-				{
-					lMalManga.setType(m);
-					break;
-				}
-
-			lMalManga.setStartYear(payload.getInt("start_year"));
-			lMalManga.setPublished(payload.getString("published"));
-			lMalManga.setScore(payload.getString("score").equals("N/A") ? 0.0 : Double.parseDouble(payload.getString("score")));
-			lMalManga.setStatus(payload.getString("status"));
-
-			lMalManga.setEsScore(jo.getDouble("es_score"));
-
-			File image = selectImage(lMalManga);
+			File image = selectImage(i);
 			if (image == null)
-				insertImage(lMalManga);
+				insertImage(i);
 			else
-				lMalManga.setImageFile(image);
-
-			results.add(lMalManga);
+				i.setImageFile(image);
 		}
 
-		return results;
+		return response;
 	}
 
-	public static void fillInformation(MALManga manga) throws IOException
+	public static void fillInformation(Item manga) throws IOException
 	{
 		String html = RequestUtils.get(manga.getUrl().toString());
 
@@ -145,7 +116,7 @@ public class MyAnimeList
 
 	}
 
-	private static void insertImage(MALManga object) throws IOException
+	private static void insertImage(Item object) throws IOException
 	{
 		File f = new File(String.format(FILE_MYANIMELIST, object.getId()));
 		if (!f.getParentFile().exists())
@@ -172,7 +143,7 @@ public class MyAnimeList
 		object.setImageFile(f);
 	}
 
-	private static File selectImage(MALManga object)
+	private static File selectImage(Item object)
 	{
 		File result = new File(String.format(FILE_MYANIMELIST, object.getId()));
 

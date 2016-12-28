@@ -14,8 +14,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import org.json.JSONObject;
-
 public class RequestUtils
 {
 	/** User-Agent used by the HTTP Requests. */
@@ -243,17 +241,17 @@ public class RequestUtils
 		}
 	}
 
-	public static String post(String url, JSONObject jsonObject) throws IOException
+	public static String post(String url, String json) throws IOException
 	{
-		if (requestHashMap.containsKey("POST:" + url+jsonObject.toString()))
-			return requestHashMap.get("POST:" + url+jsonObject.toString());
+		if (requestHashMap.containsKey("POST:" + url + json))
+			return requestHashMap.get("POST:" + url + json);
 
 		try
 		{
 			OkHttpClient lOkHttpClient = getClient();
 
 			MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-			RequestBody lRequestBody = RequestBody.create(JSON, jsonObject.toString());
+			RequestBody lRequestBody = RequestBody.create(JSON, json);
 
 			Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).post(lRequestBody).build();
 
@@ -269,19 +267,19 @@ public class RequestUtils
 		}
 		catch (IOException e)
 		{
-			return post(url, jsonObject, true);
+			return post(url, json, true);
 		}
 	}
 
-	private static String post(String url, JSONObject jsonObject, boolean retry) throws IOException
+	private static String post(String url, String json, boolean retry) throws IOException
 	{
-		if (requestHashMap.containsKey("POST:" + url+jsonObject.toString()))
-			return requestHashMap.get("POST:" + url+jsonObject.toString());
+		if (requestHashMap.containsKey("POST:" + url + json))
+			return requestHashMap.get("POST:" + url + json);
 
 		OkHttpClient lOkHttpClient = getClient();
 
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-		RequestBody lRequestBody = RequestBody.create(JSON, jsonObject.toString());
+		RequestBody lRequestBody = RequestBody.create(JSON, json);
 
 		Request request = new Request.Builder().url(url).header("User-Agent", USER_AGENT).post(lRequestBody).build();
 

@@ -13,7 +13,7 @@ import model.Volume;
 import org.apache.commons.io.FileUtils;
 
 import utils.ExceptionUtils;
-import api.mal.model.MALManga;
+import api.mal.model.Item;
 import api.mcd.model.ImageCover;
 
 public class ImageDatabase

@@ -7,16 +7,17 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
 import java.util.Arrays;
-import java.util.Currency;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
@@ -27,11 +28,13 @@ import utils.ExceptionUtils;
 
 import com.bulenkov.darcula.DarculaLaf;
 
+import database.Database;
+
 public class Splash extends JFrame
 {
 
 	public static final String PROJECT_NAME = "Manga no Keiei";
-	public static final String PROJECT_VERSION = "v1.3.2";
+	public static final String PROJECT_VERSION = "v1.4.0";
 	public static final int DATABASE_VERSION = 1;
 
 	public static Main MAIN;
@@ -46,6 +49,8 @@ public class Splash extends JFrame
 	{
 		try
 		{
+			// Quick workaround for Issue #29 in Darcula Look and Feel.
+			UIManager.getFont("Label.font");
 			UIManager.setLookAndFeel(new DarculaLaf());
 		}
 		catch (Throwable e)
@@ -55,6 +60,12 @@ public class Splash extends JFrame
 		EventQueue.invokeLater(new Runnable() {
 			public void run()
 			{
+				if (!isAlreadyRunning())
+				{
+					JOptionPane.showMessageDialog(null, "Already running");
+					System.exit(0);
+				}
+
 				try
 				{
 					Splash frame = new Splash();
@@ -102,6 +113,44 @@ public class Splash extends JFrame
 		contentPane.add(lbLogo);
 
 		startTimer();
+	}
+
+	private static boolean isAlreadyRunning()
+	{
+		// socket concept is shown at
+		// http://www.rbgrn.net/content/43-java-single-application-instance
+		// but this one is really great
+		try
+		{
+			final File file = new File("Running.txt");
+			final RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+			final FileLock fileLock = randomAccessFile.getChannel().tryLock();
+			if (fileLock != null)
+			{
+				Runtime.getRuntime().addShutdownHook(new Thread() {
+					public void run()
+					{
+						try
+						{
+							fileLock.release();
+							randomAccessFile.close();
+							file.delete();
+						}
+						catch (Exception e)
+						{
+							// log.error("Unable to remove lock file: " +
+							// lockFile, e);
+						}
+					}
+				});
+				return true;
+			}
+		}
+		catch (Exception e)
+		{
+			// log.error("Unable to create and/or lock file: " + lockFile, e);
+		}
+		return false;
 	}
 
 	private void startTimer()

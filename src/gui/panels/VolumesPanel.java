@@ -38,6 +38,7 @@ import javax.swing.table.TableColumn;
 import locale.MessageSource;
 import model.Manga;
 import model.Volume;
+import utils.BorderUtils;
 import utils.ExceptionUtils;
 import database.dao.MangaDAO;
 import database.dao.VolumeDAO;
@@ -63,7 +64,10 @@ public class VolumesPanel extends JPanel
 		add(panelNorth, BorderLayout.NORTH);
 		panelNorth.setLayout(new BoxLayout(panelNorth, BoxLayout.Y_AXIS));
 
-		mhManga = new MangaHeader(manga);
+		JPanel panelFilter = new JPanel();
+		panelFilter.setBorder(BorderUtils.createRoundedTitleBorder("Filtro",0));
+		
+		mhManga = new MangaHeader(manga,panelFilter);
 		mhManga.addEditButtonActionListener(new ActionListener() {
 
 			@Override

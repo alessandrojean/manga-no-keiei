@@ -1,23 +1,16 @@
 package gui.dialogs;
 
-import gui.components.panels.MALMangaCard;
+import gui.components.panels.ItemCard;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,16 +24,12 @@ import javax.swing.UIManager;
 
 import locale.MessageSource;
 import net.miginfocom.swing.MigLayout;
-
-import org.json.JSONException;
-
-import utils.BorderUtils;
 import utils.ExceptionUtils;
-import utils.Utilities;
 import api.mal.MyAnimeList;
-import api.mal.model.MALManga;
+import api.mal.model.Item;
+import api.mal.model.Search;
 
-public class MyAnimeListDialog extends Dialog<MALManga>
+public class MyAnimeListDialog extends Dialog<Item>
 {
 	private JTextField textField;
 	private JPanel panelResults;
@@ -120,19 +109,19 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 	}
 
 	@Override
-	protected MALManga generateResult()
+	protected Item generateResult()
 	{
 		return result;
 	}
 
 	private void search()
 	{
-		SwingWorker<List<MALManga>, Void> lSwingWorker = new SwingWorker<List<MALManga>, Void>() {
+		SwingWorker<Search, Void> lSwingWorker = new SwingWorker<Search, Void>() {
 
 			private boolean worked = true;
 
 			@Override
-			protected List<MALManga> doInBackground() throws Exception
+			protected Search doInBackground() throws Exception
 			{
 				SwingUtilities.invokeLater(new Runnable() {
 
@@ -148,13 +137,14 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 					}
 				});
 
-				List<MALManga> result = null;
+				Search result = null;
 				try
 				{
 					result = MyAnimeList.search(textField.getText());
 				}
-				catch (IOException | JSONException e)
+				catch (IOException e)
 				{
+					e.printStackTrace();
 					worked = false;
 				}
 
@@ -164,22 +154,22 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 			@Override
 			protected void done()
 			{
+				progressBar.setIndeterminate(false);
+				lbStatus.setText("");
+				textField.setEnabled(true);
 				if (worked)
 					try
 					{
-						progressBar.setIndeterminate(false);
-						lbStatus.setText("");
-						textField.setEnabled(true);
-						List<MALManga> results = get();
-						for (MALManga m : results)
+						Search result = get();
+						for (Item m : result.getCategories().get(0).getItems())
 						{
-							MALMangaCard lMalMangaCard = new MALMangaCard(m);
+							ItemCard lMalMangaCard = new ItemCard(m);
 							lMalMangaCard.setClickListener(new Runnable() {
 
 								@Override
 								public void run()
 								{
-									result = m;
+									MyAnimeListDialog.this.result = m;
 									fillInformation();
 								}
 							});
@@ -187,7 +177,7 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 						}
 						panelResults.revalidate();
 						panelResults.repaint();
-						panelResults.setPreferredSize(new Dimension(300, 105 * results.size()));
+						panelResults.setPreferredSize(new Dimension(300, 105 * result.getCategories().get(0).getItems().size()));
 					}
 					catch (InterruptedException | ExecutionException e)
 					{
@@ -236,6 +226,7 @@ public class MyAnimeListDialog extends Dialog<MALManga>
 				}
 				catch (IOException e)
 				{
+					e.printStackTrace();
 					worked = false;
 				}
 				return null;

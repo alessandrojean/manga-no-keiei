@@ -2,15 +2,34 @@ package model;
 
 import java.util.Locale;
 
+import com.google.gson.annotations.SerializedName;
+
 import locale.MessageSource;
 
-public enum MangaType
+public enum Type
 {
-	MANGA(0), MANHWA(1), MANHUA(2), MANFRA(3), DOUJINSHIN(4), HQ(5), NOVEL(6), LIGHT_NOVEL(7), ONE_SHOT(8);
+	@SerializedName("Manga")
+	MANGA(0), 
+	@SerializedName("Manhwa")
+	MANHWA(1), 
+	@SerializedName("Manhua")
+	MANHUA(2), 
+	@SerializedName("Manfra")
+	MANFRA(3), 
+	@SerializedName("Doujinshi")
+	DOUJINSHIN(4), 
+	@SerializedName("HQ")
+	HQ(5), 
+	@SerializedName("Novel")
+	NOVEL(6), 
+	@SerializedName("Light Novel")
+	LIGHT_NOVEL(7), 
+	@SerializedName("One-shot")
+	ONE_SHOT(8);
 
 	private int value;
 
-	private MangaType(int value)
+	private Type(int value)
 	{
 		this.value = value;
 	}
@@ -19,10 +38,10 @@ public enum MangaType
 	{
 		return value;
 	}
-	
-	public static MangaType fromValue(int value)
+
+	public static Type fromValue(int value)
 	{
-		return MangaType.values()[value];
+		return Type.values()[value];
 	}
 
 	@Override
@@ -52,7 +71,7 @@ public enum MangaType
 				return "";
 		}
 	}
-	
+
 	public String toString(Locale locale)
 	{
 		switch (this)

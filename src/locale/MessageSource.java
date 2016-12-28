@@ -57,7 +57,15 @@ public class MessageSource
 		}
 		catch (MissingResourceException e)
 		{
-			return '!' + key + '!';
+			try
+			{
+				String english = getResourceBundleInLocale(Locale.US).getString(key);
+				return english;
+			}
+			catch (MissingResourceException e1)
+			{
+				return '!' + key + '!';
+			}
 		}
 	}
 
@@ -69,7 +77,15 @@ public class MessageSource
 		}
 		catch (MissingResourceException e)
 		{
-			return '!' + key + '!';
+			try
+			{
+				String english = getResourceBundleInLocale(Locale.US).getString(key);
+				return String.format(english, parameters);
+			}
+			catch (MissingResourceException e1)
+			{
+				return '!' + key + '!';
+			}
 		}
 	}
 

@@ -3,28 +3,45 @@ package api.mcd.model;
 import java.io.File;
 import java.net.URL;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ImageCover
 {
+	@SerializedName("MIME")
 	private String mime;
+	@SerializedName("Normal")
 	private URL normal;
+	@SerializedName("NormalSize")
 	private int normalSize;
+	@SerializedName("NormalX")
 	private int normalX;
+	@SerializedName("NormalY")
 	private int normalY;
+	@SerializedName("Raw")
 	private URL raw;
+	@SerializedName("RawSize")
 	private int rawSize;
+	@SerializedName("RawX")
 	private int rawX;
+	@SerializedName("RawY")
 	private int rawY;
+	@SerializedName("Side")
 	private String side;
+	@SerializedName("Thumbnail")
 	private URL thumbnail;
+	@SerializedName("ThumbnailSize")
 	private int thumbnailSize;
+	@SerializedName("ThumbnailX")
 	private int thumbnailX;
+	@SerializedName("ThumbnailY")
 	private int thumbnailY;
+	@SerializedName("Volume")
 	private int volume;
 
 	private File normalFile;
 	private File thumbnailFile;
 	
-	private MangaCover parent;
+	private Serie parent;
 
 	public String getMime()
 	{
@@ -186,12 +203,12 @@ public class ImageCover
 		this.normalFile = normalFile;
 	}
 
-	public MangaCover getParent()
+	public Serie getParent()
 	{
 		return parent;
 	}
 
-	public void setParent(MangaCover parent)
+	public void setParent(Serie parent)
 	{
 		this.parent = parent;
 	}

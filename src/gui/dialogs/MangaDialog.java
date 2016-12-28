@@ -35,15 +35,15 @@ import javax.swing.border.EmptyBorder;
 import locale.MessageSource;
 import model.Gender;
 import model.Manga;
-import model.MangaEdition;
-import model.MangaType;
+import model.Edition;
+import model.Type;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
 import utils.ComboBoxUtils;
 import utils.DateUtils;
 import utils.FormUtils;
 import utils.ImageUtils;
-import api.mal.model.MALManga;
+import api.mal.model.Item;
 
 public class MangaDialog extends Dialog<Manga>
 {
@@ -58,8 +58,8 @@ public class MangaDialog extends Dialog<Manga>
 	private JTextField tfStamp;
 	private ImageSelector imgPoster;
 
-	private JComboBox<MangaType> cbType;
-	private JComboBox<MangaEdition> cbEdition;
+	private JComboBox<model.Type> cbType;
+	private JComboBox<Edition> cbEdition;
 	private LevelBar lbsRating;
 	private JTextArea taObservations;
 	private CheckedComboBox<CheckableItem> cbGenders;
@@ -169,7 +169,7 @@ public class MangaDialog extends Dialog<Manga>
 		informationPanel.add(lbFinishDate, "cell 3 2");
 
 		cbType = new JComboBox<>();
-		cbType.setModel(new DefaultComboBoxModel<MangaType>(MangaType.values()));
+		cbType.setModel(new DefaultComboBoxModel<model.Type>(model.Type.values()));
 		informationPanel.add(cbType, "cell 0 3,growx");
 
 		tfSerialization = new JTextField();
@@ -194,7 +194,7 @@ public class MangaDialog extends Dialog<Manga>
 		informationPanel.add(tfAuthors, "cell 0 5 2 1,growx");
 
 		cbEdition = new JComboBox<>();
-		cbEdition.setModel(new DefaultComboBoxModel<MangaEdition>(MangaEdition.values()));
+		cbEdition.setModel(new DefaultComboBoxModel<Edition>(Edition.values()));
 		informationPanel.add(cbEdition, "cell 2 5,growx");
 
 		tfStamp = new JTextField();
@@ -244,16 +244,16 @@ public class MangaDialog extends Dialog<Manga>
 				MyAnimeListDialog lMyAnimeListDialog = new MyAnimeListDialog(MangaDialog.this);
 				if (lMyAnimeListDialog.showDialog() == MyAnimeListDialog.APPROVE_OPTION)
 				{
-					MALManga lMALManga = lMyAnimeListDialog.getResult();
-					tfOriginalName.setText(lMALManga.getOriginalName());
-					tfStartDate.setText(DateUtils.toString(lMALManga.getStartDate()));
-					tfFinishDate.setText(DateUtils.toString(lMALManga.getFinishDate()));
+					Item lMALManga = lMyAnimeListDialog.getResult();
+					tfOriginalName.setText(lMALManga.getName());
+					tfStartDate.setText(DateUtils.toString(lMALManga.getPayload().getStartDate()));
+					tfFinishDate.setText(DateUtils.toString(lMALManga.getPayload().getFinishDate()));
 					imgPoster.setImage(lMALManga.getImageFile());
 					tfAuthors.setText(lMALManga.getAuthors());
 					tfSerialization.setText(lMALManga.getSerialization());
 					cbGenders.setSelectedItems(lMALManga.getGenders());
-					lbsRating.setLevel(((int) lMALManga.getScore() / 2) - 1);
-					cbType.setSelectedItem(lMALManga.getType());
+					lbsRating.setLevel(lMALManga.getPayload().getScore().equals("N/A") ? -1 : ((int) Double.parseDouble(lMALManga.getPayload().getScore()) / 2) - 1);
+					cbType.setSelectedItem(lMALManga.getPayload().getMediaType());
 				}
 			}
 		});
@@ -346,19 +346,19 @@ public class MangaDialog extends Dialog<Manga>
 		}
 		result.setNationalName(tfNationalName.getText());
 		result.setOriginalName(tfOriginalName.getText());
-		result.setType((MangaType) cbType.getSelectedItem());
+		result.setType((model.Type) cbType.getSelectedItem());
 		result.setSerialization(tfSerialization.getText());
 		result.setStartDate(DateUtils.toDate(tfStartDate.getText()));
 		result.setFinishDate(DateUtils.toDate(tfFinishDate.getText()));
 		result.setAuthors(tfAuthors.getText());
-		result.setEdition((MangaEdition) cbEdition.getSelectedItem());
+		result.setEdition((Edition) cbEdition.getSelectedItem());
 		result.setStamp(tfStamp.getText());
 
 		List<Gender> genders = new ArrayList<Gender>();
 		for (int i = 0; i < cbGenders.getModel().getSize(); i++)
 			if (cbGenders.getItemAt(i).isSelected())
-				for(Gender g : Gender.values())
-					if(g.toString().equals(cbGenders.getItemAt(i).getText()))
+				for (Gender g : Gender.values())
+					if (g.toString().equals(cbGenders.getItemAt(i).getText()))
 						genders.add(g);
 
 		result.setGenders(genders);
@@ -378,7 +378,7 @@ public class MangaDialog extends Dialog<Manga>
 			return false;
 		if (!FormUtils.validateDate(tfStartDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
 			return false;
-		if (tfStartDate.getValue()!=null)
+		if (tfStartDate.getValue() != null)
 			if (!FormUtils.validateDate(tfFinishDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
 				return false;
 		if (tfAuthors.getText().equals(""))

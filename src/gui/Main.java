@@ -26,6 +26,7 @@ import javax.swing.UIManager;
 
 import locale.MessageSource;
 import model.Manga;
+import utils.BorderUtils;
 import utils.ColorUtils;
 import utils.ExceptionUtils;
 

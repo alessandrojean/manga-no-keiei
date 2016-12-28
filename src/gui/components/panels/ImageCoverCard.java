@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import net.coobird.thumbnailator.Thumbnails;
 import utils.BorderUtils;
 import utils.Utilities;
-import api.mal.model.MALManga;
+import api.mal.model.Item;
 import api.mcd.model.ImageCover;
 
 import com.bulenkov.iconloader.util.Gray;

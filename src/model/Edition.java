@@ -2,13 +2,13 @@ package model;
 
 import locale.MessageSource;
 
-public enum MangaEdition
+public enum Edition
 {
 	TANKO(0), HALF_TANKO(1), TWO_IN_ONE(2), THREE_IN_ONE(3), LUXURY(4), KANZENBAN(5), HARD_COVER(6), MAGAZINE(7), REPRINT(8), RELAUNCH(9);
 
 	private int value;
 
-	private MangaEdition(int value)
+	private Edition(int value)
 	{
 		this.value = value;
 	}
@@ -18,9 +18,9 @@ public enum MangaEdition
 		return value;
 	}
 	
-	public static MangaEdition fromValue(int value)
+	public static Edition fromValue(int value)
 	{
-		return MangaEdition.values()[value];
+		return Edition.values()[value];
 	}
 	
 	@Override

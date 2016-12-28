@@ -12,12 +12,12 @@ public class Manga
 	protected int id;
 	protected String nationalName;
 	protected String originalName;
-	protected MangaType type;
+	protected Type type;
 	protected String serialization;
 	protected Date startDate;
 	protected Date finishDate;
 	protected String authors;
-	protected MangaEdition edition;
+	protected Edition edition;
 	protected String stamp;
 	protected List<Gender> genders;
 	protected int rating;
@@ -75,12 +75,12 @@ public class Manga
 		this.originalName = originalName;
 	}
 
-	public MangaType getType()
+	public Type getType()
 	{
 		return type;
 	}
 
-	public void setType(MangaType type)
+	public void setType(Type type)
 	{
 		this.type = type;
 	}
@@ -125,12 +125,12 @@ public class Manga
 		this.authors = authors;
 	}
 
-	public MangaEdition getEdition()
+	public Edition getEdition()
 	{
 		return edition;
 	}
 
-	public void setEdition(MangaEdition edition)
+	public void setEdition(Edition edition)
 	{
 		this.edition = edition;
 	}

@@ -1,70 +1,44 @@
 package api.mal.model;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import model.Gender;
-import model.Manga;
-import model.MangaType;
+import com.google.gson.annotations.SerializedName;
 
-public class MALManga extends Manga
+import model.Type;
+
+public class Payload
 {
-	private URL url;
-	private URL imageUrl;
-	private URL thumbnailUrl;
+	@SerializedName("media_type")
+	private Type mediaType;
+	@SerializedName("start_year")
 	private int startYear;
 	private String published;
-	private double score;
+	private String score;
 	private String status;
-	private double esScore;
+	private Date startDate;
+	private Date finishDate;
 
 	private static final String DATE_YEAR_PATTERN = "yyyy";
 	private static final String DATE_FULL_PATTERN = "MMM dd, yyyy";
 
-	private File imageFile;
-	private BufferedImage image;
-
-	public MALManga()
+	public Payload()
 	{
 		super();
 	}
 
-	public URL getUrl()
+	public Type getMediaType()
 	{
-		return url;
+		return mediaType;
 	}
 
-	public void setUrl(URL url)
+	public void setMediaType(Type mediaType)
 	{
-		this.url = url;
-	}
-
-	public URL getImageUrl()
-	{
-		return imageUrl;
-	}
-
-	public void setImageUrl(URL imageUrl)
-	{
-		this.imageUrl = imageUrl;
-	}
-
-	public URL getThumbnailUrl()
-	{
-		return thumbnailUrl;
-	}
-
-	public void setThumbnailUrl(URL thumbnailUrl)
-	{
-		this.thumbnailUrl = thumbnailUrl;
+		this.mediaType = mediaType;
 	}
 
 	public int getStartYear()
@@ -85,15 +59,14 @@ public class MALManga extends Manga
 	public void setPublished(String published)
 	{
 		this.published = published;
-		fillDates();
 	}
 
-	public double getScore()
+	public String getScore()
 	{
 		return score;
 	}
 
-	public void setScore(double score)
+	public void setScore(String score)
 	{
 		this.score = score;
 	}
@@ -108,36 +81,27 @@ public class MALManga extends Manga
 		this.status = status;
 	}
 
-	public double getEsScore()
+	public Date getStartDate()
 	{
-		return esScore;
+		fillDates();
+		return startDate;
 	}
 
-	public void setEsScore(double esScore)
+	public void setStartDate(Date startDate)
 	{
-		this.esScore = esScore;
+		this.startDate = startDate;
 	}
 
-	public BufferedImage getImage()
+	public Date getFinishDate()
 	{
-		return image;
+		fillDates();
+		return finishDate;
 	}
 
-	public void setImage(BufferedImage image)
+	public void setFinishDate(Date finishDate)
 	{
-		this.image = image;
+		this.finishDate = finishDate;
 	}
-
-	public File getImageFile()
-	{
-		return imageFile;
-	}
-
-	public void setImageFile(File imageFile)
-	{
-		this.imageFile = imageFile;
-	}
-
 
 	private void fillDates()
 	{
@@ -168,11 +132,5 @@ public class MALManga extends Manga
 		{
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public String toString()
-	{
-		return "MALManga [id=" + id + ", type=" + type + ", name=" + originalName + ", score=" + score + "]";
 	}
 }

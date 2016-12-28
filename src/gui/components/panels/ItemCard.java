@@ -23,19 +23,19 @@ import javax.swing.JPanel;
 import net.coobird.thumbnailator.Thumbnails;
 import utils.BorderUtils;
 import utils.Utilities;
-import api.mal.model.MALManga;
+import api.mal.model.Item;
 
 import com.bulenkov.iconloader.util.Gray;
 
-public class MALMangaCard extends JPanel implements MouseListener, MouseMotionListener
+public class ItemCard extends JPanel implements MouseListener, MouseMotionListener
 {
 
-	private MALManga manga;
+	private Item manga;
 
 	private Color hoverColor = new Color(69, 73, 74);
 
 	private Runnable clickListener;
-	
+
 	private BufferedImage posterResized;
 
 	public Runnable getClickListener()
@@ -48,7 +48,7 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 		this.clickListener = clickListener;
 	}
 
-	public MALMangaCard(MALManga manga)
+	public ItemCard(Item manga)
 	{
 		super();
 		this.manga = manga;
@@ -58,12 +58,12 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 		addMouseMotionListener(this);
 	}
 
-	public MALManga getManga()
+	public Item getManga()
 	{
 		return manga;
 	}
 
-	public void setMALManga(MALManga manga)
+	public void setMALManga(Item manga)
 	{
 		this.manga = manga;
 		posterResized = null;
@@ -107,7 +107,7 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 		g2d.setColor(getForeground());
 		g2d.setFont(getFont().deriveFont(Font.BOLD));
 		FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-		String mangaName = manga.getOriginalName();
+		String mangaName = manga.getName();
 		if (metrics.stringWidth(mangaName) >= width - 75 - metrics.stringWidth("(" + manga.getType() + ")"))
 		{
 			String temp = "";
@@ -120,13 +120,13 @@ public class MALMangaCard extends JPanel implements MouseListener, MouseMotionLi
 			g2d.drawString(temp, 69, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		}
 		else
-			g2d.drawString(manga.getOriginalName(), 69, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+			g2d.drawString(manga.getName(), 69, (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 		metrics = getFontMetrics(getFont().deriveFont(Font.ITALIC));
 		g2d.setFont(getFont().deriveFont(Font.ITALIC));
-		g2d.drawString("(" + manga.getType() + ")", width - 5 - metrics.stringWidth("(" + manga.getType() + ")"), (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
+		g2d.drawString("(" + manga.getPayload().getMediaType() + ")", width - 5 - metrics.stringWidth("(" + manga.getPayload().getMediaType() + ")"), (titleHeight - metrics.getHeight()) / 2 + metrics.getAscent());
 
 		// Draw Details
-		String published = String.format("Published: %s", manga.getPublished()), score = String.format("Score: %1$.2f", manga.getScore()), status = String.format("Status: %s", manga.getStatus());
+		String published = String.format("Published: %s", manga.getPayload().getPublished()), score = String.format("Score: %s", manga.getPayload().getScore()), status = String.format("Status: %s", manga.getPayload().getStatus());
 		metrics = getFontMetrics(getFont());
 		g2d.setFont(getFont());
 		g2d.drawString(published, 69, titleHeight + (height - titleHeight + 10) / 2 - 16);

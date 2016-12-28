@@ -39,15 +39,35 @@ public class MangaHeader extends JPanel
 	private Color hoverColor = new Color(69,73,74);
 	
 	private BufferedImage posterResized;
+	private Box horizontalBox_1;
+	private Component horizontalGlue_1;
+	private Box verticalBox;
+	private Component rigidArea_1;
+	private JPanel panel;
+	private Component rigidArea_2;
 
-	public MangaHeader(Manga manga)
+	public MangaHeader(Manga manga, Component component)
 	{
 		super();
 		this.manga = manga;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
-		Component verticalGlue = Box.createVerticalGlue();
-		add(verticalGlue);
+		horizontalBox_1 = Box.createHorizontalBox();
+		add(horizontalBox_1);
+		
+		horizontalGlue_1 = Box.createHorizontalGlue();
+		horizontalBox_1.add(horizontalGlue_1);
+		
+		verticalBox = Box.createVerticalBox();
+		horizontalBox_1.add(verticalBox);
+		
+		rigidArea_1 = Box.createRigidArea(new Dimension(16, 26));
+		verticalBox.add(rigidArea_1);
+		
+		verticalBox.add(component);
+		
+		rigidArea_2 = Box.createRigidArea(new Dimension(26, 16));
+		horizontalBox_1.add(rigidArea_2);
 		
 		Box horizontalBox = Box.createHorizontalBox();
 		add(horizontalBox);
