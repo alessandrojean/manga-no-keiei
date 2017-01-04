@@ -2,6 +2,7 @@ package gui.components;
 
 import java.awt.AlphaComposite;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -58,14 +59,16 @@ public class ProgressCircleUI extends BasicProgressBarUI
 		
 		Image logo = new ImageIcon(getClass().getResource("/images/logo_splash_inner.png")).getImage();
 		g2.drawImage(logo, -10, -10, logo.getWidth(null), logo.getHeight(null), null);
-		
-		g2.dispose();
 
 		// Deal with possible text painting
 		if (progressBar.isStringPainted())
 		{
-			// paintString(g, b.left, b.top, barRectWidth, barRectHeight, 0, b);
+			 //paintString(g, b.left, b.top, barRectWidth/2, barRectHeight, 0, b);
+			FontMetrics lFontMetrics = progressBar.getFontMetrics(progressBar.getFont());
+			g2.drawString(progressBar.getString(), barRectWidth - lFontMetrics.stringWidth(progressBar.getString()), 300);
 		}
+		
+		g2.dispose();
 
 	}
 }

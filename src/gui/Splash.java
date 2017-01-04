@@ -3,11 +3,13 @@ package gui;
 import gui.components.ProgressCircleUI;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
 import java.util.Arrays;
@@ -20,11 +22,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import utils.ExceptionUtils;
+import utils.UrlUtils;
+import api.github.GitHub;
+import api.github.model.LatestRelease;
 
 import com.bulenkov.darcula.DarculaLaf;
 
@@ -34,8 +40,10 @@ public class Splash extends JFrame
 {
 
 	public static final String PROJECT_NAME = "Manga no Keiei";
-	public static final String PROJECT_VERSION = "v1.4-beta";
+	public static final String PROJECT_VERSION = "v1.4.1";
 	public static final int DATABASE_VERSION = 1;
+	
+	public static Database DATABASE;
 
 	public static Main MAIN;
 
@@ -113,6 +121,64 @@ public class Splash extends JFrame
 		contentPane.add(lbLogo);
 
 		startTimer();
+		//startProcedures();
+	}
+	
+	private void startProcedures()
+	{
+		SwingWorker<Void, String> lSwingWorker = new SwingWorker<Void, String>(){
+
+			@Override
+			protected Void doInBackground() throws Exception
+			{
+				try
+				{
+					publish("0--Checking for updates.");
+					checkForUpdates();
+					publish("50--Creating and updating tables.");
+					createDatabase();
+					publish("100--Starting.");
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+				return null;
+			}
+			
+			@Override
+			protected void process(List<String> chunks)
+			{
+				String i = chunks.get(chunks.size()-1);
+				String[] split = i.split("--");
+				progressBar.setValue(Integer.parseInt(split[0]));
+				progressBar.setString(split[1]);
+			}
+			
+			@Override
+			protected void done()
+			{
+				showMain();
+			}
+			
+		};
+		lSwingWorker.execute();
+	}
+	
+	private void checkForUpdates() throws IOException
+	{
+		LatestRelease lLatestRelease = GitHub.getLatestRelease();
+		if(!lLatestRelease.getTagName().equals(PROJECT_VERSION))
+		{
+			int result = JOptionPane.showOptionDialog(this, String.format("The version %s is available for download.", lLatestRelease.getTagName()), "Update available!", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new String[]{"Download", "Cancel"}, "Download");
+			if(result==JOptionPane.YES_OPTION)
+				Desktop.getDesktop().browse(UrlUtils.toURI(lLatestRelease.getUrl()));
+		}
+	}
+	
+	private void createDatabase()
+	{
+		DATABASE = new Database();
 	}
 
 	private static boolean isAlreadyRunning()

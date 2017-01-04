@@ -65,7 +65,7 @@ public class Database
 	{
 		int version = getUserVersion(statement);
 
-		if (version < Splash.DATABASE_VERSION)
+		if (version > 0 && version < Splash.DATABASE_VERSION)
 		{
 			switch (version)
 			{
@@ -74,8 +74,8 @@ public class Database
 					statement.executeUpdate(String.format("alter table volumes add column date_add_volume text not null default '%s';", DateUtils.toString(new Date())));
 					break;
 			}
-			setUserVersion(statement, Splash.DATABASE_VERSION);
 		}
+		setUserVersion(statement, Splash.DATABASE_VERSION);
 	}
 
 	private int getUserVersion(Statement statement) throws SQLException
