@@ -10,6 +10,7 @@ public class ExceptionUtils
 	public static void showExceptionDialog(Component parent, Throwable e)
 	{
 		ExceptionDialog.showExceptionDialog(e);
+		e.printStackTrace();
 	}
 
 	public static String stackTraceToString(Throwable e)

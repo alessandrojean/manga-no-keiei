@@ -30,6 +30,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import locale.MessageSource;
+import model.Manga;
+import model.Volume;
 import net.miginfocom.swing.MigLayout;
 import utils.ExceptionUtils;
 import api.mcd.MangaCoverDatabase;
@@ -39,7 +41,6 @@ import api.mcd.model.Serie;
 
 public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 {
-	private JTextField textField;
 	private JList<String> listResults;
 	private JPanel panelResults;
 
@@ -51,6 +52,8 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 
 	private int selectedSerie;
 	private Search search;
+	
+	private Volume volume;
 
 	/**
 	 * Launch the application.
@@ -70,7 +73,7 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 			{
 				try
 				{
-					MangaCoverDatabaseDialog dialog = new MangaCoverDatabaseDialog(null);
+					MangaCoverDatabaseDialog dialog = new MangaCoverDatabaseDialog(null, null);
 					dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					dialog.setVisible(true);
 				}
@@ -85,25 +88,14 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 	/**
 	 * Create the dialog.
 	 */
-	public MangaCoverDatabaseDialog(Component component)
+	public MangaCoverDatabaseDialog(Component component, Volume volume)
 	{
+		this.volume = volume;
+		
 		setResizable(false);
 		setTitle("MangaCoverDatabase");
 		setBounds(100, 100, 400, 500);
-		getContentPane().setLayout(new MigLayout("", "[grow][]", "[][grow][]"));
-
-		textField = new JTextField();
-		textField.putClientProperty("JTextField.variant", "search");
-		textField.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				search();
-			}
-		});
-		getContentPane().add(textField, "cell 0 0 2 1,growx");
-		textField.setColumns(10);
+		getContentPane().setLayout(new MigLayout("", "[grow][]", "[grow][]"));
 
 		panelCard = new JPanel();
 		panelCard.setLayout(new CardLayout());
@@ -135,15 +127,17 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 		scrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		panelCard.add(scrollPane1, "images");
 
-		getContentPane().add(panelCard, "flowx,cell 0 1 2 1,grow");
+		getContentPane().add(panelCard, "flowx,cell 0 0 2 1,grow");
 
 		lbStatus = new JLabel();
-		getContentPane().add(lbStatus, "cell 0 2");
+		getContentPane().add(lbStatus, "cell 0 1");
 
 		progressBar = new JProgressBar();
-		getContentPane().add(progressBar, "cell 1 2");
+		getContentPane().add(progressBar, "cell 1 1");
 
 		setLocationRelativeTo(component);
+		
+		search();
 	}
 
 	@Override
@@ -171,14 +165,13 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 						panelResults.repaint();
 						panelResults.setPreferredSize(new Dimension(1, 1));
 						lbStatus.setText(MessageSource.getInstance().getString("MangaCoverDatabaseDialog.searching"));
-						textField.setEnabled(false);
 					}
 				});
 
 				Serie serie = null;
 				try
 				{
-					serie = MangaCoverDatabase.getSerie(selectedSerie);
+					serie = MangaCoverDatabase.getSerie(selectedSerie, Integer.parseInt(volume.getNumber()));
 				}
 				catch (IOException e)
 				{
@@ -201,14 +194,15 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 
 						for (ImageCover i : result.getCovers().get("a"))
 						{
-							ImageCoverCard lImageCoverCard = new ImageCoverCard(i);
+							ImageCoverCard lImageCoverCard = new ImageCoverCard(i, true);
 							lImageCoverCard.setClickListener(new Runnable() {
 
 								@Override
 								public void run()
 								{
 									MangaCoverDatabaseDialog.this.result = i;
-									downloadNormalFile();
+									approveOption();
+									//downloadNormalFile();
 								}
 							});
 							panelResults.add(lImageCoverCard);
@@ -261,7 +255,7 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 
 				try
 				{
-					MangaCoverDatabase.insertImage(result, false);
+					MangaCoverDatabase.insertImage(result, false, "a");
 				}
 				catch (IOException e)
 				{
@@ -304,7 +298,6 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 					{
 						progressBar.setIndeterminate(true);
 						((DefaultListModel<String>) listResults.getModel()).removeAllElements();
-						textField.setEnabled(false);
 						lbStatus.setText(MessageSource.getInstance().getString("MangaCoverDatabaseDialog.searching"));
 					}
 				});
@@ -312,7 +305,7 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 				Search result = null;
 				try
 				{
-					result = MangaCoverDatabase.search(textField.getText());
+					result = MangaCoverDatabase.search(volume.getManga().getOriginalName().equals("") ? volume.getManga().getNationalName() : volume.getManga().getOriginalName());
 				}
 				catch (IOException e)
 				{
@@ -327,7 +320,6 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 			{
 				progressBar.setIndeterminate(false);
 				lbStatus.setText("");
-				textField.setEnabled(true);
 				if (worked)
 					try
 					{

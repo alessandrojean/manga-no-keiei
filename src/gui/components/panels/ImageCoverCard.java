@@ -32,11 +32,12 @@ public class ImageCoverCard extends JPanel implements MouseListener
 {
 
 	private ImageCover imageCover;
+	private boolean showSide = false;
 
 	private Color hoverColor = new Color(69, 73, 74);
 
 	private Runnable clickListener;
-	
+
 	private BufferedImage coverResized;
 
 	public Runnable getClickListener()
@@ -53,6 +54,18 @@ public class ImageCoverCard extends JPanel implements MouseListener
 	{
 		super();
 		this.imageCover = imageCover;
+
+		setBackground(hoverColor);
+		addMouseListener(this);
+
+		setCursor(new Cursor(Cursor.HAND_CURSOR));
+	}
+
+	public ImageCoverCard(ImageCover imageCover, boolean showSide)
+	{
+		super();
+		this.imageCover = imageCover;
+		this.showSide = showSide;
 
 		setBackground(hoverColor);
 		addMouseListener(this);
@@ -93,7 +106,12 @@ public class ImageCoverCard extends JPanel implements MouseListener
 		if (coverResized == null)
 			try
 			{
-				BufferedImage cover = imageCover.getThumbnailFile() == null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(imageCover.getThumbnailFile());
+				//BufferedImage cover = imageCover.getThumbnailFile() == null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : showSide ? ImageIO.read(imageCover.getNormalFile()) : ImageIO.read(imageCover.getThumbnailFile());
+				BufferedImage cover = null;
+				if(showSide)
+					cover = imageCover.getNormalFile()==null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(imageCover.getNormalFile());
+				else
+					cover = imageCover.getThumbnailFile()==null ? ImageIO.read(getClass().getResourceAsStream("/images/sample_poster.png")) : ImageIO.read(imageCover.getThumbnailFile());
 				coverResized = Thumbnails.of(cover).size(width, height).asBufferedImage();
 			}
 			catch (IOException e)
@@ -104,16 +122,19 @@ public class ImageCoverCard extends JPanel implements MouseListener
 		g2d.drawImage(coverResized, 0, 0, width, height, null);
 
 		String volume = String.format("#%d", imageCover.getVolume());
+		String side = imageCover.getSide().substring(0,1).toUpperCase() + imageCover.getSide().substring(1).toLowerCase();
 		FontMetrics metrics = getFontMetrics(getFont().deriveFont(Font.BOLD));
-		
-		g2d.setPaint(new Color(0,0,0,150));
-		g2d.fillRect(0, height - metrics.getHeight()-5, width, height);
-		
+
+		g2d.setPaint(new Color(0, 0, 0, 150));
+		g2d.fillRect(0, height - metrics.getHeight() - 5, width, height);
+
 		// Draw Details
-		
+
 		g2d.setFont(getFont().deriveFont(Font.BOLD));
 		g2d.setColor(Color.WHITE);
 		g2d.drawString(volume, width - 5 - metrics.stringWidth(volume), height - 5);
+		if(showSide)
+			g2d.drawString(side, 5, height - 5);
 
 		// Draw Border
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));

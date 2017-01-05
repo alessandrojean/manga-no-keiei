@@ -3,6 +3,7 @@ Helps in the administration of your manga collection.
 
 ## Required libraries
 - **[Apache Commons IO](https://github.com/apache/commons-io)** *v2.5+*
+- **[Barcode4J](http://barcode4j.sourceforge.net)** *v2.1+*
 - **[Darcula Look and Feel](https://github.com/bulenkov/darcula)** *v1.0+* 
 - **[Gson](https://github.com/google/gson)** *v2.8.0+*
 - **[MigLayout](https://github.com/mikaelgrev/miglayout)** *v4.2+* 

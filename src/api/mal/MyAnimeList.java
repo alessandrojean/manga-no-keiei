@@ -32,7 +32,7 @@ public class MyAnimeList
 
 	private static final String SEARCH_URL = "https://myanimelist.net/search/prefix.json";
 
-	private static final String FILE_MYANIMELIST = ImageDatabase.DEFAULT_FOLDER + File.separator + "myanimelist" + File.separator + "%d.png";
+	private static final String FILE_MYANIMELIST = System.getProperty("java.io.tmpdir") + File.separator + "manga-no-keiei" + File.separator + "myanimelist" + File.separator + "%d.png";
 
 	public static Search search(String keyword) throws IOException
 	{

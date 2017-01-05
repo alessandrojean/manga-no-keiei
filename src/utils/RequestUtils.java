@@ -261,7 +261,7 @@ public class RequestUtils
 			else
 			{
 				String response = lResponse.body().string();
-				requestHashMap.put("POST:" + url, response);
+				requestHashMap.put("POST:" + url + json, response);
 				return response;
 			}
 		}
@@ -289,7 +289,7 @@ public class RequestUtils
 		else
 		{
 			String response = lResponse.body().string();
-			requestHashMap.put("POST:" + url, response);
+			requestHashMap.put("POST:" + url + json, response);
 			return response;
 		}
 	}

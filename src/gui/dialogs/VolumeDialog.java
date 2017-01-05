@@ -222,7 +222,7 @@ public class VolumeDialog extends Dialog<Volume>
 
 		JLabel lbAge = new JLabel(MessageSource.getInstance().getString("VolumeDialog.lbl.classification"));
 		informationPanel.add(lbAge, "cell 3 6");
-		
+
 		tfPaper = new JTextField();
 		informationPanel.add(tfPaper, "cell 0 7,growx");
 		tfPaper.setColumns(10);
@@ -266,18 +266,33 @@ public class VolumeDialog extends Dialog<Volume>
 		JPanel buttonPanel = new JPanel();
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-		
+
 		JButton btMCD = new JButton("MangaCoverDatabase");
 		btMCD.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0)
 			{
-				MangaCoverDatabaseDialog lMangaCoverDatabaseSearchDialog = new MangaCoverDatabaseDialog(VolumeDialog.this);
-				if(lMangaCoverDatabaseSearchDialog.showDialog()==MangaCoverDatabaseDialog.APPROVE_OPTION)
+				if (!tfVolume.getText().equals(""))
 				{
-					imgPoster.setImage(lMangaCoverDatabaseSearchDialog.getResult().getNormalFile());
+					Volume v = null;
+					if (result != null)
+						v = result;
+					else
+					{
+						v = new Volume();
+						v.setManga(manga);
+						v.setNumber(tfVolume.getText());
+					}
+
+					MangaCoverDatabaseDialog lMangaCoverDatabaseSearchDialog = new MangaCoverDatabaseDialog(VolumeDialog.this, v);
+					if (lMangaCoverDatabaseSearchDialog.showDialog() == MangaCoverDatabaseDialog.APPROVE_OPTION)
+					{
+						imgPoster.setImage(lMangaCoverDatabaseSearchDialog.getResult().getNormalFile());
+					}
 				}
+				else
+					tfVolume.requestFocus();
 			}
 		});
 		buttonPanel.add(btMCD);
@@ -331,9 +346,9 @@ public class VolumeDialog extends Dialog<Volume>
 				return o1.getCurrencyCode().compareTo(o2.getCurrencyCode());
 			}
 		});
-		for(Currency c : currencies)
+		for (Currency c : currencies)
 			cbCurrency.addItem(c);
-		
+
 		cbCurrency.setSelectedItem(Currency.getInstance(MessageSource.ACTUAL_LOCALE));
 	}
 
@@ -420,7 +435,7 @@ public class VolumeDialog extends Dialog<Volume>
 		result.setNumber(tfVolume.getText());
 		result.setChecklistDate(DateUtils.toDate(tfChecklistDate.getText()));
 		result.setBarcode(tfBarcode.getText());
-		result.setIsbn(tfISBN.getText());
+		result.setIsbn(String.valueOf(tfISBN.getValue()==null ? "" : tfISBN.getValue()));
 		result.setTitle(tfTitle.getText());
 		result.setSubtitle(tfSubtitle.getText());
 		result.setPublisher((Publisher) cbPublisher.getSelectedItem());
@@ -448,7 +463,7 @@ public class VolumeDialog extends Dialog<Volume>
 			return false;
 		if (!FormUtils.validateDate(tfChecklistDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
 			return false;
-		if (!tfISBN.getText().equals(""))
+		if (tfISBN.getValue()!=null)
 			if (!FormUtils.validateISBN13(tfISBN.getText()))
 				return false;
 		if (tfTitle.getText().equals(""))

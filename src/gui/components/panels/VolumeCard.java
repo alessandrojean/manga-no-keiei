@@ -9,11 +9,11 @@ import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -27,9 +27,15 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
-import net.coobird.thumbnailator.Thumbnails;
 import locale.MessageSource;
 import model.Volume;
+import net.coobird.thumbnailator.Thumbnails;
+
+import org.krysalis.barcode4j.impl.upcean.EAN13Bean;
+import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
+import org.krysalis.barcode4j.output.java2d.Java2DCanvasProvider;
+import org.krysalis.barcode4j.tools.UnitConv;
+
 import utils.BorderUtils;
 import utils.Utilities;
 
@@ -198,13 +204,17 @@ public class VolumeCard extends JPanel implements MouseListener
 		g2d.setColor(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
 		g2d.drawLine(110, titleHeight + 16 + metrics.getHeight() * 2, width - 5, titleHeight + 16 + metrics.getHeight() * 2);
 
-		// Draw Number
-		String number = "#" + String.valueOf(volume.getNumber());
-		int yVolumes = titleHeight + 16 + metrics.getHeight() * 2;
-		g2d.setFont(getFont().deriveFont(30.0f));
-		metrics = getFontMetrics(getFont().deriveFont(30.0f));
-		g2d.setColor(getForeground());
-		g2d.drawString(number, 105 + (195 - metrics.stringWidth(number)) / 2, yVolumes + (height - yVolumes - metrics.getHeight()) / 2 + metrics.getAscent());
+		if (!volume.getBarcode().isEmpty() || !volume.getIsbn().isEmpty())
+			try
+			{
+				int yLastLine = titleHeight + 16 + metrics.getHeight() * 2;
+				BufferedImage lBufferedImage = createBarcode();
+				g2d.drawImage(lBufferedImage, 105 + (195 - lBufferedImage.getWidth()) / 2, yLastLine + ((height - yLastLine) - lBufferedImage.getHeight()) / 2, lBufferedImage.getWidth(), lBufferedImage.getHeight(), null);
+			}
+			catch (IOException e)
+			{
+
+			}
 
 		// Draw Button Background
 		g2d.setPaint(new Color(0, 0, 0, 150));
@@ -215,6 +225,34 @@ public class VolumeCard extends JPanel implements MouseListener
 		g2d.drawRect(0, 0, width - 1, height - 1);
 
 		g2d.dispose();
+	}
+
+	private BufferedImage createBarcode() throws IOException
+	{
+		String data = (volume.getIsbn().equals("") ? volume.getBarcode() : volume.getIsbn().replace("-", "")) + "+" + (volume.getNumber().length() == 1 ? "0" + volume.getNumber() : volume.getNumber());
+		EAN13Bean bean = new EAN13Bean();
+		bean.setHeight(12d);
+		bean.setModuleWidth(UnitConv.in2mm(1.0f / 100));
+		bean.setFontSize(2);
+
+		BitmapCanvasProvider provider = new BitmapCanvasProvider(100, BufferedImage.TYPE_INT_RGB, true, 0);
+		bean.generateBarcode(provider, data);
+		provider.finish();
+
+		BufferedImage barcodeImage = provider.getBufferedImage();
+		BufferedImage result = new BufferedImage(barcodeImage.getWidth() + 4, barcodeImage.getHeight() + 9, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g2d = result.createGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+		g2d.setPaint(Utilities.deriveColorAlpha(BorderUtils.DEFAULT_LINE_COLOR, 255));
+		g2d.fillRect(0, 0, result.getWidth(), result.getHeight());
+		g2d.setPaint(Color.WHITE);
+		g2d.fillRect(2, 2, result.getWidth() - 4, result.getHeight() - 4);
+		g2d.drawImage(barcodeImage, 2, 5, barcodeImage.getWidth(), barcodeImage.getHeight(), null);
+
+		g2d.dispose();
+
+		return result;
 	}
 
 	protected int getTitleHeight()

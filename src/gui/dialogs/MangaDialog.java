@@ -378,7 +378,7 @@ public class MangaDialog extends Dialog<Manga>
 			return false;
 		if (!FormUtils.validateDate(tfStartDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
 			return false;
-		if (tfStartDate.getValue() != null)
+		if (tfFinishDate.getValue() != null)
 			if (!FormUtils.validateDate(tfFinishDate.getText(), DateUtils.DEFAULT_DATE_FORMAT))
 				return false;
 		if (tfAuthors.getText().equals(""))

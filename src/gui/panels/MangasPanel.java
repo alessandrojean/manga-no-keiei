@@ -109,6 +109,7 @@ public class MangasPanel extends JPanel
 		add(centerPanel, BorderLayout.CENTER);
 
 		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.getVerticalScrollBar().setUnitIncrement(16);
 		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		centerPanel.add(scrollPane_1, PANEL_CARDS);
 
