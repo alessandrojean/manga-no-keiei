@@ -10,20 +10,20 @@ public class Publisher
 	private String site;
 	private String history;
 	private boolean favorite;
-	
+
 	private List<Volume> volumes;
-	
+
 	private File logo;
 
-	public Publisher()
+	private Publisher(PublisherBuilder builder)
 	{
-		super();
-	}
-
-	public Publisher(int id)
-	{
-		super();
-		this.id = id;
+		this.id = builder.id;
+		this.name = builder.name;
+		this.site = builder.site;
+		this.history = builder.history;
+		this.favorite = builder.favorite;
+		this.volumes = builder.volumes;
+		this.logo = builder.logo;
 	}
 
 	public int getId()
@@ -100,6 +100,66 @@ public class Publisher
 	public String toString()
 	{
 		return name;
+	}
+
+	public static class PublisherBuilder
+	{
+		private int id;
+		private String name;
+		private String site;
+		private String history;
+		private boolean favorite;
+
+		private List<Volume> volumes;
+
+		private File logo;
+
+		public PublisherBuilder id(int id)
+		{
+			this.id = id;
+			return this;
+		}
+
+		public PublisherBuilder name(String name)
+		{
+			this.name = name;
+			return this;
+		}
+
+		public PublisherBuilder site(String site)
+		{
+			this.site = site;
+			return this;
+		}
+
+		public PublisherBuilder history(String history)
+		{
+			this.history = history;
+			return this;
+		}
+
+		public PublisherBuilder favorite(boolean favorite)
+		{
+			this.favorite = favorite;
+			return this;
+		}
+
+		public PublisherBuilder volumes(List<Volume> volumes)
+		{
+			this.volumes = volumes;
+			return this;
+		}
+
+		public PublisherBuilder logo(File logo)
+		{
+			this.logo = logo;
+			return this;
+		}
+
+		public Publisher build()
+		{
+			return new Publisher(this);
+		}
 	}
 
 }

@@ -8,8 +8,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -22,7 +20,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
@@ -30,15 +27,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import locale.MessageSource;
-import model.Manga;
 import model.Volume;
 import net.miginfocom.swing.MigLayout;
 import utils.ExceptionUtils;
-import api.mcd.MangaCoverDatabase;
+import api.mcd.MCDApi;
 import api.mcd.model.ImageCover;
 import api.mcd.model.Search;
 import api.mcd.model.Serie;
 
+@SuppressWarnings("serial")
 public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 {
 	private JList<String> listResults;
@@ -171,7 +168,9 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 				Serie serie = null;
 				try
 				{
-					serie = MangaCoverDatabase.getSerie(selectedSerie, Integer.parseInt(volume.getNumber()));
+					MCDApi lMcdApi = new MCDApi();
+					serie = lMcdApi.getSerie(selectedSerie, Integer.parseInt(volume.getNumber()));
+					//serie = MangaCoverDatabase.getSerie(selectedSerie, Integer.parseInt(volume.getNumber()));
 				}
 				catch (IOException e)
 				{
@@ -232,56 +231,6 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 		lSwingWorker.execute();
 	}
 
-	private void downloadNormalFile()
-	{
-		SwingWorker<Void, Void> lSwingWorker = new SwingWorker<Void, Void>() {
-
-			private boolean worked = true;
-
-			@Override
-			protected Void doInBackground() throws Exception
-			{
-				SwingUtilities.invokeLater(new Runnable() {
-
-					@Override
-					public void run()
-					{
-						progressBar.setIndeterminate(true);
-						for (Component c : panelResults.getComponents())
-							c.setEnabled(false);
-						lbStatus.setText(MessageSource.getInstance().getString("MangaCoverDatabaseDialog.downloadingFullImage"));
-					}
-				});
-
-				try
-				{
-					MangaCoverDatabase.insertImage(result, false, "a");
-				}
-				catch (IOException e)
-				{
-					worked = false;
-				}
-
-				return null;
-			}
-
-			@Override
-			protected void done()
-			{
-				if (worked)
-					approveOption();
-				else
-				{
-					int option = JOptionPane.showConfirmDialog(MangaCoverDatabaseDialog.this, MessageSource.getInstance().getString("Basics.serverError"), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION);
-					if (option == JOptionPane.YES_OPTION)
-						downloadNormalFile();
-				}
-			}
-
-		};
-		lSwingWorker.execute();
-	}
-
 	private void search()
 	{
 		SwingWorker<Search, Void> lSwingWorker = new SwingWorker<Search, Void>() {
@@ -305,7 +254,9 @@ public class MangaCoverDatabaseDialog extends Dialog<ImageCover>
 				Search result = null;
 				try
 				{
-					result = MangaCoverDatabase.search(volume.getManga().getOriginalName().equals("") ? volume.getManga().getNationalName() : volume.getManga().getOriginalName());
+					//result = MangaCoverDatabase.search(volume.getManga().getOriginalName().equals("") ? volume.getManga().getNationalName() : volume.getManga().getOriginalName());
+					MCDApi lMcdApi = new MCDApi();
+					result = lMcdApi.search(volume.getManga().getOriginalName().equals("") ? volume.getManga().getNationalName() : volume.getManga().getOriginalName());
 				}
 				catch (IOException e)
 				{

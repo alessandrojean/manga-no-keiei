@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import model.Manga;
 import utils.ExceptionUtils;
 import database.dao.MangaDAO;
 
+@SuppressWarnings("serial")
 public class MangasPanel extends JPanel
 {
 
@@ -161,7 +163,7 @@ public class MangasPanel extends JPanel
 					JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.insert"), MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
 
 			}
-			catch (SQLException e)
+			catch (SQLException | IOException e)
 			{
 				ExceptionUtils.showExceptionDialog(null, e);
 			}
@@ -205,7 +207,7 @@ public class MangasPanel extends JPanel
 								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError",new Object[]{MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisManga")}), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE); 
 							lMangaCard.setManga(lMangaDialog.getResult());
 						}
-						catch (SQLException e)
+						catch (SQLException | IOException e)
 						{
 							ExceptionUtils.showExceptionDialog(null, e);
 						}

@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.swing.Box;
@@ -43,6 +44,7 @@ import utils.ExceptionUtils;
 import database.dao.MangaDAO;
 import database.dao.VolumeDAO;
 
+@SuppressWarnings("serial")
 public class VolumesPanel extends JPanel
 {
 
@@ -82,7 +84,7 @@ public class VolumesPanel extends JPanel
 							JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisManga") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 						mhManga.setManga(lMangaDialog.getResult());
 					}
-					catch (SQLException e)
+					catch (SQLException | IOException e)
 					{
 						ExceptionUtils.showExceptionDialog(null, e);
 					}
@@ -221,7 +223,7 @@ public class VolumesPanel extends JPanel
 				else
 					Main.HOME_PANEL.updateLastInserted(result);
 			}
-			catch (SQLException e)
+			catch (SQLException | IOException e)
 			{
 				ExceptionUtils.showExceptionDialog(null, e);
 			}
@@ -268,7 +270,7 @@ public class VolumesPanel extends JPanel
 								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisVolume") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 							lVolumeCard.setVolume(lVolumeDialog.getResult());
 						}
-						catch (SQLException e)
+						catch (SQLException | IOException e)
 						{
 							ExceptionUtils.showExceptionDialog(null, e);
 						}
@@ -308,7 +310,7 @@ public class VolumesPanel extends JPanel
 							JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisVolume") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 						lVolumeCard.setVolume(v);
 					}
-					catch (SQLException e)
+					catch (SQLException | IOException e)
 					{
 						ExceptionUtils.showExceptionDialog(null, e);
 					}

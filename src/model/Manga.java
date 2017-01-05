@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
 public class Manga
 {
 	protected int id;
@@ -27,22 +25,23 @@ public class Manga
 
 	private List<Volume> volumes;
 
-	public Manga()
+	private Manga(MangaBuilder builder)
 	{
-		super();
-	}
-
-	public Manga(int id)
-	{
-		super();
-		this.id = id;
-	}
-
-	public Manga(int id, String nationalName)
-	{
-		super();
-		this.id = id;
-		this.nationalName = nationalName;
+		this.id = builder.id;
+		this.nationalName = builder.nationalName;
+		this.originalName = builder.originalName;
+		this.type = builder.type;
+		this.serialization = builder.serialization;
+		this.startDate = builder.startDate;
+		this.finishDate = builder.finishDate;
+		this.authors = builder.authors;
+		this.edition = builder.edition;
+		this.stamp = builder.stamp;
+		this.genders = builder.genders;
+		this.rating = builder.rating;
+		this.observations = builder.observations;
+		this.poster = builder.poster;
+		this.volumes = builder.volumes;
 	}
 
 	public int getId()
@@ -172,7 +171,6 @@ public class Manga
 
 		for (String s : gendersSplitted)
 			gendersList.add(Gender.fromValue(Integer.parseInt(s)));
-		
 
 		this.genders = gendersList;
 	}
@@ -221,5 +219,134 @@ public class Manga
 	public String toString()
 	{
 		return "Manga [id=" + id + ", nationalName=" + nationalName + ", type=" + type + ", edition=" + edition + ", stamp=" + stamp + "]";
+	}
+
+	public static class MangaBuilder
+	{
+		private int id;
+		private String nationalName;
+		private String originalName;
+		private Type type;
+		private String serialization;
+		private Date startDate;
+		private Date finishDate;
+		private String authors;
+		private Edition edition;
+		private String stamp;
+		private List<Gender> genders;
+		private int rating;
+		private String observations;
+
+		private File poster;
+
+		private List<Volume> volumes;
+
+		public MangaBuilder id(int id)
+		{
+			this.id = id;
+			return this;
+		}
+
+		public MangaBuilder nationalName(String nationalName)
+		{
+			this.nationalName = nationalName;
+			return this;
+		}
+
+		public MangaBuilder originalName(String originalName)
+		{
+			this.originalName = originalName;
+			return this;
+		}
+
+		public MangaBuilder type(Type type)
+		{
+			this.type = type;
+			return this;
+		}
+
+		public MangaBuilder serialization(String serialization)
+		{
+			this.serialization = serialization;
+			return this;
+		}
+
+		public MangaBuilder startDate(Date startDate)
+		{
+			this.startDate = startDate;
+			return this;
+		}
+
+		public MangaBuilder finishDate(Date finishDate)
+		{
+			this.finishDate = finishDate;
+			return this;
+		}
+
+		public MangaBuilder authors(String authors)
+		{
+			this.authors = authors;
+			return this;
+		}
+
+		public MangaBuilder edition(Edition edition)
+		{
+			this.edition = edition;
+			return this;
+		}
+
+		public MangaBuilder stamp(String stamp)
+		{
+			this.stamp = stamp;
+			return this;
+		}
+
+		public MangaBuilder genders(List<Gender> genders)
+		{
+			this.genders = genders;
+			return this;
+		}
+
+		public MangaBuilder genders(String genders)
+		{
+			List<Gender> gendersList = new ArrayList<Gender>();
+			String[] gendersSplitted = genders.split(";");
+
+			for (String s : gendersSplitted)
+				gendersList.add(Gender.fromValue(Integer.parseInt(s)));
+
+			this.genders = gendersList;
+
+			return this;
+		}
+
+		public MangaBuilder rating(int rating)
+		{
+			this.rating = rating;
+			return this;
+		}
+
+		public MangaBuilder observations(String observations)
+		{
+			this.observations = observations;
+			return this;
+		}
+
+		public MangaBuilder poster(File poster)
+		{
+			this.poster = poster;
+			return this;
+		}
+
+		public MangaBuilder volumes(List<Volume> volumes)
+		{
+			this.volumes = volumes;
+			return this;
+		}
+
+		public Manga build()
+		{
+			return new Manga(this);
+		}
 	}
 }

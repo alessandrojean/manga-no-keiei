@@ -1,5 +1,7 @@
 package database.dao;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,8 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Publisher;
+import model.Publisher.PublisherBuilder;
+
+import org.apache.commons.io.FileUtils;
+
 import database.DatabaseMethods;
-import database.ImageDatabase;
 
 public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 {
@@ -29,7 +34,7 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 	}
 
 	@Override
-	public boolean insert(Publisher object) throws SQLException
+	public boolean insert(Publisher object) throws SQLException, IOException
 	{
 		try
 		{
@@ -45,7 +50,7 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 				if (generatedKeys.next())
 				{
 					object.setId(generatedKeys.getInt(1));
-					ImageDatabase.insertImage(object);
+					insertImage(object);
 					return true;
 				}
 				else
@@ -60,7 +65,7 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 	}
 
 	@Override
-	public boolean update(Publisher object) throws SQLException
+	public boolean update(Publisher object) throws SQLException, IOException
 	{
 		try
 		{
@@ -72,10 +77,10 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 			lPreparedStatement.setInt(5, object.getId());
 			int i = lPreparedStatement.executeUpdate();
 
-			if(i>0)
-				ImageDatabase.insertImage(object);
-			
-			return i>0;
+			if (i > 0)
+				insertImage(object);
+
+			return i > 0;
 		}
 		catch (SQLException e)
 		{
@@ -91,11 +96,11 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 			PreparedStatement lPreparedStatement = connection.prepareStatement(SQL_REMOVE);
 			lPreparedStatement.setInt(1, object.getId());
 			int i = lPreparedStatement.executeUpdate();
-			
-			if(i>0)
-				ImageDatabase.removeImage(object);
 
-			return i>0;
+			if (i > 0)
+				removeImage(object);
+
+			return i > 0;
 		}
 		catch (SQLException e)
 		{
@@ -111,31 +116,33 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 		{
 			Statement lStatement = connection.createStatement();
 			ResultSet lResultSet = lStatement.executeQuery(SQL_SELECT_ALL);
-			
+
+			@SuppressWarnings("resource")
 			VolumeDAO lVolumeDAO = new VolumeDAO(connection);
-			
+
 			while (lResultSet.next())
 			{
-				Publisher lPublisher = new Publisher();
-				lPublisher.setId(lResultSet.getInt("id_publisher"));
-				lPublisher.setName(lResultSet.getString("name_publisher"));
-				lPublisher.setSite(lResultSet.getString("site_publisher"));
-				lPublisher.setHistory(lResultSet.getString("history_publisher"));
-				lPublisher.setFavorite(lResultSet.getBoolean("favorite_publisher"));
-				lPublisher.setLogo(ImageDatabase.selectImage(lPublisher));
+				Publisher lPublisher = new PublisherBuilder()
+											.id(lResultSet.getInt("id_publisher"))
+											.name(lResultSet.getString("name_publisher"))
+											.site(lResultSet.getString("site_publisher"))
+											.history(lResultSet.getString("history_publisher"))
+											.favorite(lResultSet.getBoolean("favorite_publisher"))
+											.build();
+				lPublisher.setLogo(selectImage(lPublisher));
 				lPublisher.setVolumes(lVolumeDAO.select(lPublisher));
-				
+
 				result.add(lPublisher);
 			}
 
 			lResultSet.close();
-			lStatement.close();		
+			lStatement.close();
 		}
 		catch (SQLException e)
 		{
 			throw e;
 		}
-		
+
 		return result;
 	}
 
@@ -147,25 +154,27 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 			PreparedStatement lPreparedStatement = connection.prepareStatement(SQL_SELECT_BY_ID);
 			lPreparedStatement.setInt(1, id);
 			ResultSet lResultSet = lPreparedStatement.executeQuery();
-			
+
+			@SuppressWarnings("resource")
 			VolumeDAO lVolumeDAO = new VolumeDAO(connection);
-			
+
 			Publisher result = null;
 			if (lResultSet.next())
 			{
-				result = new Publisher();
-				result.setId(id);
-				result.setName(lResultSet.getString("name_publisher"));
-				result.setSite(lResultSet.getString("site_publisher"));
-				result.setHistory(lResultSet.getString("history_publisher"));
-				result.setFavorite(lResultSet.getBoolean("favorite_publisher"));
-				result.setLogo(ImageDatabase.selectImage(result));
+				result = new PublisherBuilder()
+								.id(lResultSet.getInt("id_publisher"))
+								.name(lResultSet.getString("name_publisher"))
+								.site(lResultSet.getString("site_publisher"))
+								.history(lResultSet.getString("history_publisher"))
+								.favorite(lResultSet.getBoolean("favorite_publisher"))
+								.build();
+				result.setLogo(selectImage(result));
 				result.setVolumes(lVolumeDAO.select(result));
 			}
 
 			lResultSet.close();
 			lPreparedStatement.close();
-			
+
 			return result;
 		}
 		catch (SQLException e)
@@ -179,6 +188,38 @@ public class PublisherDAO implements DatabaseMethods<Publisher>, AutoCloseable
 	{
 		connection.commit();
 		connection.close();
+	}
+
+	@Override
+	public void insertImage(Publisher object) throws IOException
+	{
+		File f = new File(String.format(getImageFileLocation(), object.getId()));
+		if (!f.getParentFile().exists())
+			f.getParentFile().mkdirs();
+		if (!f.toString().equals(object.getLogo().toString()))
+			FileUtils.copyFile(object.getLogo(), f);
+	}
+
+	@Override
+	public File selectImage(Publisher object)
+	{
+		File result = new File(String.format(getImageFileLocation(), object.getId()));
+
+		return result.exists() ? result : null;
+	}
+
+	@Override
+	public void removeImage(Publisher object)
+	{
+		File result = new File(String.format(getImageFileLocation(), object.getId()));
+		if (result.exists())
+			result.delete();
+	}
+
+	@Override
+	public String getImageFileLocation()
+	{
+		return DEFAULT_FOLDER + File.separator + "publishers" + File.separator + "%d.png";
 	}
 
 }

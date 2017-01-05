@@ -1,5 +1,7 @@
 package database.dao;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +12,8 @@ import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+
 import model.Classification;
 import model.Gift;
 import model.Manga;
@@ -17,6 +21,9 @@ import model.Edition;
 import model.Type;
 import model.Publisher;
 import model.Volume;
+import model.Manga.MangaBuilder;
+import model.Publisher.PublisherBuilder;
+import model.Volume.VolumeBuilder;
 import utils.DateUtils;
 import database.DatabaseMethods;
 import database.ImageDatabase;
@@ -41,7 +48,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 	}
 
 	@Override
-	public boolean insert(Volume object) throws SQLException
+	public boolean insert(Volume object) throws SQLException, IOException
 	{
 		try
 		{
@@ -75,7 +82,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 				if (generatedKeys.next())
 				{
 					object.setId(generatedKeys.getInt(1));
-					ImageDatabase.insertImage(object);
+					insertImage(object);
 					return true;
 				}
 				else
@@ -90,7 +97,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 	}
 
 	@Override
-	public boolean update(Volume object) throws SQLException
+	public boolean update(Volume object) throws SQLException, IOException
 	{
 		try
 		{
@@ -120,7 +127,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 			int i = lPreparedStatement.executeUpdate();
 
 			if (i > 0)
-				ImageDatabase.insertImage(object);
+				insertImage(object);
 
 			return i > 0;
 		}
@@ -140,7 +147,7 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 			int i = lPreparedStatement.executeUpdate();
 
 			if (i > 0)
-				ImageDatabase.removeImage(object);
+				removeImage(object);
 
 			return i > 0;
 		}
@@ -161,48 +168,48 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 
 			while (lResultSet.next())
 			{
-				Volume lVolume = new Volume();
-				lVolume.setId(lResultSet.getInt("id_volume"));
-				lVolume.setNumber(lResultSet.getString("number_volume"));
-				lVolume.setChecklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")));
-				lVolume.setBarcode(lResultSet.getString("barcode_volume"));
-				lVolume.setIsbn(lResultSet.getString("isbn_volume"));
-				lVolume.setTitle(lResultSet.getString("title_volume"));
-				lVolume.setSubtitle(lResultSet.getString("subtitle_volume"));
-				lVolume.setPublisher(new Publisher(lResultSet.getInt("publisher_volume")));
-				lVolume.setTotalPrice(lResultSet.getDouble("total_price_volume"));
-				lVolume.setPaidPrice(lResultSet.getDouble("paid_price_volume"));
-				lVolume.setCurrency(Currency.getInstance(lResultSet.getString("currency_volume")));
-				lVolume.setPaper(lResultSet.getString("paper_volume"));
-				lVolume.setSize(lResultSet.getString("size_volume"));
-				lVolume.setGift(Gift.fromValue(lResultSet.getInt("gift_volume")));
-				lVolume.setClassification(Classification.fromValue(lResultSet.getInt("classification_volume")));
-				lVolume.setColorPages(lResultSet.getBoolean("color_pages_volume"));
-				lVolume.setOriginalPlastic(lResultSet.getBoolean("original_plastic_volume"));
-				lVolume.setProtectionPlastic(lResultSet.getBoolean("protection_plastic_volume"));
-				lVolume.setPlan(lResultSet.getBoolean("plan_volume"));
-				lVolume.setObservations(lResultSet.getString("observations_volume"));
-				lVolume.setFavorite(lResultSet.getBoolean("favorite_volume"));
-				lVolume.setInsertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")));
-
-				Manga lManga = new Manga();
-				lManga.setId(lResultSet.getInt("id_manga"));
-				lManga.setNationalName(lResultSet.getString("national_name_manga"));
-				lManga.setOriginalName(lResultSet.getString("original_name_manga"));
-				lManga.setType(Type.fromValue(lResultSet.getInt("type_manga")));
-				lManga.setSerialization(lResultSet.getString("serialization_manga"));
-				lManga.setStartDate(DateUtils.toDate(lResultSet.getString("start_date_manga")));
-				lManga.setFinishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")));
-				lManga.setAuthors(lResultSet.getString("authors_manga"));
-				lManga.setEdition(Edition.fromValue(lResultSet.getInt("edition_manga")));
-				lManga.setStamp(lResultSet.getString("stamp_manga"));
-				lManga.setGenders(lResultSet.getString("genders_manga"));
-				lManga.setRating(lResultSet.getInt("rating_manga"));
-				lManga.setObservations(lResultSet.getString("observations_manga"));
-				lManga.setPoster(ImageDatabase.selectImage(lManga));
-
-				lVolume.setManga(lManga);
-				lVolume.setPoster(ImageDatabase.selectImage(lVolume));
+				Manga lManga = new MangaBuilder()
+										.id(lResultSet.getInt("id_manga"))
+										.nationalName(lResultSet.getString("national_name_manga"))
+										.originalName(lResultSet.getString("original_name_manga"))
+										.type(Type.fromValue(lResultSet.getInt("type_manga")))
+										.serialization(lResultSet.getString("serialization_manga"))
+										.startDate(DateUtils.toDate(lResultSet.getString("start_date_manga")))
+										.finishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")))
+										.authors(lResultSet.getString("authors_manga"))
+										.edition(Edition.fromValue(lResultSet.getInt("edition_manga")))
+										.stamp(lResultSet.getString("stamp_manga"))
+										.genders(lResultSet.getString("genders_manga"))
+										.rating(lResultSet.getInt("rating_manga"))
+										.observations(lResultSet.getString("observations_manga"))
+										.build();
+				
+				Volume lVolume = new VolumeBuilder()
+										.id(lResultSet.getInt("id_volume"))
+										.number(lResultSet.getString("number_volume"))
+										.checklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")))
+										.barcode(lResultSet.getString("barcode_volume"))
+										.isbn(lResultSet.getString("isbn_volume"))
+										.title(lResultSet.getString("title_volume"))
+										.subtitle(lResultSet.getString("subtitle_volume"))
+										.publisher(new Publisher.PublisherBuilder().id(lResultSet.getInt("publisher_volume")).build())
+										.totalPrice(lResultSet.getDouble("total_price_volume"))
+										.paidPrice(lResultSet.getDouble("paid_price_volume"))
+										.currency(Currency.getInstance(lResultSet.getString("currency_volume")))
+										.paper(lResultSet.getString("paper_volume"))
+										.size(lResultSet.getString("size_volume"))
+										.gift(Gift.fromValue(lResultSet.getInt("gift_volume")))
+										.classification(Classification.fromValue(lResultSet.getInt("classification_volume")))
+										.colorPages(lResultSet.getBoolean("color_pages_volume"))
+										.originalPlastic(lResultSet.getBoolean("original_plastic_volume"))
+										.protectionPlastic(lResultSet.getBoolean("protection_plastic_volume"))
+										.plan(lResultSet.getBoolean("plan_volume"))
+										.observations(lResultSet.getString("observations_volume"))
+										.favorite(lResultSet.getBoolean("favorite_volume"))
+										.insertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")))
+										.manga(lManga)
+										.build();
+				lVolume.setPoster(selectImage(lVolume));
 
 				result.add(lVolume);
 			}
@@ -230,48 +237,48 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 			Volume result = null;
 			if (lResultSet.next())
 			{
-				result = new Volume();
-				result.setId(lResultSet.getInt("id_volume"));
-				result.setNumber(lResultSet.getString("number_volume"));
-				result.setChecklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")));
-				result.setBarcode(lResultSet.getString("barcode_volume"));
-				result.setIsbn(lResultSet.getString("isbn_volume"));
-				result.setTitle(lResultSet.getString("title_volume"));
-				result.setSubtitle(lResultSet.getString("subtitle_volume"));
-				result.setPublisher(new Publisher(lResultSet.getInt("publisher_volume")));
-				result.setTotalPrice(lResultSet.getDouble("total_price_volume"));
-				result.setPaidPrice(lResultSet.getDouble("paid_price_volume"));
-				result.setCurrency(Currency.getInstance(lResultSet.getString("currency_volume")));
-				result.setPaper(lResultSet.getString("paper_volume"));
-				result.setSize(lResultSet.getString("size_volume"));
-				result.setGift(Gift.fromValue(lResultSet.getInt("gift_volume")));
-				result.setClassification(Classification.fromValue(lResultSet.getInt("classification_volume")));
-				result.setColorPages(lResultSet.getBoolean("color_pages_volume"));
-				result.setOriginalPlastic(lResultSet.getBoolean("original_plastic_volume"));
-				result.setProtectionPlastic(lResultSet.getBoolean("protection_plastic_volume"));
-				result.setPlan(lResultSet.getBoolean("plan_volume"));
-				result.setObservations(lResultSet.getString("observations_volume"));
-				result.setFavorite(lResultSet.getBoolean("favorite_volume"));
-				result.setInsertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")));
+				Manga lManga = new MangaBuilder()
+									.id(lResultSet.getInt("id_manga"))
+									.nationalName(lResultSet.getString("national_name_manga"))
+									.originalName(lResultSet.getString("original_name_manga"))
+									.type(Type.fromValue(lResultSet.getInt("type_manga")))
+									.serialization(lResultSet.getString("serialization_manga"))
+									.startDate(DateUtils.toDate(lResultSet.getString("start_date_manga")))
+									.finishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")))
+									.authors(lResultSet.getString("authors_manga"))
+									.edition(Edition.fromValue(lResultSet.getInt("edition_manga")))
+									.stamp(lResultSet.getString("stamp_manga"))
+									.genders(lResultSet.getString("genders_manga"))
+									.rating(lResultSet.getInt("rating_manga"))
+									.observations(lResultSet.getString("observations_manga"))
+									.build();
 
-				Manga lManga = new Manga();
-				lManga.setId(lResultSet.getInt("id_manga"));
-				lManga.setNationalName(lResultSet.getString("national_name_manga"));
-				lManga.setOriginalName(lResultSet.getString("original_name_manga"));
-				lManga.setType(Type.fromValue(lResultSet.getInt("type_manga")));
-				lManga.setSerialization(lResultSet.getString("serialization_manga"));
-				lManga.setStartDate(DateUtils.toDate(lResultSet.getString("start_date_manga")));
-				lManga.setFinishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")));
-				lManga.setAuthors(lResultSet.getString("authors_manga"));
-				lManga.setEdition(Edition.fromValue(lResultSet.getInt("edition_manga")));
-				lManga.setStamp(lResultSet.getString("stamp_manga"));
-				lManga.setGenders(lResultSet.getString("genders_manga"));
-				lManga.setRating(lResultSet.getInt("rating_manga"));
-				lManga.setObservations(lResultSet.getString("observations_manga"));
-				lManga.setPoster(ImageDatabase.selectImage(lManga));
-
-				result.setManga(lManga);
-				result.setPoster(ImageDatabase.selectImage(result));
+				result = new VolumeBuilder()
+									.id(lResultSet.getInt("id_volume"))
+									.number(lResultSet.getString("number_volume"))
+									.checklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")))
+									.barcode(lResultSet.getString("barcode_volume"))
+									.isbn(lResultSet.getString("isbn_volume"))
+									.title(lResultSet.getString("title_volume"))
+									.subtitle(lResultSet.getString("subtitle_volume"))
+									.publisher(new Publisher.PublisherBuilder().id(lResultSet.getInt("publisher_volume")).build())
+									.totalPrice(lResultSet.getDouble("total_price_volume"))
+									.paidPrice(lResultSet.getDouble("paid_price_volume"))
+									.currency(Currency.getInstance(lResultSet.getString("currency_volume")))
+									.paper(lResultSet.getString("paper_volume"))
+									.size(lResultSet.getString("size_volume"))
+									.gift(Gift.fromValue(lResultSet.getInt("gift_volume")))
+									.classification(Classification.fromValue(lResultSet.getInt("classification_volume")))
+									.colorPages(lResultSet.getBoolean("color_pages_volume"))
+									.originalPlastic(lResultSet.getBoolean("original_plastic_volume"))
+									.protectionPlastic(lResultSet.getBoolean("protection_plastic_volume"))
+									.plan(lResultSet.getBoolean("plan_volume"))
+									.observations(lResultSet.getString("observations_volume"))
+									.favorite(lResultSet.getBoolean("favorite_volume"))
+									.insertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")))
+									.manga(lManga)
+									.build();
+				result.setPoster(selectImage(result));
 			}
 
 			lResultSet.close();
@@ -296,40 +303,41 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 
 			while (lResultSet.next())
 			{
-				Volume lVolume = new Volume();
-				lVolume.setId(lResultSet.getInt("id_volume"));
-				lVolume.setNumber(lResultSet.getString("number_volume"));
-				lVolume.setChecklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")));
-				lVolume.setBarcode(lResultSet.getString("barcode_volume"));
-				lVolume.setIsbn(lResultSet.getString("isbn_volume"));
-				lVolume.setTitle(lResultSet.getString("title_volume"));
-				lVolume.setSubtitle(lResultSet.getString("subtitle_volume"));
-				lVolume.setTotalPrice(lResultSet.getDouble("total_price_volume"));
-				lVolume.setPaidPrice(lResultSet.getDouble("paid_price_volume"));
-				lVolume.setCurrency(Currency.getInstance(lResultSet.getString("currency_volume")));
-				lVolume.setPaper(lResultSet.getString("paper_volume"));
-				lVolume.setSize(lResultSet.getString("size_volume"));
-				lVolume.setGift(Gift.fromValue(lResultSet.getInt("gift_volume")));
-				lVolume.setClassification(Classification.fromValue(lResultSet.getInt("classification_volume")));
-				lVolume.setColorPages(lResultSet.getBoolean("color_pages_volume"));
-				lVolume.setOriginalPlastic(lResultSet.getBoolean("original_plastic_volume"));
-				lVolume.setProtectionPlastic(lResultSet.getBoolean("protection_plastic_volume"));
-				lVolume.setPlan(lResultSet.getBoolean("plan_volume"));
-				lVolume.setObservations(lResultSet.getString("observations_volume"));
-				lVolume.setManga(manga);
-				lVolume.setPoster(ImageDatabase.selectImage(lVolume));
-				lVolume.setFavorite(lResultSet.getBoolean("favorite_volume"));
-				lVolume.setInsertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")));
-
-				Publisher lPublisher = new Publisher();
-				lPublisher.setId(lResultSet.getInt("id_publisher"));
-				lPublisher.setName(lResultSet.getString("name_publisher"));
-				lPublisher.setSite(lResultSet.getString("site_publisher"));
-				lPublisher.setHistory(lResultSet.getString("history_publisher"));
-				lPublisher.setFavorite(lResultSet.getBoolean("favorite_publisher"));
-				lPublisher.setLogo(ImageDatabase.selectImage(lPublisher));
-
-				lVolume.setPublisher(lPublisher);
+				Publisher lPublisher = new PublisherBuilder()
+											.id(lResultSet.getInt("id_publisher"))
+											.name(lResultSet.getString("name_publisher"))
+											.site(lResultSet.getString("site_publisher"))
+											.history(lResultSet.getString("history_publisher"))
+											.favorite(lResultSet.getBoolean("favorite_publisher"))
+											.build();
+				
+				Volume lVolume = new VolumeBuilder()
+											.id(lResultSet.getInt("id_volume"))
+											.number(lResultSet.getString("number_volume"))
+											.checklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")))
+											.barcode(lResultSet.getString("barcode_volume"))
+											.isbn(lResultSet.getString("isbn_volume"))
+											.title(lResultSet.getString("title_volume"))
+											.subtitle(lResultSet.getString("subtitle_volume"))
+											.publisher(new Publisher.PublisherBuilder().id(lResultSet.getInt("publisher_volume")).build())
+											.totalPrice(lResultSet.getDouble("total_price_volume"))
+											.paidPrice(lResultSet.getDouble("paid_price_volume"))
+											.currency(Currency.getInstance(lResultSet.getString("currency_volume")))
+											.paper(lResultSet.getString("paper_volume"))
+											.size(lResultSet.getString("size_volume"))
+											.gift(Gift.fromValue(lResultSet.getInt("gift_volume")))
+											.classification(Classification.fromValue(lResultSet.getInt("classification_volume")))
+											.colorPages(lResultSet.getBoolean("color_pages_volume"))
+											.originalPlastic(lResultSet.getBoolean("original_plastic_volume"))
+											.protectionPlastic(lResultSet.getBoolean("protection_plastic_volume"))
+											.plan(lResultSet.getBoolean("plan_volume"))
+											.observations(lResultSet.getString("observations_volume"))
+											.favorite(lResultSet.getBoolean("favorite_volume"))
+											.insertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")))
+											.manga(manga)
+											.publisher(lPublisher)
+											.build();
+				lVolume.setPoster(selectImage(lVolume));
 
 				result.add(lVolume);
 			}
@@ -356,49 +364,49 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 
 			while (lResultSet.next())
 			{
-				Volume lVolume = new Volume();
-				lVolume.setId(lResultSet.getInt("id_volume"));
-				lVolume.setNumber(lResultSet.getString("number_volume"));
-				lVolume.setChecklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")));
-				lVolume.setBarcode(lResultSet.getString("barcode_volume"));
-				lVolume.setIsbn(lResultSet.getString("isbn_volume"));
-				lVolume.setTitle(lResultSet.getString("title_volume"));
-				lVolume.setSubtitle(lResultSet.getString("subtitle_volume"));
-				lVolume.setPublisher(new Publisher(lResultSet.getInt("publisher_volume")));
-				lVolume.setTotalPrice(lResultSet.getDouble("total_price_volume"));
-				lVolume.setPaidPrice(lResultSet.getDouble("paid_price_volume"));
-				lVolume.setCurrency(Currency.getInstance(lResultSet.getString("currency_volume")));
-				lVolume.setPaper(lResultSet.getString("paper_volume"));
-				lVolume.setSize(lResultSet.getString("size_volume"));
-				lVolume.setGift(Gift.fromValue(lResultSet.getInt("gift_volume")));
-				lVolume.setClassification(Classification.fromValue(lResultSet.getInt("classification_volume")));
-				lVolume.setColorPages(lResultSet.getBoolean("color_pages_volume"));
-				lVolume.setOriginalPlastic(lResultSet.getBoolean("original_plastic_volume"));
-				lVolume.setProtectionPlastic(lResultSet.getBoolean("protection_plastic_volume"));
-				lVolume.setPlan(lResultSet.getBoolean("plan_volume"));
-				lVolume.setObservations(lResultSet.getString("observations_volume"));
-				lVolume.setPublisher(publisher);
-				lVolume.setPoster(ImageDatabase.selectImage(lVolume));
-				lVolume.setFavorite(lResultSet.getBoolean("favorite_volume"));
-				lVolume.setInsertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")));
+				Manga lManga = new MangaBuilder()
+									.id(lResultSet.getInt("id_manga"))
+									.nationalName(lResultSet.getString("national_name_manga"))
+									.originalName(lResultSet.getString("original_name_manga"))
+									.type(Type.fromValue(lResultSet.getInt("type_manga")))
+									.serialization(lResultSet.getString("serialization_manga"))
+									.startDate(DateUtils.toDate(lResultSet.getString("start_date_manga")))
+									.finishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")))
+									.authors(lResultSet.getString("authors_manga"))
+									.edition(Edition.fromValue(lResultSet.getInt("edition_manga")))
+									.stamp(lResultSet.getString("stamp_manga"))
+									.genders(lResultSet.getString("genders_manga"))
+									.rating(lResultSet.getInt("rating_manga"))
+									.observations(lResultSet.getString("observations_manga"))
+									.build();
 
-				Manga lManga = new Manga();
-				lManga.setId(lResultSet.getInt("id_manga"));
-				lManga.setNationalName(lResultSet.getString("national_name_manga"));
-				lManga.setOriginalName(lResultSet.getString("original_name_manga"));
-				lManga.setType(Type.fromValue(lResultSet.getInt("type_manga")));
-				lManga.setSerialization(lResultSet.getString("serialization_manga"));
-				lManga.setStartDate(DateUtils.toDate(lResultSet.getString("start_date_manga")));
-				lManga.setFinishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")));
-				lManga.setAuthors(lResultSet.getString("authors_manga"));
-				lManga.setEdition(Edition.fromValue(lResultSet.getInt("edition_manga")));
-				lManga.setStamp(lResultSet.getString("stamp_manga"));
-				lManga.setGenders(lResultSet.getString("genders_manga"));
-				lManga.setRating(lResultSet.getInt("rating_manga"));
-				lManga.setObservations(lResultSet.getString("observations_manga"));
-				lManga.setPoster(ImageDatabase.selectImage(lManga));
-
-				lVolume.setManga(lManga);
+				Volume lVolume = new VolumeBuilder()
+									.id(lResultSet.getInt("id_volume"))
+									.number(lResultSet.getString("number_volume"))
+									.checklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")))
+									.barcode(lResultSet.getString("barcode_volume"))
+									.isbn(lResultSet.getString("isbn_volume"))
+									.title(lResultSet.getString("title_volume"))
+									.subtitle(lResultSet.getString("subtitle_volume"))
+									.publisher(new Publisher.PublisherBuilder().id(lResultSet.getInt("publisher_volume")).build())
+									.totalPrice(lResultSet.getDouble("total_price_volume"))
+									.paidPrice(lResultSet.getDouble("paid_price_volume"))
+									.currency(Currency.getInstance(lResultSet.getString("currency_volume")))
+									.paper(lResultSet.getString("paper_volume"))
+									.size(lResultSet.getString("size_volume"))
+									.gift(Gift.fromValue(lResultSet.getInt("gift_volume")))
+									.classification(Classification.fromValue(lResultSet.getInt("classification_volume")))
+									.colorPages(lResultSet.getBoolean("color_pages_volume"))
+									.originalPlastic(lResultSet.getBoolean("original_plastic_volume"))
+									.protectionPlastic(lResultSet.getBoolean("protection_plastic_volume"))
+									.plan(lResultSet.getBoolean("plan_volume"))
+									.observations(lResultSet.getString("observations_volume"))
+									.favorite(lResultSet.getBoolean("favorite_volume"))
+									.insertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")))
+									.manga(lManga)
+									.publisher(publisher)
+									.build();
+				lVolume.setPoster(selectImage(lVolume));
 
 				result.add(lVolume);
 			}
@@ -422,46 +430,47 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 			Statement lStatement = connection.createStatement();
 			ResultSet lResultSet = lStatement.executeQuery(SQL_SELECT_LAST_INSERTED);
 
+			@SuppressWarnings("resource")
 			MangaDAO lMangaDAO = new MangaDAO(connection);
 
 			while (lResultSet.next())
 			{
-				Volume lVolume = new Volume();
-				lVolume.setId(lResultSet.getInt("id_volume"));
-				lVolume.setNumber(lResultSet.getString("number_volume"));
-				lVolume.setChecklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")));
-				lVolume.setBarcode(lResultSet.getString("barcode_volume"));
-				lVolume.setIsbn(lResultSet.getString("isbn_volume"));
-				lVolume.setTitle(lResultSet.getString("title_volume"));
-				lVolume.setSubtitle(lResultSet.getString("subtitle_volume"));
-				lVolume.setPublisher(new Publisher(lResultSet.getInt("publisher_volume")));
-				lVolume.setTotalPrice(lResultSet.getDouble("total_price_volume"));
-				lVolume.setPaidPrice(lResultSet.getDouble("paid_price_volume"));
-				lVolume.setCurrency(Currency.getInstance(lResultSet.getString("currency_volume")));
-				lVolume.setPaper(lResultSet.getString("paper_volume"));
-				lVolume.setSize(lResultSet.getString("size_volume"));
-				lVolume.setGift(Gift.fromValue(lResultSet.getInt("gift_volume")));
-				lVolume.setClassification(Classification.fromValue(lResultSet.getInt("classification_volume")));
-				lVolume.setColorPages(lResultSet.getBoolean("color_pages_volume"));
-				lVolume.setOriginalPlastic(lResultSet.getBoolean("original_plastic_volume"));
-				lVolume.setProtectionPlastic(lResultSet.getBoolean("protection_plastic_volume"));
-				lVolume.setPlan(lResultSet.getBoolean("plan_volume"));
-				lVolume.setObservations(lResultSet.getString("observations_volume"));
-				lVolume.setFavorite(lResultSet.getBoolean("favorite_volume"));
-				lVolume.setInsertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")));
-
-				lVolume.setManga(lMangaDAO.select(lResultSet.getInt("manga_volume")));
-				lVolume.setPoster(ImageDatabase.selectImage(lVolume));
-
-				Publisher lPublisher = new Publisher();
-				lPublisher.setId(lResultSet.getInt("id_publisher"));
-				lPublisher.setName(lResultSet.getString("name_publisher"));
-				lPublisher.setSite(lResultSet.getString("site_publisher"));
-				lPublisher.setHistory(lResultSet.getString("history_publisher"));
-				lPublisher.setFavorite(lResultSet.getBoolean("favorite_publisher"));
+				Publisher lPublisher = new PublisherBuilder()
+										.id(lResultSet.getInt("id_publisher"))
+										.name(lResultSet.getString("name_publisher"))
+										.site(lResultSet.getString("site_publisher"))
+										.history(lResultSet.getString("history_publisher"))
+										.favorite(lResultSet.getBoolean("favorite_publisher"))
+										.build();
 				lPublisher.setLogo(ImageDatabase.selectImage(lPublisher));
-
-				lVolume.setPublisher(lPublisher);
+				
+				Volume lVolume = new VolumeBuilder()
+										.id(lResultSet.getInt("id_volume"))
+										.number(lResultSet.getString("number_volume"))
+										.checklistDate(DateUtils.toDate(lResultSet.getString("checklist_date_volume")))
+										.barcode(lResultSet.getString("barcode_volume"))
+										.isbn(lResultSet.getString("isbn_volume"))
+										.title(lResultSet.getString("title_volume"))
+										.subtitle(lResultSet.getString("subtitle_volume"))
+										.publisher(new Publisher.PublisherBuilder().id(lResultSet.getInt("publisher_volume")).build())
+										.totalPrice(lResultSet.getDouble("total_price_volume"))
+										.paidPrice(lResultSet.getDouble("paid_price_volume"))
+										.currency(Currency.getInstance(lResultSet.getString("currency_volume")))
+										.paper(lResultSet.getString("paper_volume"))
+										.size(lResultSet.getString("size_volume"))
+										.gift(Gift.fromValue(lResultSet.getInt("gift_volume")))
+										.classification(Classification.fromValue(lResultSet.getInt("classification_volume")))
+										.colorPages(lResultSet.getBoolean("color_pages_volume"))
+										.originalPlastic(lResultSet.getBoolean("original_plastic_volume"))
+										.protectionPlastic(lResultSet.getBoolean("protection_plastic_volume"))
+										.plan(lResultSet.getBoolean("plan_volume"))
+										.observations(lResultSet.getString("observations_volume"))
+										.favorite(lResultSet.getBoolean("favorite_volume"))
+										.insertDate(DateUtils.toDate(lResultSet.getString("date_add_volume")))
+										.manga(lMangaDAO.select(lResultSet.getInt("manga_volume")))
+										.publisher(lPublisher)
+										.build();
+				lVolume.setPoster(ImageDatabase.selectImage(lVolume));
 
 				result.add(lVolume);
 			}
@@ -482,6 +491,38 @@ public class VolumeDAO implements DatabaseMethods<Volume>, AutoCloseable
 	{
 		connection.commit();
 		connection.close();
+	}
+
+	@Override
+	public void insertImage(Volume object) throws IOException
+	{
+		File f = new File(String.format(getImageFileLocation(), object.getId()));
+		if (!f.getParentFile().exists())
+			f.getParentFile().mkdirs();
+		if (!f.toString().equals(object.getPoster().toString()))
+			FileUtils.copyFile(object.getPoster(), f);
+	}
+
+	@Override
+	public File selectImage(Volume object)
+	{
+		File result = new File(String.format(getImageFileLocation(), object.getId()));
+
+		return result.exists() ? result : null;
+	}
+
+	@Override
+	public void removeImage(Volume object)
+	{
+		File result = new File(String.format(getImageFileLocation(), object.getId()));
+		if (result.exists())
+			result.delete();		
+	}
+
+	@Override
+	public String getImageFileLocation()
+	{
+		return DEFAULT_FOLDER + File.separator + "volumes" + File.separator + "%d.png";
 	}
 
 }

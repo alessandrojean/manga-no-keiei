@@ -37,14 +37,17 @@ import locale.MessageSource;
 import model.Classification;
 import model.Gift;
 import model.Manga;
+import model.Manga.MangaBuilder;
 import model.Publisher;
 import model.Volume;
+import model.Volume.VolumeBuilder;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
 import utils.DateUtils;
 import utils.FormUtils;
 import database.dao.PublisherDAO;
 
+@SuppressWarnings("serial")
 public class VolumeDialog extends Dialog<Volume>
 {
 
@@ -90,7 +93,7 @@ public class VolumeDialog extends Dialog<Volume>
 			{
 				try
 				{
-					VolumeDialog frame = new VolumeDialog(new Manga(1, "Slam Dunk"));
+					VolumeDialog frame = new VolumeDialog(new MangaBuilder().id(1).nationalName("Slam Dunk").build());
 					frame.setVisible(true);
 				}
 				catch (Exception e)
@@ -275,21 +278,13 @@ public class VolumeDialog extends Dialog<Volume>
 			{
 				if (!tfVolume.getText().equals(""))
 				{
-					Volume v = null;
-					if (result != null)
-						v = result;
-					else
-					{
-						v = new Volume();
-						v.setManga(manga);
-						v.setNumber(tfVolume.getText());
-					}
+					Volume v = result!=null ?
+							   result :
+							   new VolumeBuilder().manga(manga).number(tfVolume.getText()).build();
 
 					MangaCoverDatabaseDialog lMangaCoverDatabaseSearchDialog = new MangaCoverDatabaseDialog(VolumeDialog.this, v);
 					if (lMangaCoverDatabaseSearchDialog.showDialog() == MangaCoverDatabaseDialog.APPROVE_OPTION)
-					{
 						imgPoster.setImage(lMangaCoverDatabaseSearchDialog.getResult().getNormalFile());
-					}
 				}
 				else
 					tfVolume.requestFocus();
@@ -424,7 +419,28 @@ public class VolumeDialog extends Dialog<Volume>
 	@Override
 	protected Volume generateResult()
 	{
-		Volume result = new Volume();
+		Volume result = new VolumeBuilder()
+							.number(tfVolume.getText())
+							.checklistDate(DateUtils.toDate(tfChecklistDate.getText()))
+							.barcode(tfBarcode.getText())
+							.isbn(String.valueOf(tfISBN.getValue()==null ? "" : tfISBN.getValue()))
+							.title(tfTitle.getText())
+							.subtitle(tfSubtitle.getText())
+							.publisher((Publisher) cbPublisher.getSelectedItem())
+							.currency((Currency) cbCurrency.getSelectedItem())
+							.totalPrice(Double.parseDouble(tfTotalPrice.getText().replace(",", ".")))
+							.paidPrice(Double.parseDouble(tfPaidPrice.getText().replace(",", ".")))
+							.paper(tfPaper.getText())
+							.size(tfSize.getText())
+							.gift((Gift) cbGift.getSelectedItem())
+							.classification((Classification) cbClassification.getSelectedItem())
+							.colorPages(chbColorPages.isSelected())
+							.originalPlastic(chbOriginalPlastic.isSelected())
+							.protectionPlastic(chbProtectionPlastic.isSelected())
+							.plan(chbPlan.isSelected())
+							.observations(taObservations.getText())
+							.poster(imgPoster.getImage())
+							.build();
 		if (this.result != null)
 		{
 			result.setId(this.result.getId());
@@ -432,26 +448,6 @@ public class VolumeDialog extends Dialog<Volume>
 		}
 		else
 			result.setManga(manga);
-		result.setNumber(tfVolume.getText());
-		result.setChecklistDate(DateUtils.toDate(tfChecklistDate.getText()));
-		result.setBarcode(tfBarcode.getText());
-		result.setIsbn(String.valueOf(tfISBN.getValue()==null ? "" : tfISBN.getValue()));
-		result.setTitle(tfTitle.getText());
-		result.setSubtitle(tfSubtitle.getText());
-		result.setPublisher((Publisher) cbPublisher.getSelectedItem());
-		result.setCurrency((Currency) cbCurrency.getSelectedItem());
-		result.setTotalPrice(Double.parseDouble(tfTotalPrice.getText().replace(",", ".")));
-		result.setPaidPrice(Double.parseDouble(tfPaidPrice.getText().replace(",", ".")));
-		result.setPaper(tfPaper.getText());
-		result.setSize(tfSize.getText());
-		result.setGift((Gift) cbGift.getSelectedItem());
-		result.setClassification((Classification) cbClassification.getSelectedItem());
-		result.setColorPages(chbColorPages.isSelected());
-		result.setOriginalPlastic(chbOriginalPlastic.isSelected());
-		result.setProtectionPlastic(chbProtectionPlastic.isSelected());
-		result.setPlan(chbPlan.isSelected());
-		result.setObservations(taObservations.getText());
-		result.setPoster(imgPoster.getImage());
 
 		return result;
 	}

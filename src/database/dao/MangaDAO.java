@@ -1,5 +1,7 @@
 package database.dao;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,9 +10,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Manga;
 import model.Edition;
+import model.Manga;
+import model.Manga.MangaBuilder;
 import model.Type;
+
+import org.apache.commons.io.FileUtils;
+
 import utils.DateUtils;
 import database.DatabaseMethods;
 import database.ImageDatabase;
@@ -32,7 +38,7 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 	}
 
 	@Override
-	public boolean insert(Manga object) throws SQLException
+	public boolean insert(Manga object) throws SQLException, IOException
 	{
 		try
 		{
@@ -56,7 +62,7 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 				if (generatedKeys.next())
 				{
 					object.setId(generatedKeys.getInt(1));
-					ImageDatabase.insertImage(object);
+					insertImage(object);
 					return true;
 				}
 				else
@@ -71,7 +77,7 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 	}
 
 	@Override
-	public boolean update(Manga object) throws SQLException
+	public boolean update(Manga object) throws SQLException, IOException
 	{
 		try
 		{
@@ -91,10 +97,10 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 			lPreparedStatement.setInt(13, object.getId());
 			int i = lPreparedStatement.executeUpdate();
 
-			if(i>0)
-				ImageDatabase.insertImage(object);
-			
-			return i>0;
+			if (i > 0)
+				insertImage(object);
+
+			return i > 0;
 		}
 		catch (SQLException e)
 		{
@@ -110,11 +116,11 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 			PreparedStatement lPreparedStatement = connection.prepareStatement(SQL_REMOVE);
 			lPreparedStatement.setInt(1, object.getId());
 			int i = lPreparedStatement.executeUpdate();
-			
-			if(i>0)
+
+			if (i > 0)
 				ImageDatabase.removeImage(object);
 
-			return i>0;
+			return i > 0;
 		}
 		catch (SQLException e)
 		{
@@ -130,39 +136,41 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 		{
 			Statement lStatement = connection.createStatement();
 			ResultSet lResultSet = lStatement.executeQuery(SQL_SELECT_ALL);
-			
+
+			@SuppressWarnings("resource")
 			VolumeDAO lVolumeDAO = new VolumeDAO(connection);
-			
+
 			while (lResultSet.next())
 			{
-				Manga lManga = new Manga();
-				lManga.setId(lResultSet.getInt("id_manga"));
-				lManga.setNationalName(lResultSet.getString("national_name_manga"));
-				lManga.setOriginalName(lResultSet.getString("original_name_manga"));
-				lManga.setType(Type.fromValue(lResultSet.getInt("type_manga")));
-				lManga.setSerialization(lResultSet.getString("serialization_manga"));
-				lManga.setStartDate(DateUtils.toDate(lResultSet.getString("start_date_manga")));
-				lManga.setFinishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")));
-				lManga.setAuthors(lResultSet.getString("authors_manga"));
-				lManga.setEdition(Edition.fromValue(lResultSet.getInt("edition_manga")));
-				lManga.setStamp(lResultSet.getString("stamp_manga"));
-				lManga.setGenders(lResultSet.getString("genders_manga"));
-				lManga.setRating(lResultSet.getInt("rating_manga"));
-				lManga.setObservations(lResultSet.getString("observations_manga"));
-				lManga.setPoster(ImageDatabase.selectImage(lManga));
+				Manga lManga = new MangaBuilder()
+								.id(lResultSet.getInt("id_manga"))
+								.nationalName(lResultSet.getString("national_name_manga"))
+								.originalName(lResultSet.getString("original_name_manga"))
+								.type(Type.fromValue(lResultSet.getInt("type_manga")))
+								.serialization(lResultSet.getString("serialization_manga"))
+								.startDate(DateUtils.toDate(lResultSet.getString("start_date_manga")))
+								.finishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")))
+								.authors(lResultSet.getString("authors_manga"))
+								.edition(Edition.fromValue(lResultSet.getInt("edition_manga")))
+								.stamp(lResultSet.getString("stamp_manga"))
+								.genders(lResultSet.getString("genders_manga"))
+								.rating(lResultSet.getInt("rating_manga"))
+								.observations(lResultSet.getString("observations_manga"))
+								.build();
+				lManga.setPoster(selectImage(lManga));
 				lManga.setVolumes(lVolumeDAO.select(lManga));
-				
+
 				result.add(lManga);
 			}
 
 			lResultSet.close();
-			lStatement.close();		
+			lStatement.close();
 		}
 		catch (SQLException e)
 		{
 			throw e;
 		}
-		
+
 		return result;
 	}
 
@@ -174,33 +182,35 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 			PreparedStatement lPreparedStatement = connection.prepareStatement(SQL_SELECT_BY_ID);
 			lPreparedStatement.setInt(1, id);
 			ResultSet lResultSet = lPreparedStatement.executeQuery();
-			
+
+			@SuppressWarnings("resource")
 			VolumeDAO lVolumeDAO = new VolumeDAO(connection);
-			
+
 			Manga result = null;
 			if (lResultSet.next())
 			{
-				result = new Manga();
-				result.setId(lResultSet.getInt("id_manga"));
-				result.setNationalName(lResultSet.getString("national_name_manga"));
-				result.setOriginalName(lResultSet.getString("original_name_manga"));
-				result.setType(Type.fromValue(lResultSet.getInt("type_manga")));
-				result.setSerialization(lResultSet.getString("serialization_manga"));
-				result.setStartDate(DateUtils.toDate(lResultSet.getString("start_date_manga")));
-				result.setFinishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")));
-				result.setAuthors(lResultSet.getString("authors_manga"));
-				result.setEdition(Edition.fromValue(lResultSet.getInt("edition_manga")));
-				result.setStamp(lResultSet.getString("stamp_manga"));
-				result.setGenders(lResultSet.getString("genders_manga"));
-				result.setRating(lResultSet.getInt("rating_manga"));
-				result.setObservations(lResultSet.getString("observations_manga"));
-				result.setPoster(ImageDatabase.selectImage(result));
+				result = new MangaBuilder()
+									.id(lResultSet.getInt("id_manga"))
+									.nationalName(lResultSet.getString("national_name_manga"))
+									.originalName(lResultSet.getString("original_name_manga"))
+									.type(Type.fromValue(lResultSet.getInt("type_manga")))
+									.serialization(lResultSet.getString("serialization_manga"))
+									.startDate(DateUtils.toDate(lResultSet.getString("start_date_manga")))
+									.finishDate(DateUtils.toDate(lResultSet.getString("finish_date_manga")))
+									.authors(lResultSet.getString("authors_manga"))
+									.edition(Edition.fromValue(lResultSet.getInt("edition_manga")))
+									.stamp(lResultSet.getString("stamp_manga"))
+									.genders(lResultSet.getString("genders_manga"))
+									.rating(lResultSet.getInt("rating_manga"))
+									.observations(lResultSet.getString("observations_manga"))
+									.build();
+				result.setPoster(selectImage(result));
 				result.setVolumes(lVolumeDAO.select(result));
 			}
 
 			lResultSet.close();
 			lPreparedStatement.close();
-			
+
 			return result;
 		}
 		catch (SQLException e)
@@ -214,6 +224,38 @@ public class MangaDAO implements DatabaseMethods<Manga>, AutoCloseable
 	{
 		connection.commit();
 		connection.close();
+	}
+
+	@Override
+	public void insertImage(Manga object) throws IOException
+	{
+		File f = new File(String.format(getImageFileLocation(), object.getId()));
+		if (!f.getParentFile().exists())
+			f.getParentFile().mkdirs();
+		if (!f.toString().equals(object.getPoster().toString()))
+			FileUtils.copyFile(object.getPoster(), f);
+	}
+
+	@Override
+	public File selectImage(Manga object)
+	{
+		File result = new File(String.format(getImageFileLocation(), object.getId()));
+
+		return result.exists() ? result : null;
+	}
+
+	@Override
+	public void removeImage(Manga object)
+	{
+		File result = new File(String.format(getImageFileLocation(), object.getId()));
+		if (result.exists())
+			result.delete();
+	}
+
+	@Override
+	public String getImageFileLocation()
+	{
+		return DEFAULT_FOLDER + File.separator + "mangas" + File.separator + "%d.png";
 	}
 
 }

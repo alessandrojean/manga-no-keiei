@@ -24,9 +24,11 @@ import javax.swing.border.EmptyBorder;
 
 import locale.MessageSource;
 import model.Publisher;
+import model.Publisher.PublisherBuilder;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
 
+@SuppressWarnings("serial")
 public class PublisherDialog extends Dialog<Publisher>
 {
 
@@ -186,14 +188,15 @@ public class PublisherDialog extends Dialog<Publisher>
 	@Override
 	protected Publisher generateResult()
 	{
-		Publisher result = new Publisher();
+		Publisher result = new PublisherBuilder()
+								.name(tfName.getText())
+								.site(tfSite.getText())
+								.history(taHistory.getText())
+								.favorite(false)
+								.logo(imgLogo.getImage())
+								.build();
 		if (this.result != null)
 			result.setId(this.result.getId());
-		result.setName(tfName.getText());
-		result.setSite(tfSite.getText());
-		result.setHistory(taHistory.getText());
-		result.setFavorite(false);
-		result.setLogo(imgLogo.getImage());
 
 		return result;
 	}

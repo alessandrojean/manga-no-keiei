@@ -84,7 +84,9 @@ public class RoundedTitleBorder extends RoundedBorder
 	public Insets getBorderInsets(Component c, Insets insets)
 	{
 		Insets borderInsets = super.getBorderInsets(c, insets);
-		borderInsets.top = getTitleHeight(c);
+		borderInsets.top = getTitleHeight(c)+2;
+		borderInsets.bottom = 2;
+		borderInsets.left = borderInsets.right = 5;
 		return borderInsets;
 	}
 

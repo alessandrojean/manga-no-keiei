@@ -25,10 +25,11 @@ import javax.swing.UIManager;
 import locale.MessageSource;
 import net.miginfocom.swing.MigLayout;
 import utils.ExceptionUtils;
-import api.mal.MyAnimeList;
+import api.mal.MALApi;
 import api.mal.model.Item;
 import api.mal.model.Search;
 
+@SuppressWarnings("serial")
 public class MyAnimeListDialog extends Dialog<Item>
 {
 	private JTextField textField;
@@ -140,7 +141,8 @@ public class MyAnimeListDialog extends Dialog<Item>
 				Search result = null;
 				try
 				{
-					result = MyAnimeList.search(textField.getText());
+					MALApi lMalApi = new MALApi();
+					result = lMalApi.searchManga(textField.getText());
 				}
 				catch (IOException e)
 				{
@@ -222,7 +224,8 @@ public class MyAnimeListDialog extends Dialog<Item>
 
 				try
 				{
-					MyAnimeList.fillInformation(result);
+					MALApi lMalApi = new MALApi();
+					lMalApi.fillMangaInformation(result);
 				}
 				catch (IOException e)
 				{

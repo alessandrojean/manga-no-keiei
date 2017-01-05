@@ -33,10 +33,10 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import locale.MessageSource;
+import model.Edition;
 import model.Gender;
 import model.Manga;
-import model.Edition;
-import model.Type;
+import model.Manga.MangaBuilder;
 import net.miginfocom.swing.MigLayout;
 import utils.BorderUtils;
 import utils.ComboBoxUtils;
@@ -45,6 +45,7 @@ import utils.FormUtils;
 import utils.ImageUtils;
 import api.mal.model.Item;
 
+@SuppressWarnings("serial")
 public class MangaDialog extends Dialog<Manga>
 {
 
@@ -338,34 +339,33 @@ public class MangaDialog extends Dialog<Manga>
 	@Override
 	protected Manga generateResult()
 	{
-		Manga result = new Manga();
-		if (this.result != null)
-		{
-			result.setId(this.result.getId());
-			result.setVolumes(this.result.getVolumes());
-		}
-		result.setNationalName(tfNationalName.getText());
-		result.setOriginalName(tfOriginalName.getText());
-		result.setType((model.Type) cbType.getSelectedItem());
-		result.setSerialization(tfSerialization.getText());
-		result.setStartDate(DateUtils.toDate(tfStartDate.getText()));
-		result.setFinishDate(DateUtils.toDate(tfFinishDate.getText()));
-		result.setAuthors(tfAuthors.getText());
-		result.setEdition((Edition) cbEdition.getSelectedItem());
-		result.setStamp(tfStamp.getText());
-
 		List<Gender> genders = new ArrayList<Gender>();
 		for (int i = 0; i < cbGenders.getModel().getSize(); i++)
 			if (cbGenders.getItemAt(i).isSelected())
 				for (Gender g : Gender.values())
 					if (g.toString().equals(cbGenders.getItemAt(i).getText()))
 						genders.add(g);
-
-		result.setGenders(genders);
-		result.setRating(lbsRating.getLevel());
-		result.setObservations(taObservations.getText());
-		result.setPoster(imgPoster.getImage());
-
+		
+		Manga result = new MangaBuilder()
+							.nationalName(tfNationalName.getText())
+							.originalName(tfOriginalName.getText())
+							.type((model.Type) cbType.getSelectedItem())
+							.serialization(tfSerialization.getText())
+							.startDate(DateUtils.toDate(tfStartDate.getText()))
+							.finishDate(DateUtils.toDate(tfFinishDate.getText()))
+							.authors(tfAuthors.getText())
+							.edition((Edition) cbEdition.getSelectedItem())
+							.stamp(tfStamp.getText())
+							.genders(genders)
+							.rating(lbsRating.getLevel())
+							.observations(taObservations.getText())
+							.poster(imgPoster.getImage())
+							.build();
+		if (this.result != null)
+		{
+			result.setId(this.result.getId());
+			result.setVolumes(this.result.getVolumes());
+		}
 		return result;
 	}
 

@@ -28,7 +28,7 @@ public class RequestUtils
 
 	private static OkHttpClient getClient()
 	{
-		return new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build();
+		return new OkHttpClient.Builder().connectTimeout(60, TimeUnit.SECONDS).writeTimeout(60, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).build();
 	}
 
 	private static String addParametersToUrl(String url, HashMap<String, String> parameters)

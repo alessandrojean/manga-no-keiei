@@ -5,46 +5,43 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import javax.imageio.ImageIO;
 
 import model.Gender;
+import okhttp3.ResponseBody;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import utils.RequestUtils;
+import retrofit2.Response;
 import utils.UrlUtils;
+import api.APIHelper;
 import api.mal.model.Item;
 import api.mal.model.Search;
 
-import com.google.gson.Gson;
-
-import database.ImageDatabase;
-
-public class MyAnimeList
+public class MALApi
 {
-
-	private static final String SEARCH_URL = "https://myanimelist.net/search/prefix.json";
-
+	private static final String API_HOST = "https://myanimelist.net/";
 	private static final String FILE_MYANIMELIST = System.getProperty("java.io.tmpdir") + File.separator + "manga-no-keiei" + File.separator + "myanimelist" + File.separator + "%d.png";
 
-	public static Search search(String keyword) throws IOException
+	private MALService service;
+
+	public MALApi()
 	{
-		HashMap<String, String> parameters = new HashMap<String, String>();
-		parameters.put("type", "manga");
-		parameters.put("keyword", keyword);
-		parameters.put("v", "1");
+		service = APIHelper.createClient(API_HOST, MALService.class);
+	}
 
-		String json = RequestUtils.get(SEARCH_URL, parameters);
+	public Search searchManga(String keyword) throws IOException
+	{
+		Response<Search> response = service.search("manga", keyword, 1).execute();
 
-		Search response = new Gson().fromJson(json, Search.class);
-		for (Item i : response.getCategories().get(0).getItems())
+		Search body = response.body();
+		for (Item i : body.getCategories().get(0).getItems())
 		{
 			File image = selectImage(i);
 			if (image == null)
@@ -53,12 +50,14 @@ public class MyAnimeList
 				i.setImageFile(image);
 		}
 
-		return response;
+		return body;
 	}
 
-	public static void fillInformation(Item manga) throws IOException
+	public void fillMangaInformation(Item manga) throws IOException
 	{
-		String html = RequestUtils.get(manga.getUrl().toString());
+		Response<ResponseBody> response = service.getMangaInformation(manga.getId()).execute();
+
+		String html = response.body().string();
 
 		Document lDocument = Jsoup.parse(html);
 
@@ -113,10 +112,9 @@ public class MyAnimeList
 				}
 			}
 		}
-
 	}
 
-	private static void insertImage(Item object) throws IOException
+	private void insertImage(Item object) throws IOException
 	{
 		File f = new File(String.format(FILE_MYANIMELIST, object.getId()));
 		if (!f.getParentFile().exists())
@@ -124,8 +122,9 @@ public class MyAnimeList
 
 		if (!f.exists())
 		{
-			InputStream lInputStream = RequestUtils.getInputStream(object.getImageUrl().toString());
+			Response<ResponseBody> response = service.downloadImage(object.getImageUrl().toString()).execute();
 
+			InputStream lInputStream = response.body().byteStream();
 			object.setImage(ImageIO.read(lInputStream));
 			ImageIO.write(object.getImage(), "png", f);
 		}
@@ -134,8 +133,9 @@ public class MyAnimeList
 			Image i = ImageIO.read(f);
 			if (i.getWidth(null) <= 116 && i.getHeight(null) <= 180)
 			{
-				InputStream lInputStream = RequestUtils.getInputStream(object.getImageUrl().toString());
+				Response<ResponseBody> response = service.downloadImage(object.getImageUrl().toString()).execute();
 
+				InputStream lInputStream = response.body().byteStream();
 				object.setImage(ImageIO.read(lInputStream));
 				ImageIO.write(object.getImage(), "png", f);
 			}
@@ -143,7 +143,7 @@ public class MyAnimeList
 		object.setImageFile(f);
 	}
 
-	private static File selectImage(Item object)
+	private File selectImage(Item object)
 	{
 		File result = new File(String.format(FILE_MYANIMELIST, object.getId()));
 

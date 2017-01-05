@@ -36,11 +36,12 @@ import com.bulenkov.darcula.DarculaLaf;
 
 import database.Database;
 
+@SuppressWarnings("serial")
 public class Splash extends JFrame
 {
 
 	public static final String PROJECT_NAME = "Manga no Keiei";
-	public static final String PROJECT_VERSION = "v1.5";
+	public static final String PROJECT_VERSION = "v1.6";
 	public static final int DATABASE_VERSION = 1;
 	
 	public static Database DATABASE;
@@ -124,6 +125,7 @@ public class Splash extends JFrame
 		//startProcedures();
 	}
 	
+	@SuppressWarnings("unused")
 	private void startProcedures()
 	{
 		SwingWorker<Void, String> lSwingWorker = new SwingWorker<Void, String>(){

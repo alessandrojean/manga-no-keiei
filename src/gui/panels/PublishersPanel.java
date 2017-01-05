@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import model.Publisher;
 import utils.ExceptionUtils;
 import database.dao.PublisherDAO;
 
+@SuppressWarnings("serial")
 public class PublishersPanel extends JPanel
 {
 
@@ -160,7 +162,7 @@ public class PublishersPanel extends JPanel
 					JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.insert"), MessageSource.getInstance().getString("Basics.thisPublisher") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 
 			}
-			catch (SQLException e)
+			catch (SQLException | IOException e)
 			{
 				ExceptionUtils.showExceptionDialog(null, e);
 			}
@@ -204,7 +206,7 @@ public class PublishersPanel extends JPanel
 								JOptionPane.showMessageDialog(null, MessageSource.getInstance().getString("Basics.databaseError", new Object[] { MessageSource.getInstance().getString("Basics.update"), MessageSource.getInstance().getString("Basics.thisPublisher") }), MessageSource.getInstance().getString("Basics.error"), JOptionPane.ERROR_MESSAGE);
 							lPublisherCard.setPublisher(lPublisherDialog.getResult());
 						}
-						catch (SQLException e)
+						catch (SQLException | IOException e)
 						{
 							ExceptionUtils.showExceptionDialog(null, e);
 						}
